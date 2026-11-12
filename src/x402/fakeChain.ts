@@ -1,5 +1,5 @@
 import { ERC20_IFACE, JAR_IFACE, type ChainReader } from "./server";
-import type { ExactPayload } from "./types";
+import type { ExactPayload, PaymentRequirement } from "./types";
 
 /** In-memory chain for tests and the offline demo. Never used against Fuji. */
 export class FakeChain implements ChainReader {
@@ -13,7 +13,7 @@ export class FakeChain implements ChainReader {
   async isJar(addr: string) {
     return this.jars.has(addr.toLowerCase());
   }
-  async settleExact(p: ExactPayload) {
+  async settleExact(p: ExactPayload, _req?: PaymentRequirement) {
     this.settled.push(p);
     return "0x" + (this.settled.length).toString(16).padStart(64, "0");
   }

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lotus — evidence jar</title>
+<style>
+  :root {
+    --paper: #f6f1e8; --card: #fffdf8; --ink: #1d2721; --muted: #6f756e; --line: #e6ded0;
+    --lotus: #d0467c; --lotus-soft: #fbe3ec; --leaf: #2e6a4e; --leaf-soft: #e1efe6;
+    --amber: #b7791f; --amber-soft: #fbefd9; --red: #b4232c; --red-soft: #fbe2e2; --grey-soft: #eeebe4;
+    --serif: ui-serif, "Iowan Old Style", Georgia, serif; --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.5 var(--sans); }
+  a { color: var(--leaf); }
+  header { display: flex; align-items: center; gap: 16px; padding: 20px 32px; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand h1 { margin: 0; font: 600 26px/1 var(--serif); letter-spacing: .2px; }
+  .brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .badges { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge { font: 12px var(--mono); padding: 4px 10px; border-radius: 999px; background: var(--grey-soft); color: var(--muted); }
+  .badge.ok { background: var(--leaf-soft); color: var(--leaf); }
+  .badge.warn { background: var(--amber-soft); color: var(--amber); }
+  main { display: grid; grid-template-columns: 380px 1fr; gap: 24px; padding: 24px 32px 40px; max-width: 1440px; margin: 0 auto; }
+  @media (max-width: 980px) { main { grid-template-columns: 1fr; padding: 16px; } header { padding: 16px; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .card + .card { margin-top: 16px; }
+  .card h2 { margin: 0 0 12px; font: 600 15px var(--sans); letter-spacing: .3px; text-transform: uppercase; color: var(--muted); }
+  .jar-balance { font: 600 40px/1.1 var(--serif); }
+  .jar-balance small { font: 500 15px var(--sans); color: var(--muted); margin-left: 6px; }
+  .meter { margin-top: 14px; }
+  .meter-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .bar { height: 8px; border-radius: 99px; background: var(--grey-soft); overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--lotus); border-radius: 99px; transition: width .4s; }
+  .bar.leaf > i { background: var(--leaf); }
+  .kv { display: grid; grid-template-columns: 90px 1fr; gap: 4px 10px; margin-top: 14px; font-size: 12px; }
+  .kv dt { color: var(--muted); } .kv dd { margin: 0; font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; }
+  .pill.open { background: var(--leaf-soft); color: var(--leaf); } .pill.locked { background: var(--red-soft); color: var(--red); }
+  textarea, select, button { font: inherit; }
+  textarea { width: 100%; min-height: 72px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; background: #fff; resize: vertical; }
+  select { width: 100%; margin-top: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 8px; background: #fff; }
+  .btn { margin-top: 10px; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer; background: var(--ink); color: #fff; }
+  .btn.lotus { background: var(--lotus); } .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .examples button { border: 1px dashed var(--line); background: transparent; border-radius: 99px; padding: 3px 10px; font-size: 12px; color: var(--muted); cursor: pointer; }
+  .approval { border: 1px solid var(--lotus); background: var(--lotus-soft); border-radius: 12px; padding: 12px; margin-top: 10px; }
+  .approval .row { display: flex; justify-content: space-between; font-size: 12px; } .approval .row span:last-child { font-family: var(--mono); }
+  .muted { color: var(--muted); } .mono { font-family: var(--mono); }
+  .run { border-top: 1px solid var(--line); padding: 16px 0; display: grid; grid-template-columns: 150px 1fr; gap: 16px; }
+  .run:first-of-type { border-top: 0; padding-top: 4px; }
+  .verdict { font: 600 12px var(--mono); padding: 6px 10px; border-radius: 8px; text-align: center; }
+  .v-SUPPORTED { background: var(--leaf-soft); color: var(--leaf); } .v-WEAK { background: var(--amber-soft); color: var(--amber); }
+  .v-CONTESTED { background: var(--amber-soft); color: var(--amber); } .v-CONTRADICTED { background: var(--red-soft); color: var(--red); }
+  .v-MISSING_EVIDENCE { background: var(--grey-soft); color: var(--ink); } .v-REFUSE { background: var(--red-soft); color: var(--red); }
+  .v-pending { background: var(--lotus-soft); color: var(--lotus); }
+  .score { font: 600 28px var(--serif); margin-top: 8px; text-align: center; } .score small { font: 12px var(--sans); color: var(--muted); }
+  .claim { font: 500 16px/1.4 var(--serif); margin: 0 0 6px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin: 6px 0; }
+  .stats b { color: var(--ink); font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip { font: 11px var(--mono); padding: 2px 8px; border-radius: 6px; background: var(--grey-soft); }
+  .chip.bad { background: var(--red-soft); color: var(--red); } .chip.warn { background: var(--amber-soft); color: var(--amber); }
+  .links { margin-top: 8px; font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .echo { display: inline-block; width: 60px; vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; }
+  td.mono { font-family: var(--mono); }
+  #redteam .scroll { max-height: 420px; overflow: auto; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  @media (max-width: 1200px) { .split { grid-template-columns: 1fr; } }
+  .pass { color: var(--leaf); font-weight: 600; } .fail { color: var(--red); font-weight: 600; }
+  .empty { color: var(--muted); padding: 20px 0; text-align: center; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 0 0 32px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M20 6c4 5 4 13 0 20-4-7-4-15 0-20z" fill="#d0467c"/>
+      <path d="M20 26c-6-2-11-7-12-14 6 1 10 6 12 14z" fill="#e889ad"/>
+      <path d="M20 26c6-2 11-7 12-14-6 1-10 6-12 14z" fill="#e889ad"/>
+      <path d="M6 28c8 4 20 4 28 0" stroke="#2e6a4e" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1>Lotus</h1>
+      <p>Bằng chứng sạch giữa bùn tin đồn · paid evidence scores over x402</p>
+    </div>
+  </div>
+  <div class="badges" id="badges"></div>
+</header>
+
+<main>
+  <section>
+    <div class="card" id="jarCard"><h2>Hũ bằng chứng</h2><div class="empty">Đang đọc hũ trên Fuji…</div></div>
+
+    <div class="card">
+      <h2>Hỏi Lotus</h2>
+      <textarea id="claim" placeholder="Dán một nhận định thị trường, ví dụ: NATO has invoked Article 5"></textarea>
+      <select id="desk"></select>
+      <button class="btn lotus" id="ask">Chấm bằng chứng (trả qua hũ)</button>
+      <div class="examples" id="examples"></div>
+      <p class="muted" style="font-size:12px;margin:10px 0 0">Mỗi khoản chi cần người duyệt. Lotus không tư vấn đầu tư, không giá mục tiêu.</p>
+    </div>
+
+    <div class="card"><h2>Chờ duyệt</h2><div id="pending" class="empty">Không có khoản chờ duyệt.</div></div>
+  </section>
+
+  <section>
+    <div class="card"><h2>Kết quả gần đây</h2><div id="runs"></div></div>
+    <div class="split">
+      <div class="card"><h2>Sổ biên nhận (hash chain)</h2><div id="ledger"></div></div>
+      <div class="card"><h2>Red Team</h2><div id="redteam"></div></div>
+    </div>
+  </section>
+</main>
+<footer>Lotus · Avalanche Fuji testnet only · only hashes go on-chain · not investment advice</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const short = (a) => (a && a.length > 14 ? a.slice(0, 8) + "…" + a.slice(-6) : a || "—");
+const EXAMPLES = [
+  ["US CPI rose last month", "macro_whitehouse"],
+  ["The Fed cut rates by 50 bp", "macro_whitehouse"],
+  ["NATO has invoked Article 5", "gold_war"],
+  ["Did the White House put a 100% tariff on gold exports today?", "gold_war"],
+  ["Bitcoin hashrate hit 600 TH/s", "btc_ta"],
+  ["Nên mua ETH ngay không?", "btc_ta"],
+];
+const BAD = ["PROMPT_INJECTION", "IMPERSONATION", "SHILL_LANGUAGE", "TRADE_REQUEST", "FLOOD", "CONTRADICTION", "UNIT_MISMATCH"];
+const WARN = ["ECHO_DUPLICATE", "STALE", "NEW_ACCOUNT", "ENGAGEMENT_ANOMALY", "SCREENSHOT_ONLY", "MISSING_PRIMARY", "NO_EVIDENCE"];
+let state = null, desksLoaded = false;
+
+function badges(s) {
+  const b = [`<span class="badge">${esc(s.network)}</span>`];
+  b.push(`<span class="badge ${s.botEnabled ? "ok" : "warn"}">Telegram ${s.botEnabled ? "on" : "off"}</span>`);
+  b.push(`<span class="badge ${s.ledger.intact ? "ok" : "warn"}">ledger ${s.ledger.intact ? "intact" : "BROKEN"} · ${s.ledger.count}</span>`);
+  if (s.redteam) b.push(`<span class="badge ${s.redteam.passed === s.redteam.total ? "ok" : "warn"}">red team ${s.redteam.passed}/${s.redteam.total}</span>`);
+  $("badges").innerHTML = b.join("");
+}
+
+function jar(s) {
+  const j = s.jar;
+  if (!j) { $("jarCard").innerHTML = `<h2>Hũ bằng chứng</h2><div class="empty">${esc(s.jarError || "Chưa cấu hình JAR_ADDRESS")}</div>`; return; }
+  const usedToday = Math.max(0, +j.perDay - +j.remainingToday);
+  const pctDay = +j.perDay ? (usedToday / +j.perDay) * 100 : 0;
+  const pctLife = +j.lifetime ? (+j.spentLifetime / +j.lifetime) * 100 : 0;
+  $("jarCard").innerHTML = `
+    <h2 style="display:flex;justify-content:space-between;align-items:center">Hũ bằng chứng
+      <span class="pill ${j.locked ? "locked" : "open"}">${j.locked ? "🔒 Đã khoá" : "● Đang mở"}</span></h2>
+    <div class="jar-balance">${(+j.balance).toFixed(2)}<small>test USDC</small></div>
+    <div class="meter"><div class="meter-label"><span>Đã chi hôm nay</span><span>${usedToday.toFixed(2)} / ${j.perDay}</span></div><div class="bar"><i style="width:${pctDay}%"></i></div></div>
+    <div class="meter"><div class="meter-label"><span>Đã chi tổng</span><span>${(+j.spentLifetime).toFixed(2)} / ${j.lifetime}</span></div><div class="bar leaf"><i style="width:${pctLife}%"></i></div></div>
+    <dl class="kv">
+      <dt>Mỗi lệnh</dt><dd>≤ ${j.perTx} USDC</dd>
+      <dt>Hết hạn</dt><dd>${new Date(j.expiresAt * 1000).toLocaleString("vi-VN")}</dd>
+      <dt>Hũ</dt><dd><a href="${s.explorer}/address/${j.address}" target="_blank">${short(j.address)}</a></dd>
+      <dt>Chủ</dt><dd>${short(j.owner)}</dd>
+      <dt>Duyệt</dt><dd>${short(j.approver)}</dd>
+      <dt>Bảo vệ</dt><dd>${short(j.guardian)} <span class="muted">(chỉ khoá)</span></dd>
+    </dl>`;
+}
+
+function pending(s) {
+  if (!s.pending.length) { $("pending").className = "empty"; $("pending").innerHTML = "Không có khoản chờ duyệt."; return; }
+  $("pending").className = "";
+  $("pending").innerHTML = s.pending.map((c) => `
+    <div class="approval">
+      <div style="font-weight:600;margin-bottom:6px">${esc(c.claim)}</div>
+      <div class="row"><span>Số tiền</span><span>${c.amountHuman} USDC (upto)</span></div>
+      <div class="row"><span>payTo</span><span>${short(c.payTo)}</span></div>
+      <div class="row"><span>requestHash</span><span>${short(c.requestHash)}</span></div>
+      <div class="row"><span>Còn hôm nay</span><span>${c.remainingToday} USDC</span></div>
+      ${s.canApproveHere
+        ? `<button class="btn" onclick="approve('${c.runId}',true)">✅ Duyệt</button> <button class="btn ghost" onclick="approve('${c.runId}',false)">Từ chối</button>`
+        : `<p class="muted" style="margin:8px 0 0;font-size:12px">📱 Duyệt trên Telegram</p>`}
+    </div>`).join("");
+}
+
+function chip(c) { return `<span class="chip ${BAD.includes(c) ? "bad" : WARN.includes(c) ? "warn" : ""}">${esc(c)}</span>`; }
+
+function runs(s) {
+  if (!s.runs.length) { $("runs").innerHTML = `<div class="empty">Chưa có lượt nào. Thử một nhận định bên trái.</div>`; return; }
+  $("runs").innerHTML = s.runs.map((r) => {
+    if (r.status !== "done") {
+      const label = { started: "ĐANG HỎI", awaiting_approval: "CHỜ DUYỆT", paying: "ĐANG TRẢ", declined: "KHÔNG DUYỆT", blocked: "PREFLIGHT CHẶN", error: "LỖI" }[r.status] || r.status;
+      const why = r.status === "blocked" ? (r.preflightReasons || []).map(chip).join("") : r.error ? `<span class="muted">${esc(r.error)}</span>` : r.approvedBy ? `<span class="muted">bởi ${esc(r.approvedBy)}</span>` : "";
+      return `<div class="run"><div><div class="verdict v-pending">${label}</div></div><div><p class="claim">${esc(r.claim)}</p><span class="chip">${esc(r.desk)}</span><div class="chips">${why}</div></div></div>`;
+    }
+    const x = r.result || {}, rc = x.receipt || {};
+    const links = [];
+    if ((r.preflightReasons || []).includes("FREE_REFUSAL")) links.push(`<span class="chip">Miễn phí · từ chối trước khi báo giá</span>`);
+    if (r.payTx) links.push(`<a target="_blank" href="${s.explorer}/tx/${r.payTx}">Thanh toán ↗</a>`);
+    if (rc.anchorTx) links.push(`<a target="_blank" href="${s.explorer}/tx/${rc.anchorTx}">Biên nhận on-chain ↗</a>`);
+    if (rc.refundTx) links.push(`<a target="_blank" href="${s.explorer}/tx/${rc.refundTx}">Hoàn ${(rc.pricing.refundDue / 1e6).toFixed(2)} USDC ↗</a>`);
+    else if (rc.pricing && +rc.pricing.refundDue > 0) links.push(`<span class="muted">refundDue ${(rc.pricing.refundDue / 1e6).toFixed(2)} USDC</span>`);
+    return `<div class="run">
+      <div><div class="verdict v-${x.verdict}">${esc(String(x.verdict).replace("_", " "))}</div><div class="score">${x.score}<small>/100</small></div></div>
+      <div>
+        <p class="claim">${esc(r.claim)}</p>
+        <span class="chip">${esc(r.desk)}</span>${x.deskLive === false ? ` <span class="chip warn">SYNTHETIC fixtures</span>` : ` <span class="chip">LIVE</span>`}
+        <div class="stats">
+          <span>Nguồn độc lập ủng hộ <b>${x.independentSupport}</b></span>
+          <span>phản bác <b>${x.independentContra}</b></span>
+          <span>Buồng vang <b>${x.echoIndex}</b> <span class="bar echo"><i style="width:${x.echoIndex * 100}%"></i></span></span>
+          <span>Mục đã xem <b>${x.itemsSeen}</b></span>
+        </div>
+        <div class="chips">${(x.reasonCodes || []).map(chip).join("")}</div>
+        ${(x.debate?.skeptic?.rules || []).length ? `<div class="muted" style="font-size:12px;margin-top:6px">↳ ${x.debate.skeptic.rules.map(esc).join(" · ")}</div>` : ""}
+        <div class="links">${links.join("")}</div>
+      </div></div>`;
+  }).join("");
+}
+
+function ledger(s) {
+  if (!s.ledger.recent.length) { $("ledger").innerHTML = `<div class="empty">Chưa có biên nhận.</div>`; return; }
+  $("ledger").innerHTML = `<table><tr><th>#</th><th>Kết luận</th><th>hash</th><th>prev</th><th>Thanh toán</th></tr>${s.ledger.recent.map((r) => `
+    <tr><td>${r.index}</td><td>${esc(r.verdict)}</td><td class="mono">${short(r.hash)}</td><td class="mono">${short(r.prevHash)}</td>
+    <td class="mono">${r.payment ? `<a target="_blank" href="${s.explorer}/tx/${r.payment.ref}">${short(r.payment.ref)}</a>` : "—"}</td></tr>`).join("")}</table>
+    <p class="muted" style="font-size:12px">Chuỗi ${s.ledger.intact ? "nguyên vẹn ✓" : "BỊ SỬA ✗"} · head <span class="mono">${short(s.ledger.head)}</span></p>`;
+}
+
+function redteam(s) {
+  const r = s.redteam;
+  if (!r) { $("redteam").innerHTML = `<div class="empty">Chạy <span class="mono">npm run redteam</span> để tạo báo cáo.</div>`; return; }
+  $("redteam").innerHTML = `<p style="margin:0 0 8px"><b style="font:600 22px var(--serif)">${r.passed}/${r.total}</b> <span class="muted">kiểm tra đạt · fixtures SYNTHETIC</span></p>
+    <div class="scroll"><table><tr><th>ID</th><th>Kịch bản</th><th></th></tr>${r.rows.map((x) => `<tr><td class="mono">${esc(x.id)}</td><td>${esc(x.title)}</td><td class="${x.pass ? "pass" : "fail"}">${x.pass ? "PASS" : "FAIL"}</td></tr>`).join("")}</table></div>`;
+}
+
+async function refresh() {
+  try {
+    const s = await (await fetch("/api/state")).json();
+    state = s;
+    if (!desksLoaded) {
+      $("desk").innerHTML = s.desks.map((d) => `<option value="${d.id}">${esc(d.name)}${d.live ? " · LIVE" : " · fixture"}</option>`).join("");
+      $("desk").value = "macro_whitehouse";
+      desksLoaded = true;
+    }
+    badges(s); jar(s); pending(s); runs(s); ledger(s); redteam(s);
+  } catch (e) { console.error(e); }
+}
+
+async function approve(runId, approved) {
+  await fetch("/api/approve", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ runId, approved }) });
+  refresh();
+}
+
+$("ask").onclick = async () => {
+  const claim = $("claim").value.trim();
+  if (!claim) return;
+  $("ask").disabled = true;
+  const r = await fetch("/api/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ claim, desk: $("desk").value }) });
+  if (!r.ok) alert((await r.json()).error);
+  $("ask").disabled = false;
+  refresh();
+};
+$("examples").innerHTML = EXAMPLES.map(([c, d], i) => `<button data-i="${i}">${esc(c.length > 34 ? c.slice(0, 32) + "…" : c)}</button>`).join("");
+$("examples").onclick = (e) => { const i = e.target.dataset.i; if (i === undefined) return; $("claim").value = EXAMPLES[i][0]; $("desk").value = EXAMPLES[i][1]; };
+
+refresh();
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>

@@ -16,6 +16,8 @@ export type AppDeps = {
   ledger: Ledger;
   quotes?: QuoteBook;
   anchor?: (receiptHash: string, prevHash: string, packHash: string, reason: string) => Promise<string | undefined>;
+  /** Returns the unused part of an `upto` payment to the payer. Optional: needs the treasury key. */
+  refund?: (to: string, amount: bigint) => Promise<string>;
 };
 
 const SCORE_ROUTE = "/v1/score";
@@ -44,7 +46,9 @@ export function createApp(d: AppDeps) {
             perIndependentSource: d.cfg.pricing.perSource.toString(),
             maxSources: d.cfg.pricing.maxSources,
             ceiling: maxPrice(d.cfg).toString(),
-            refund: "ceiling − earned is recorded as refundDue on the receipt",
+            refund: d.refund
+              ? "ceiling − earned is sent back to the payer on-chain right after the answer (refundTx on the receipt)"
+              : "ceiling − earned is recorded as refundDue on the receipt",
           },
           network: d.cfg.network,
           chainId: d.cfg.chainId,
@@ -67,6 +71,12 @@ export function createApp(d: AppDeps) {
     if (!claim || claim.length > 500 || !DESKS[deskId]) {
       return res.status(400).json({ error: "body must be { claim: string ≤500, desk: one of " + Object.keys(DESKS).join("|") + " }" });
     }
+    // Refusals that need no search are free: never charge for "should I buy…" or kèo/shill text.
+    const pre = scoreClaim({ text: claim, desk: deskId }, getDesk(deskId), []);
+    if (pre.verdict === "REFUSE") {
+      return res.json({ ...pre, charged: "0", evidence: [], note: "Refused before quoting: Lotus grades evidence, it does not give trade calls." });
+    }
+
     const rh = requestHash("POST", SCORE_ROUTE, { claim, desk: deskId });
     const raw = req.header("X-PAYMENT");
 
@@ -119,11 +129,20 @@ export function createApp(d: AppDeps) {
       }
     }
 
+    let refundTx: string | undefined;
+    if (d.refund && refundDue > 0n) {
+      try {
+        refundTx = await d.refund(v.payer, refundDue);
+      } catch (e) {
+        refundTx = undefined; // refund stays recorded as refundDue on the receipt and can be retried
+      }
+    }
+
     res.setHeader(
       "X-PAYMENT-RESPONSE",
       encodeHeader({ success: true, network: d.cfg.network, transaction: v.tx, payer: v.payer }),
     );
-    return res.json({ ...result, evidence: items, receipt: { ...receipt, anchorTx } });
+    return res.json({ ...result, evidence: items, receipt: { ...receipt, anchorTx, refundTx } });
   });
 
   return app;

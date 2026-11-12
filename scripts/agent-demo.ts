@@ -1,98 +1,52 @@
 /**
- * Agent-side demo client, run against a live Lotus API on Fuji:
- *   npx ts-node --transpile-only scripts/agent-demo.ts "US CPI rose last month" macro_whitehouse
+ * Terminal version of the Lotus buyer agent (same flow as the Telegram bot, approval typed as y/N):
+ *   npm run demo:agent -- "US CPI rose last month" macro_whitehouse
  *
- * Roles (separate keys on purpose):
- *   - AGENT_PRIVATE_KEY     : relays the signed spend and pays gas. Cannot move jar funds by itself.
- *   - APPROVER_PRIVATE_KEY  : the human's approval key (later: held by the Telegram bot after the user taps
- *                             "Duyệt"). Never given to the LLM.
- * Flow: request → 402 → preflight → approval card → human types y → sign Spend → jar pays → retry → result.
+ * Keys: AGENT_PRIVATE_KEY relays and pays gas; APPROVER_PRIVATE_KEY signs only after you type y.
  */
 import readline from "readline/promises";
-import { Contract, JsonRpcProvider, Wallet, randomBytes, hexlify } from "ethers";
+import { Contract, JsonRpcProvider, Wallet } from "ethers";
 import { loadConfig } from "../src/config";
-import { preflight } from "../src/buyer/preflight";
-import { encodeHeader, type PaymentRequired, type PaymentHeader } from "../src/x402/types";
-
-const JAR_ABI = [
-  "function request((address token,address payTo,uint256 amount,bytes32 requestHash,uint256 nonce,uint64 validBefore) s, bytes signature) returns (bytes32)",
-  "function remainingToday() view returns (uint256)",
-  "function locked() view returns (bool)",
-];
+import { JAR_ABI, runCheck } from "../src/agent/runner";
 
 async function main() {
   const [claim, desk] = [process.argv[2], process.argv[3] ?? "macro_whitehouse"];
-  if (!claim) throw new Error('usage: agent-demo.ts "<claim>" <desk>');
+  if (!claim) throw new Error('usage: npm run demo:agent -- "<claim>" <desk>');
   const cfg = loadConfig();
-  const api = process.env.LOTUS_API ?? "http://localhost:8402";
-  const jarAddr = process.env.JAR_ADDRESS!;
   const provider = new JsonRpcProvider(cfg.rpcUrl, cfg.chainId);
-  const agent = new Wallet(process.env.AGENT_PRIVATE_KEY!, provider);
-  const approver = new Wallet(process.env.APPROVER_PRIVATE_KEY!);
-  const jar = new Contract(jarAddr, JAR_ABI, agent);
-
-  const body = { claim, desk };
-  const first = await fetch(`${api}/v1/score`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-  if (first.status !== 402) throw new Error(`expected 402, got ${first.status}`);
-  const required = (await first.json()) as PaymentRequired;
-
-  const remaining = (await jar.remainingToday()) as bigint;
-  const pf = preflight(
-    {
-      kind: "buy_evidence", method: "POST", route: "/v1/score", body,
-      maxAmount: BigInt(process.env.MAX_PER_CALL ?? "500000"), remainingToday: remaining,
-      chainId: cfg.chainId, network: cfg.network, allowedAssets: [cfg.asset], allowedPayTo: [cfg.treasury],
+  const r = await runCheck({
+    api: process.env.LOTUS_API ?? "http://localhost:8402",
+    cfg,
+    jar: new Contract(process.env.JAR_ADDRESS!, JAR_ABI, new Wallet(process.env.AGENT_PRIVATE_KEY!, provider)),
+    approver: new Wallet(process.env.APPROVER_PRIVATE_KEY!),
+    claim,
+    desk,
+    maxPerCall: BigInt(process.env.MAX_PER_CALL ?? "500000"),
+    approve: async (c) => {
+      console.log(`preflight: pay (${c.reasons.join(", ")})`);
+      console.log("\n— Phiếu duyệt / Approval card —");
+      console.log(`  claim       : ${c.claim}  [desk ${c.desk}]`);
+      console.log(`  amount      : ${c.amountHuman} test USDC (upto; unused part refunded or recorded as refundDue)`);
+      console.log(`  payTo       : ${c.payTo}`);
+      console.log(`  asset       : ${c.asset}`);
+      console.log(`  requestHash : ${c.requestHash}`);
+      console.log(`  remaining   : ${c.remainingToday} test USDC today`);
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      const ans = (await rl.question("Duyệt khoản chi này? (y/N) ")).trim().toLowerCase();
+      rl.close();
+      return { approved: ans === "y", by: "terminal" };
     },
-    required,
-    { preferScheme: "lotus-jar" },
-  );
-  console.log(`preflight: ${pf.decision} (${pf.reasons.join(", ")})`);
-  if (pf.decision === "do_not_pay" || !pf.requirement) return;
-  const r = pf.requirement;
-
-  console.log("\n— Phiếu duyệt / Approval card —");
-  console.log(`  claim       : ${claim}  [desk ${desk}]`);
-  console.log(`  amount      : ${Number(r.maxAmountRequired) / 1e6} test USDC (upto; unused part recorded as refundDue)`);
-  console.log(`  payTo       : ${r.payTo}`);
-  console.log(`  asset       : ${r.asset}`);
-  console.log(`  requestHash : ${r.extra.requestHash}`);
-  console.log(`  remaining   : ${Number(remaining) / 1e6} test USDC today`);
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const ans = (await rl.question("Duyệt khoản chi này? (y/N) ")).trim().toLowerCase();
-  rl.close();
-  if (ans !== "y") return console.log("Không duyệt. Không trả tiền.");
-
-  const { chainId } = await provider.getNetwork();
-  const spend = {
-    token: r.asset,
-    payTo: r.payTo,
-    amount: BigInt(r.maxAmountRequired),
-    requestHash: r.extra.requestHash,
-    nonce: BigInt(hexlify(randomBytes(16))),
-    validBefore: BigInt(Math.floor(Date.now() / 1000) + 300),
-  };
-  const sig = await approver.signTypedData(
-    { name: "LotusJar", version: "1", chainId, verifyingContract: jarAddr },
-    {
-      Spend: [
-        { name: "token", type: "address" }, { name: "payTo", type: "address" }, { name: "amount", type: "uint256" },
-        { name: "requestHash", type: "bytes32" }, { name: "nonce", type: "uint256" }, { name: "validBefore", type: "uint64" },
-      ],
-    },
-    spend,
-  );
-  const tx = await jar.request(spend, sig);
-  console.log(`jar payment tx ${tx.hash}`);
-  await tx.wait();
-
-  const header: PaymentHeader = { x402Version: 1, scheme: "lotus-jar", network: cfg.network, quoteId: r.extra.quoteId, payload: { txHash: tx.hash, jar: jarAddr } };
-  const paid = await fetch(`${api}/v1/score`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "X-PAYMENT": encodeHeader(header) },
-    body: JSON.stringify(body),
   });
-  const out = await paid.json();
-  console.log(JSON.stringify({ verdict: out.verdict, score: out.score, independentSupport: out.independentSupport, echoIndex: out.echoIndex, reasonCodes: out.reasonCodes, receipt: out.receipt?.hash, anchorTx: out.receipt?.anchorTx }, null, 2));
+  if (r.status !== "done") {
+    console.log(`${r.status}: ${r.error ?? (r.preflightReasons ?? []).join(", ")}`);
+    return;
+  }
+  const out = r.result;
+  console.log(`jar payment tx ${r.payTx}`);
+  console.log(JSON.stringify({
+    verdict: out.verdict, score: out.score, independentSupport: out.independentSupport, echoIndex: out.echoIndex,
+    reasonCodes: out.reasonCodes, receipt: out.receipt?.hash, anchorTx: out.receipt?.anchorTx, refundTx: out.receipt?.refundTx,
+  }, null, 2));
 }
 
 main().catch((e) => {

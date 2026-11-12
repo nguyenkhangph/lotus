@@ -1,7 +1,8 @@
-import { Contract, JsonRpcProvider, Signature, Wallet } from "ethers";
+import { Contract, JsonRpcProvider, Signature, Wallet, type Provider } from "ethers";
 import type { LotusConfig } from "../config";
 import type { ChainReader } from "./server";
-import type { ExactPayload } from "./types";
+import type { ExactPayload, PaymentRequirement } from "./types";
+import { FacilitatorClient } from "./facilitator";
 
 const FACTORY_ABI = ["function isJar(address) view returns (bool)"];
 const USDC_ABI = [
@@ -17,12 +18,14 @@ const RECEIPTS_ABI = [
  * authorization; it can never move anyone's funds on its own.
  */
 export class EthersChain implements ChainReader {
-  private provider: JsonRpcProvider;
+  readonly provider: Provider;
   private facilitator?: Wallet;
+  private remote?: FacilitatorClient;
 
-  constructor(private cfg: LotusConfig, facilitatorKey?: string) {
-    this.provider = new JsonRpcProvider(cfg.rpcUrl, cfg.chainId);
+  constructor(private cfg: LotusConfig, facilitatorKey?: string, opts: { provider?: Provider; facilitatorUrl?: string } = {}) {
+    this.provider = opts.provider ?? new JsonRpcProvider(cfg.rpcUrl, cfg.chainId);
     if (facilitatorKey) this.facilitator = new Wallet(facilitatorKey, this.provider);
+    if (opts.facilitatorUrl) this.remote = new FacilitatorClient(opts.facilitatorUrl);
   }
 
   async getReceipt(txHash: string) {
@@ -40,7 +43,9 @@ export class EthersChain implements ChainReader {
     return Boolean(await f.isJar(addr));
   }
 
-  async settleExact(p: ExactPayload): Promise<string> {
+  async settleExact(p: ExactPayload, req: PaymentRequirement): Promise<string> {
+    // Prefer a standard x402 facilitator when configured (PayAI / Ultravioleta / x402-rs on avalanche-fuji).
+    if (this.remote) return this.remote.settle(p, req);
     if (!this.facilitator) throw new Error("FACILITATOR_PRIVATE_KEY not set");
     const sig = Signature.from(p.signature);
     const a = p.authorization;

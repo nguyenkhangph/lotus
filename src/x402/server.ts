@@ -11,6 +11,7 @@ export type Quote = {
   amount: bigint;
   expiresAt: number;
   status: "open" | "paid";
+  exact?: PaymentRequirement; // the "exact" terms we offered, passed to a facilitator on settle
 };
 
 /** Minimal chain access so tests can swap in a fake chain. */
@@ -18,7 +19,7 @@ export interface ChainReader {
   getReceipt(txHash: string): Promise<{ status: number; logs: { address: string; topics: string[]; data: string }[] } | null>;
   isJar(addr: string): Promise<boolean>;
   /** Submits USDC.transferWithAuthorization (facilitator role). Returns tx hash. */
-  settleExact(p: ExactPayload): Promise<string>;
+  settleExact(p: ExactPayload, req: PaymentRequirement): Promise<string>;
 }
 
 export const JAR_IFACE = new Interface([
@@ -52,7 +53,6 @@ export class QuoteBook {
       expiresAt: this.now() + this.cfg.quoteTtlSeconds,
       status: "open",
     };
-    this.quotes.set(q.id, q);
     const common = {
       network: this.cfg.network,
       chainId: this.cfg.chainId,
@@ -83,6 +83,8 @@ export class QuoteBook {
         ? [{ scheme: "lotus-jar" as const, ...common, extra: { ...extra, jarFactory: this.cfg.jarFactory } }]
         : []),
     ];
+    q.exact = accepts[0];
+    this.quotes.set(q.id, q);
     return { quote: q, body: { x402Version: 1, error: "X-PAYMENT header is required", accepts } };
   }
 
@@ -140,7 +142,7 @@ export class QuoteBook {
     if (getAddress(signer) !== getAddress(a.from)) return { ok: false, reason: "BAD_SIGNATURE" };
     let txHash: string;
     try {
-      txHash = await chain.settleExact(p);
+      txHash = await chain.settleExact(p, q.exact!);
     } catch (e) {
       return { ok: false, reason: "SETTLEMENT_FAILED" };
     }

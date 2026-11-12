@@ -149,7 +149,7 @@ describe("HTTP flow — 402 → preflight → jar payment → score → receipt"
     const header: PaymentHeader = { x402Version: 1, scheme: "lotus-jar", network: cfg.network, quoteId: req.extra.quoteId, payload: { txHash: tx, jar } };
 
     // Same quote, different body → refused.
-    const swapped = await request(app).post("/v1/score").set("X-PAYMENT", encodeHeader(header)).send({ ...body, claim: "buy ETH now" });
+    const swapped = await request(app).post("/v1/score").set("X-PAYMENT", encodeHeader(header)).send({ ...body, claim: "Central bank gold demand rose" });
     expect(swapped.status).to.equal(402);
 
     const paid = await request(app).post("/v1/score").set("X-PAYMENT", encodeHeader(header)).send(body);
@@ -182,5 +182,17 @@ describe("HTTP flow — 402 → preflight → jar payment → score → receipt"
     lines[1] = lines[1].replace("MISSING_EVIDENCE", "SUPPORTED");
     fs.writeFileSync(file, lines.join("\n") + "\n");
     expect(ledger.verify()).to.equal(1);
+  });
+});
+
+describe("free refusals", () => {
+  it("trade requests are refused before any 402 quote (no charge)", async () => {
+    const cfg = { ...loadConfig({}), treasury: TREASURY };
+    const app = createApp({ cfg, chain: new FakeChain(), ledger: tmpLedger(), evidence: new FixtureProvider() });
+    const r = await request(app).post("/v1/score").send({ claim: "Should I buy BTC now?", desk: "btc_ta" });
+    expect(r.status).to.equal(200);
+    expect(r.body.verdict).to.equal("REFUSE");
+    expect(r.body.charged).to.equal("0");
+    expect(r.body.reasonCodes).to.include("TRADE_REQUEST");
   });
 });

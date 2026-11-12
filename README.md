@@ -32,16 +32,23 @@ Người dùng ─► Agent (không giữ khoá) ─► POST /v1/score ─► 40
 | Preflight người mua + chặn khi hai nguồn giá lệch | `src/buyer/` | ✅ |
 | Bàn sống chứng khoán VN (RSS công bố HNX) + fixture 4 bàn còn lại | `src/evidence/`, `data/fixtures/` | ✅ (chưa chạy thật với HNX từ máy build) |
 | Red Team 22 kịch bản (28 kiểm tra) | `redteam/` | ✅ 28/28 |
-| Bot Telegram duyệt / huỷ / khoá | — | ⏳ việc tiếp theo |
-| UI hũ kiểu Lotus Pay | — | ⏳ |
+| Bot Telegram: phiếu duyệt có nút ✅/❌, `/check`, `/status`, `/lock` (khoá bằng khoá guardian), chỉ nhận lệnh từ chủ hũ, quá giờ không duyệt thì tự từ chối | `src/telegram/bot.ts` | ✅ |
+| Dashboard: hũ on-chain, khoản chờ duyệt, kết quả, sổ biên nhận, red team | `src/web/` (mở `http://localhost:8402`) | ✅ |
+| Hoàn tiền on-chain phần chênh của giá `upto` (TREASURY → hũ) | `src/agent/jar.ts`, `src/app.ts` | ✅ |
+| Câu hỏi mua/bán và "kèo" bị từ chối **miễn phí**, trước khi báo giá | `src/app.ts` | ✅ |
+| Scheme `exact` settle được qua facilitator x402 chuẩn trên Avalanche (PayAI, Ultravioleta DAO, x402-rs) | `src/x402/facilitator.ts` | ✅ (chưa chạy thật với facilitator ngoài) |
+| Verify hợp đồng trên Snowtrace (Routescan) | `scripts/verify.ts` | ✅ (chạy `npm run verify:fuji`) |
+| Test E2E trên EVM của Hardhat: agent → duyệt → hũ trả → API xác minh → neo biên nhận → hoàn tiền | `test/e2e.test.ts` | ✅ |
 
 ## Chạy thử
 
 ```bash
 npm install --legacy-peer-deps
-npm test              # 18 test hợp đồng + 8 test API
+npm test              # 26 test hợp đồng + E2E + bot, 9 test API
 npm run redteam       # bảng đạt/không đạt + hash của bộ kết quả
-npm run dev           # API trên :8402 (GET /catalog, POST /v1/score, GET /receipts)
+npm run dev           # API + dashboard + bot Telegram trên :8402 (GET /, /catalog, POST /v1/score, /receipts)
+npm run jar -- status # xem hũ; `lock` / `unlock` (unlock chỉ bằng khoá chủ hũ)
+npm run verify:fuji   # verify mã nguồn hợp đồng trên Snowtrace
 ```
 
 Hardhat biên dịch bằng `solc` lấy từ npm (`node_modules/solc`), nên chạy được cả khi mạng chặn binaries.soliditylang.org.
@@ -54,6 +61,15 @@ Hardhat biên dịch bằng `solc` lấy từ npm (`node_modules/solc`), nên ch
 4. Gửi test USDC vào `JAR_ADDRESS`
 5. `npm run dev`, sau đó ở terminal khác chạy `npm run demo:agent -- "US CPI rose last month" macro_whitehouse`
 
+### Bot Telegram
+
+1. Tạo bot qua @BotFather và điền `TELEGRAM_BOT_TOKEN` vào `.env`.
+2. Chạy `npm run dev`, mở bot rồi gửi `/start`. Bot trả lời bằng chat id của bạn.
+3. Điền `TELEGRAM_OWNER_ID=<số đó>` vào `.env` rồi chạy lại `npm run dev`.
+4. Gửi một nhận định bất kỳ, ví dụ `NATO has invoked Article 5`. Bot gửi phiếu duyệt, bạn bấm ✅ Duyệt là hũ trả tiền và kết quả quay về kèm link Snowtrace.
+
+Muốn dùng `/lock`, điền thêm `GUARDIAN_PRIVATE_KEY` (ví GUARDIAN cần khoảng 0.01 test AVAX). Muốn hoàn tiền on-chain, điền `TREASURY_PRIVATE_KEY` (ví TREASURY cũng cần khoảng 0.01 test AVAX).
+
 ## Cam kết thiết kế
 
 - **LLM không giữ khoá và không chuyển tiền.** Agent chỉ chuyển tiếp lệnh chi đã được người dùng (hoặc khoá duyệt của bot) ký.
@@ -61,7 +77,9 @@ Hardhat biên dịch bằng `solc` lấy từ npm (`node_modules/solc`), nên ch
 - **Báo giá gắn với đúng một yêu cầu.** `requestHash = keccak256(method, route, body chuẩn hoá)`. Đổi nội dung là báo giá vô hiệu (RT-21).
 - **Bằng chứng là dữ liệu, không phải lệnh.** Câu "SYSTEM: …" nằm trong nguồn bị đánh dấu nhiễm (`PROMPT_INJECTION`) và bỏ qua.
 - **Không giá mục tiêu, không khuyến nghị mua/bán, không dự báo.** Câu hỏi kiểu "có nên mua…" nhận `REFUSE`.
-- **Giá `upto`:** `base + perSource × số nguồn độc lập đã giao`, có trần. Phần chênh được ghi vào `refundDue` trên biên nhận.
+- **Giá `upto`:** `base + perSource × số nguồn độc lập đã giao`, có trần. Phần chênh (`refundDue`) được TREASURY chuyển lại về hũ on-chain ngay sau khi trả lời (khi đã cấu hình `TREASURY_PRIVATE_KEY`).
+- **Từ chối không tính tiền.** Câu "có nên mua…", giá mục tiêu hay "kèo" bị từ chối trước khi báo giá 402.
+- **Người duyệt cuối cùng là con người.** Phiếu duyệt không ai trả lời sẽ tự bị từ chối, và chỉ chủ hũ mới mở lại được hũ đã khoá.
 
 ## Giới hạn
 
@@ -80,6 +98,9 @@ Hardhat biên dịch bằng `solc` lấy từ npm (`node_modules/solc`), nên ch
 contracts/      LotusJar, LotusJarFactory, LotusReceipts (+ MockToken cho test)
 src/engine/     desks (allowlist 5 bàn), patterns, score (bộ quy tắc)
 src/x402/       quote + verify (exact / lotus-jar), kết nối Fuji, chain giả cho test
+src/agent/      runner (luồng của agent mua bằng chứng), hub (hàng chờ duyệt), jar (đọc/khoá/hoàn tiền)
+src/telegram/   bot Telegram (Bot API qua fetch, không thêm thư viện)
+src/web/        dashboard (một file HTML)
 src/buyer/      preflight, chặn lệch oracle
 src/evidence/   FixtureProvider, HnxRssProvider
 src/ledger.ts   sổ biên nhận băm nối tiếp
