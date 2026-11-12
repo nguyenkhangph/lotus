@@ -86,12 +86,12 @@ async function runPayment(s: Extract<Scenario, { layer: "preflight" | "verify" |
 }
 
 function runContractTests(): Map<string, boolean> {
-  const out = spawnSync("npx", ["hardhat", "test"], { cwd: path.join(__dirname, ".."), encoding: "utf8" });
+  const out = spawnSync("npx", ["hardhat", "test"], { cwd: path.join(__dirname, ".."), encoding: "utf8", shell: process.platform === "win32" });
   const text = (out.stdout ?? "") + (out.stderr ?? "");
   const res = new Map<string, boolean>();
   for (const line of text.split("\n")) {
-    const pass = line.match(/^\s+✔ (.+?)(?: \(\d+ms\))?$/);
-    const fail = line.match(/^\s+\d+\) (.+)$/);
+    const pass = line.match(/^\s+[✔✓√] (.+?)(?: \(\d+ms\))?\r?$/);
+    const fail = line.match(/^\s+\d+\) (.+?)\r?$/);
     if (pass) res.set(pass[1].trim(), true);
     else if (fail) res.set(fail[1].trim(), false);
   }

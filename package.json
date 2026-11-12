@@ -6,7 +6,7 @@
     "compile": "hardhat compile",
     "test": "npm run test:contracts && npm run test:api",
     "test:contracts": "hardhat test",
-    "test:api": "mocha -r ts-node/register/transpile-only 'test-api/**/*.test.ts'",
+    "test:api": "mocha -r ts-node/register/transpile-only \"test-api/**/*.test.ts\"",
     "redteam": "ts-node --transpile-only redteam/run.ts",
     "typecheck": "tsc --noEmit -p .",
     "dev": "ts-node --transpile-only src/index.ts",
