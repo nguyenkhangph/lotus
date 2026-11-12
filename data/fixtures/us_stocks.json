@@ -1,0 +1,36 @@
+[
+ {
+  "id": "sec",
+  "match": [
+   "sec",
+   "charged",
+   "kiện"
+  ],
+  "items": [
+   {
+    "id": "sec-pr",
+    "platform": "web",
+    "url": "https://www.sec.gov/newsroom/press-releases/2026-000",
+    "publishedAt": "-6h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] SEC press release announcing charges."
+   },
+   {
+    "id": "wsj",
+    "platform": "x",
+    "handle": "@WSJ",
+    "publishedAt": "-5h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] SEC charges company, per press release."
+   },
+   {
+    "id": "wsjm",
+    "platform": "x",
+    "handle": "@WSJmarkets",
+    "publishedAt": "-5h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] SEC charges company, WSJ reports."
+   }
+  ]
+ }
+]

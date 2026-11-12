@@ -1,0 +1,68 @@
+[
+ {
+  "id": "etf",
+  "match": [
+   "etf"
+  ],
+  "items": [
+   {
+    "id": "farside",
+    "platform": "x",
+    "handle": "@FarsideUK",
+    "publishedAt": "-12h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] Spot BTC ETF flow table updated."
+   },
+   {
+    "id": "k33",
+    "platform": "x",
+    "handle": "@K33Research",
+    "publishedAt": "-8h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] Weekly note: ETF inflows strong."
+   },
+   {
+    "id": "shill",
+    "platform": "x",
+    "handle": "@moonsignals",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] ETF kèo: all-in now, insiders confirm 100x"
+   }
+  ]
+ },
+ {
+  "id": "hash",
+  "match": [
+   "hashrate"
+  ],
+  "items": [
+   {
+    "id": "mp",
+    "platform": "web",
+    "url": "https://mempool.space/mining",
+    "publishedAt": "-2h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] Network hashrate",
+    "measurement": {
+     "metric": "btc_hashrate",
+     "value": 812,
+     "unit": "EH/s"
+    }
+   },
+   {
+    "id": "bad",
+    "platform": "x",
+    "handle": "@coinglass_com",
+    "publishedAt": "-2h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] hashrate 600 TH/s",
+    "measurement": {
+     "metric": "btc_hashrate",
+     "value": 600,
+     "unit": "TH/s"
+    }
+   }
+  ]
+ }
+]

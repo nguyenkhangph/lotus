@@ -1,0 +1,70 @@
+[
+ {
+  "id": "cpi",
+  "match": [
+   "cpi",
+   "lạm phát"
+  ],
+  "items": [
+   {
+    "id": "bls-rel",
+    "platform": "web",
+    "url": "https://www.bls.gov/news.release/cpi.nr0.htm",
+    "publishedAt": "-20h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] Consumer Price Index release for the latest month."
+   },
+   {
+    "id": "bls-x",
+    "platform": "x",
+    "handle": "@BLS_gov",
+    "publishedAt": "-20h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] CPI headline post linking the release."
+   },
+   {
+    "id": "fred",
+    "platform": "x",
+    "handle": "@stlouisfed",
+    "publishedAt": "-10h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] FRED CPIAUCSL updated with the new print."
+   },
+   {
+    "id": "echo1",
+    "platform": "x",
+    "handle": "@macro_hype",
+    "publishedAt": "-9h",
+    "stance": "supports",
+    "repostOf": "bls-x",
+    "text": "[SYNTHETIC] CPI headline post linking the release."
+   }
+  ]
+ },
+ {
+  "id": "fedcut",
+  "match": [
+   "fed",
+   "cắt lãi",
+   "rate cut"
+  ],
+  "items": [
+   {
+    "id": "fomc",
+    "platform": "web",
+    "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary.htm",
+    "publishedAt": "-30h",
+    "stance": "contradicts",
+    "text": "[SYNTHETIC] FOMC statement: the Committee decided to maintain the target range."
+   },
+   {
+    "id": "rumor",
+    "platform": "x",
+    "handle": "@cryptoMacroGuy",
+    "publishedAt": "-3h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] Fed just cut 50 bp, confirmed"
+   }
+  ]
+ }
+]

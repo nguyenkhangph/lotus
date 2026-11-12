@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "outDir": "dist"
   },
-  "include": ["hardhat.config.ts", "scripts", "test", "src", "redteam"]
+  "include": ["hardhat.config.ts", "scripts", "src", "redteam", "test-api"]
 }

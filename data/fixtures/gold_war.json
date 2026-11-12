@@ -1,0 +1,142 @@
+[
+ {
+  "id": "nato",
+  "match": [
+   "nato",
+   "article 5",
+   "điều 5"
+  ],
+  "items": [
+   {
+    "id": "w0",
+    "platform": "x",
+    "handle": "@warwatch0",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w1",
+    "platform": "x",
+    "handle": "@warwatch1",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w2",
+    "platform": "x",
+    "handle": "@warwatch2",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w3",
+    "platform": "x",
+    "handle": "@warwatch3",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w4",
+    "platform": "x",
+    "handle": "@warwatch4",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w5",
+    "platform": "x",
+    "handle": "@warwatch5",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w6",
+    "platform": "x",
+    "handle": "@warwatch6",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w7",
+    "platform": "x",
+    "handle": "@warwatch7",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w8",
+    "platform": "x",
+    "handle": "@warwatch8",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w9",
+    "platform": "x",
+    "handle": "@warwatch9",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w10",
+    "platform": "x",
+    "handle": "@warwatch10",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "w11",
+    "platform": "x",
+    "handle": "@warwatch11",
+    "publishedAt": "-1h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] NATO has invoked Article 5, war declared, Pentagon sources confirm"
+   },
+   {
+    "id": "nato-x",
+    "platform": "x",
+    "handle": "@NATO",
+    "publishedAt": "-2h",
+    "stance": "neutral",
+    "text": "[SYNTHETIC] Routine exercise update."
+   }
+  ]
+ },
+ {
+  "id": "wgc",
+  "match": [
+   "central bank",
+   "ngân hàng trung ương",
+   "gold demand"
+  ],
+  "items": [
+   {
+    "id": "wgc",
+    "platform": "web",
+    "url": "https://www.gold.org/goldhub/research/gold-demand-trends",
+    "publishedAt": "-40h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] Gold Demand Trends: central bank buying."
+   },
+   {
+    "id": "reu",
+    "platform": "x",
+    "handle": "@Reuters",
+    "publishedAt": "-30h",
+    "stance": "supports",
+    "text": "[SYNTHETIC] Central banks kept buying gold, WGC data show."
+   }
+  ]
+ }
+]

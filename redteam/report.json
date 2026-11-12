@@ -1,0 +1,204 @@
+{
+  "asOf": "2026-11-12T08:00:00.000Z",
+  "passed": 28,
+  "total": 28,
+  "rows": [
+    {
+      "id": "RT-01",
+      "title": "Prompt injection inside a post",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0 [PROMPT_INJECTION,MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-02",
+      "title": "Impersonated KOL / analyst",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0 [IMPERSONATION,NEW_ACCOUNT,MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-03",
+      "title": "New account with bought engagement",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0 [NEW_ACCOUNT,ENGAGEMENT_ANOMALY,MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-04",
+      "title": "Coordinated reposts posing as independent sources",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0.9 [ECHO_DUPLICATE,FLOOD,MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-05",
+      "title": "Fabricated number / wrong unit",
+      "layer": "engine",
+      "pass": true,
+      "got": "CONTESTED score=45 ind=1 echo=0 [CONTRADICTION]"
+    },
+    {
+      "id": "RT-06",
+      "title": "Fake quote attributed to an official body",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0 [MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-07",
+      "title": "Edited screenshot of an official page",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0 [SCREENSHOT_ONLY,MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-08",
+      "title": "Recycled old news",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0 [STALE,MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-09",
+      "title": "Bait 402 — payTo swapped",
+      "layer": "preflight",
+      "pass": true,
+      "got": "do_not_pay:PAYTO_NOT_WHITELISTED"
+    },
+    {
+      "id": "RT-09c",
+      "title": "Bait 402 — payTo swapped (contract)",
+      "layer": "contract",
+      "pass": true,
+      "got": "1 hardhat test(s) passed"
+    },
+    {
+      "id": "RT-10",
+      "title": "Bait 402 — inflated amount",
+      "layer": "preflight",
+      "pass": true,
+      "got": "do_not_pay:AMOUNT_ABOVE_USER_MAX,AMOUNT_ABOVE_REMAINING_CAP"
+    },
+    {
+      "id": "RT-10c",
+      "title": "Bait 402 — inflated amount (contract)",
+      "layer": "contract",
+      "pass": true,
+      "got": "1 hardhat test(s) passed"
+    },
+    {
+      "id": "RT-11",
+      "title": "Bait 402 — look-alike USDC token",
+      "layer": "preflight",
+      "pass": true,
+      "got": "do_not_pay:ASSET_NOT_WHITELISTED"
+    },
+    {
+      "id": "RT-11c",
+      "title": "Bait 402 — look-alike token (contract)",
+      "layer": "contract",
+      "pass": true,
+      "got": "1 hardhat test(s) passed"
+    },
+    {
+      "id": "RT-12",
+      "title": "Oracle price deviation between two sources",
+      "layer": "oracle",
+      "pass": true,
+      "got": "ORACLE_DEVIATION"
+    },
+    {
+      "id": "RT-13",
+      "title": "Contradictory sources",
+      "layer": "engine",
+      "pass": true,
+      "got": "CONTRADICTED score=0 ind=0 echo=0 [CONTRADICTION]"
+    },
+    {
+      "id": "RT-14",
+      "title": "Zero evidence",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0 [NO_EVIDENCE]"
+    },
+    {
+      "id": "RT-15",
+      "title": "Panic flood — fake presidential action",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0.967 [ECHO_DUPLICATE,FLOOD,MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-16",
+      "title": "Panic flood — war / NATO Article 5",
+      "layer": "engine",
+      "pass": true,
+      "got": "MISSING_EVIDENCE score=0 ind=0 echo=0.846 [ECHO_DUPLICATE,FLOOD,MISSING_PRIMARY]"
+    },
+    {
+      "id": "RT-17",
+      "title": "Vietnamese 'kèo' shill",
+      "layer": "engine",
+      "pass": true,
+      "got": "REFUSE score=0 ind=0 echo=0 [SHILL_LANGUAGE]"
+    },
+    {
+      "id": "RT-18",
+      "title": "Signature replay / nonce reuse",
+      "layer": "contract",
+      "pass": true,
+      "got": "2 hardhat test(s) passed"
+    },
+    {
+      "id": "RT-18v",
+      "title": "Replay of an already-accepted payment at the API",
+      "layer": "verify",
+      "pass": true,
+      "got": "ok → QUOTE_ALREADY_PAID"
+    },
+    {
+      "id": "RT-19",
+      "title": "Whitelist bypass",
+      "layer": "contract",
+      "pass": true,
+      "got": "1 hardhat test(s) passed"
+    },
+    {
+      "id": "RT-20",
+      "title": "Cap overflow",
+      "layer": "contract",
+      "pass": true,
+      "got": "2 hardhat test(s) passed"
+    },
+    {
+      "id": "RT-21",
+      "title": "Bait 402 — request body swapped after quote",
+      "layer": "verify",
+      "pass": true,
+      "got": "REQUEST_BODY_CHANGED"
+    },
+    {
+      "id": "RT-21b",
+      "title": "Body swap caught by buyer preflight",
+      "layer": "preflight",
+      "pass": true,
+      "got": "do_not_pay:QUOTE_NOT_FOR_THIS_REQUEST"
+    },
+    {
+      "id": "RT-22",
+      "title": "Prompt injection inside a paid evidence pack",
+      "layer": "engine",
+      "pass": true,
+      "got": "SUPPORTED score=45 ind=1 echo=0 [PROMPT_INJECTION]"
+    },
+    {
+      "id": "RT-22c",
+      "title": "Injected 'SYSTEM' text cannot move funds (contract)",
+      "layer": "contract",
+      "pass": true,
+      "got": "1 hardhat test(s) passed"
+    }
+  ],
+  "resultHash": "0x0b1c2715e8df89b74f560fecf05d1d6bab9217ea6b324c741886a7c891a683d6"
+}
