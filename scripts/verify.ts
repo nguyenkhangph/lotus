@@ -14,7 +14,7 @@ async function verify(address: string, constructorArguments: unknown[], contract
   } catch (e: any) {
     const msg = String(e?.message ?? e);
     if (/already verified/i.test(msg)) console.log("already verified", address);
-    else console.error("FAILED", address, msg.split("\n")[0]);
+    else console.error("FAILED", address, "\n" + msg);
   }
 }
 
