@@ -9,7 +9,7 @@ import { loadConfig } from "../src/config";
 import { getDesk } from "../src/engine/desks";
 import { scoreClaim } from "../src/engine/score";
 import type { EvidenceItem } from "../src/engine/types";
-import { FixtureProvider, HnxRssProvider, parseRss } from "../src/evidence/providers";
+import { CookieClient, FixtureProvider, HnxRssProvider, parseRss } from "../src/evidence/providers";
 import { Ledger } from "../src/ledger";
 import { preflight } from "../src/buyer/preflight";
 import { requestHash } from "../src/util/hash";
@@ -56,23 +56,62 @@ describe("engine — honest positives", () => {
   });
 });
 
-describe("HNX RSS live provider (offline sample)", () => {
-  const xml = `<?xml version="1.0"?><rss><channel>
-    <item><title><![CDATA[HPG: Thông báo ngày đăng ký cuối cùng chia cổ tức bằng tiền]]></title><link>https://hnx.vn/a.html</link><pubDate>Wed, 11 Nov 2026 09:00:00 +0700</pubDate></item>
-    <item><title>SHS: Báo cáo tài chính quý 3</title><link>https://hnx.vn/b.html</link><pubDate>Wed, 11 Nov 2026 10:00:00 +0700</pubDate></item>
+describe("HNX live provider (shape of the real feed, 13/11/2026)", () => {
+  // Real feed shape: titles carry no ticker; links use an internal port.
+  const xml = `<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>HNX</title>
+    <item><guid isPermaLink="false">641922</guid><link>http://hnx.vn:7978/tin-cung-cap-rss-vi_vn-641922-0.html</link><title>Ngày đăng ký cuối cùng trả cổ tức bằng tiền mặt, trả cổ phiếu thưởng cho cổ đông hiện hữu</title><pubDate>Thu, 12 Nov 2026 17:04:12 +0700</pubDate></item>
+    <item><guid isPermaLink="false">641962</guid><link>http://hnx.vn:7978/tin-cung-cap-rss-vi_vn-641962-1.html</link><title>Nghị quyết Hội đồng quản trị</title><pubDate>Fri, 13 Nov 2026 10:51:31 +0700</pubDate></item>
   </channel></rss>`;
+  const pages: Record<string, string> = {
+    "https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html": "<html><body><nav>HNX SHS PVS</nav><div>Mã chứng khoán: SHS. Ngày đăng ký cuối cùng trả cổ tức bằng tiền mặt.</div></body></html>",
+    "https://hnx.vn/tin-cung-cap-rss-vi_vn-641962-1.html": "<html><body><div>Mã chứng khoán: CEO. Nghị quyết HĐQT.</div></body></html>",
+  };
+  const client = { get: async (u: string) => (u.endsWith(".rss") ? xml : pages[u] ?? Promise.reject(new Error("404"))) };
 
   it("parses items", () => {
     expect(parseRss(xml)).to.have.length(2);
   });
 
-  it("matches only on ticker + event word, and a dead feed yields nothing", async () => {
-    const p = new HnxRssProvider(async () => xml, 0, ["feed"]);
-    const items = await p.fetch({ text: "HPG chia cổ tức", desk: "vn_stocks" }, getDesk("vn_stocks"));
+  it("finds the ticker on the disclosure page and links the public https URL", async () => {
+    const p = new HnxRssProvider(client, 0, ["feed.rss"]);
+    const items = await p.fetch({ text: "SHS chia cổ tức tiền mặt", desk: "vn_stocks" }, getDesk("vn_stocks"));
     expect(items).to.have.length(1);
     expect(items[0].stance).to.equal("supports");
-    const dead = new HnxRssProvider(async () => { throw new Error("TLS"); }, 0, ["feed"]);
-    expect(await dead.fetch({ text: "HPG chia cổ tức", desk: "vn_stocks" }, getDesk("vn_stocks"))).to.deep.equal([]);
+    expect(items[0].url).to.equal("https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html");
+    const r = scoreClaim({ text: "SHS chia cổ tức tiền mặt", desk: "vn_stocks", asOf: "2026-11-13T05:00:00Z" }, getDesk("vn_stocks"), items);
+    expect(r.verdict).to.equal("SUPPORTED");
+  });
+
+  it("a ticker that is not on the page (e.g. HPG, listed on HOSE) yields nothing", async () => {
+    const p = new HnxRssProvider(client, 0, ["feed.rss"]);
+    expect(await p.fetch({ text: "HPG chia cổ tức", desk: "vn_stocks" }, getDesk("vn_stocks"))).to.deep.equal([]);
+  });
+
+  it("a dead feed yields nothing, never invented evidence", async () => {
+    const dead = new HnxRssProvider({ get: async () => { throw new Error("TLS"); } }, 0, ["feed.rss"]);
+    expect(await dead.fetch({ text: "SHS chia cổ tức", desk: "vn_stocks" }, getDesk("vn_stocks"))).to.deep.equal([]);
+  });
+
+  it("browse lists disclosures with tickers found on their pages", async () => {
+    const p = new HnxRssProvider(client, 0, ["feed.rss"]);
+    const rows = await p.browse("cổ tức");
+    expect(rows[0].tickers[0]).to.equal("SHS");
+  });
+
+  it("CookieClient keeps the session cookie across the 'Object moved' redirect", async () => {
+    const calls: any[] = [];
+    const fake: any = async (url: string, init: any) => {
+      calls.push({ url, cookie: init.headers.cookie });
+      if (!init.headers.cookie) {
+        return new Response("<html><head><title>Object moved</title></head></html>", {
+          status: 302, headers: { location: "/feed.rss", "set-cookie": "sid=abc; path=/; HttpOnly" },
+        });
+      }
+      return new Response("<rss><channel></channel></rss>", { status: 200 });
+    };
+    const body = await new CookieClient(fake).get("https://hnx.vn/feed.rss");
+    expect(body).to.include("<rss>");
+    expect(calls[1].cookie).to.equal("sid=abc");
   });
 });
 

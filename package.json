@@ -13,7 +13,8 @@
     "deploy:fuji": "hardhat run scripts/deploy.ts --network fuji",
     "demo:agent": "ts-node --transpile-only scripts/agent-demo.ts",
     "verify:fuji": "hardhat run scripts/verify.ts --network fuji",
-    "jar": "ts-node --transpile-only scripts/jar.ts"
+    "jar": "ts-node --transpile-only scripts/jar.ts",
+    "hnx": "ts-node --transpile-only scripts/hnx.ts"
   },
   "keywords": [],
   "author": "",
