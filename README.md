@@ -40,6 +40,26 @@ Người dùng ─► Agent (không giữ khoá) ─► POST /v1/score ─► 40
 | Verify hợp đồng trên Snowtrace (Routescan) | `scripts/verify.ts` | ✅ (chạy `npm run verify:fuji`) |
 | Test E2E trên EVM của Hardhat: agent → duyệt → hũ trả → API xác minh → neo biên nhận → hoàn tiền | `test/e2e.test.ts` | ✅ |
 
+## Đang chạy trên Avalanche Fuji
+
+Ba hợp đồng đều **đã verify mã nguồn (Exact Match)** trên Snowtrace:
+
+| Hợp đồng | Địa chỉ |
+|---|---|
+| LotusJarFactory | [`0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546`](https://testnet.snowtrace.io/address/0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546#code) |
+| LotusReceipts | [`0xD8cDc230225448b005DBCE3B935ac53e2057DAd8`](https://testnet.snowtrace.io/address/0xD8cDc230225448b005DBCE3B935ac53e2057DAd8#code) |
+| LotusJar (hũ demo) | [`0x805113113EC069205f59d72137c01244BfAA9619`](https://testnet.snowtrace.io/address/0x805113113EC069205f59d72137c01244BfAA9619#code) |
+
+Một vòng chạy thật, duyệt từ Telegram (13/11/2026), với nhận định *"Did the White House put a 100% tariff on gold exports today?"*, kết quả `MISSING_EVIDENCE`:
+
+1. Hũ trả 0.45 test USDC sau khi chủ hũ bấm ✅ Duyệt: [tx](https://testnet.snowtrace.io/tx/0x93ebb66362d3f762c7bf32a8252a5a8c0a52de7c314a9b0bfab03c243a53f33c)
+2. Hash biên nhận được neo lên `LotusReceipts`: [tx](https://testnet.snowtrace.io/tx/0xfc2b3ca62870e9d108711ea42ebb2e13e804d571277827e471d8794bec549bf1)
+3. TREASURY hoàn 0.40 USDC chưa dùng về hũ (giá `upto`, không có nguồn nào được giao): [tx](https://testnet.snowtrace.io/tx/0x340757dcae6155cf0b098de77f3d6357201acff90ca3bc68dbab058e1902d7ac)
+
+Nhận định *"NATO has invoked Article 5"* ra `MISSING_EVIDENCE` với `FLOOD`, chỉ số buồng vang 0.846: [thanh toán](https://testnet.snowtrace.io/tx/0x8584484ae0951f28c4be239ace6a9dd39ef82fc8994777cbe3e1853cc1f861e0) · [biên nhận](https://testnet.snowtrace.io/tx/0x0bad1dab7a32e3a19873b8899d6174587457a25b477330ba89436b93f8b04f92)
+
+Kill switch: giao dịch `Lock` gửi từ ví guardian (lệnh `/lock` trên Telegram), sau đó `Unlock` gửi từ ví chủ hũ. Xem tab Transactions của [hũ](https://testnet.snowtrace.io/address/0x805113113EC069205f59d72137c01244BfAA9619).
+
 ## Chạy thử
 
 ```bash
