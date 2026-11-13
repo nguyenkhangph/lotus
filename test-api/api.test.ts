@@ -9,7 +9,7 @@ import { loadConfig } from "../src/config";
 import { getDesk } from "../src/engine/desks";
 import { scoreClaim } from "../src/engine/score";
 import type { EvidenceItem } from "../src/engine/types";
-import { CookieClient, FixtureProvider, HnxRssProvider, parseRss } from "../src/evidence/providers";
+import { CookieClient, FixtureProvider, HnxRssProvider, mentionsTicker, parseRss, tickersIn } from "../src/evidence/providers";
 import { Ledger } from "../src/ledger";
 import { preflight } from "../src/buyer/preflight";
 import { requestHash } from "../src/util/hash";
@@ -233,5 +233,14 @@ describe("free refusals", () => {
     expect(r.body.verdict).to.equal("REFUSE");
     expect(r.body.charged).to.equal("0");
     expect(r.body.reasonCodes).to.include("TRADE_REQUEST");
+  });
+});
+
+describe("ticker detection is Unicode-aware", () => {
+  it("never reads PHI/THI/TIN out of Vietnamese uppercase words", () => {
+    const text = "THÔNG TIN CỔ PHIẾU · THIẾT LẬP · Mã chứng khoán: SHS";
+    expect(tickersIn(text)).to.deep.equal(["SHS"]);
+    expect(mentionsTicker(text, "PHI")).to.equal(false);
+    expect(mentionsTicker(text, "SHS")).to.equal(true);
   });
 });

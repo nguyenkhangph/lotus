@@ -61,7 +61,7 @@ function decode(s: string) {
 const EVENT_WORDS = ["cổ tức", "chia", "lợi nhuận", "báo cáo tài chính", "kết quả kinh doanh", "phạt", "xử phạt", "hạn chế", "đình chỉ", "hủy niêm yết", "niêm yết", "bổ nhiệm", "miễn nhiệm", "đại hội", "nghị quyết", "phát hành", "trái phiếu", "giao dịch cổ phiếu", "kiểm toán", "nhân sự"];
 
 /** Uppercase 3-letter words that are not tickers. */
-const NOT_TICKERS = new Set(["HNX", "HSX", "USD", "VND", "CTCP", "BKS", "CBTT", "UBCK", "SGD", "NHNN", "TTCK", "CEO", "CFO", "HTML", "HTTP", "RSS", "UTF", "XML", "GMT", "ICT", "VSD", "TCT", "MTV", "TNHH", "THE", "AND", "FOR", "PDF", "DOC", "JPG", "PNG", "CSS"]);
+const NOT_TICKERS = new Set(["TIN", "CHI", "CAO", "CON", "CHO", "GIA", "KHI", "LAI", "MUA", "NAM", "SAU", "THU", "TRA", "VAN", "VAY", "VON", "HAI", "BAN", "CAC", "HNX", "HSX", "USD", "VND", "CTCP", "BKS", "CBTT", "UBCK", "SGD", "NHNN", "TTCK", "CEO", "CFO", "HTML", "HTTP", "RSS", "UTF", "XML", "GMT", "ICT", "VSD", "TCT", "MTV", "TNHH", "THE", "AND", "FOR", "PDF", "DOC", "JPG", "PNG", "CSS"]);
 
 /**
  * Minimal HTTP client with a cookie jar. hnx.vn sets a session cookie and redirects ("Object moved")
@@ -128,10 +128,22 @@ export function htmlToText(html: string): string {
     .trim();
 }
 
+/**
+ * Ticker-shaped tokens, Unicode-aware: a token must not touch another letter on either side,
+ * so "PHIẾU" never yields "PHI" and "THIẾT" never yields "THI" (plain \b treats Ế as a boundary).
+ */
+const TICKER_RE = /(?<![\p{L}\p{N}])[A-Z][A-Z0-9]{2}(?![\p{L}\p{N}])/gu;
+export function tickerTokens(text: string): string[] {
+  return (text.match(TICKER_RE) ?? []).filter((t) => !NOT_TICKERS.has(t));
+}
+export function mentionsTicker(text: string, ticker: string): boolean {
+  return new RegExp(`(?<![\\p{L}\\p{N}])${ticker}(?![\\p{L}\\p{N}])`, "u").test(text);
+}
+
 /** Most frequent ticker-looking words in a disclosure page (used by the CLI and for display only). */
 export function tickersIn(text: string): string[] {
   const counts = new Map<string, number>();
-  for (const m of text.match(/\b[A-Z][A-Z0-9]{2}\b/g) ?? []) {
+  for (const m of tickerTokens(text)) {
     if (NOT_TICKERS.has(m)) continue;
     counts.set(m, (counts.get(m) ?? 0) + 1);
   }
@@ -161,7 +173,7 @@ export class HnxRssProvider implements EvidenceProvider {
   ) {}
 
   async fetch(claim: Claim, _desk: Desk): Promise<EvidenceItem[]> {
-    const tickers = [...new Set(claim.text.match(/\b[A-Z][A-Z0-9]{2}\b/g) ?? [])].filter((t) => !NOT_TICKERS.has(t));
+    const tickers = [...new Set(tickerTokens(claim.text))];
     if (!tickers.length) return [];
     const lc = claim.text.toLowerCase();
     const events = EVENT_WORDS.filter((w) => lc.includes(w));
@@ -174,7 +186,7 @@ export class HnxRssProvider implements EvidenceProvider {
         // a dead feed yields no evidence, never invented evidence
       }
     }
-    const hasTicker = (t: string) => tickers.some((k) => new RegExp(`\\b${k}\\b`).test(t));
+    const hasTicker = (t: string) => tickers.some((k) => mentionsTicker(t, k));
     const sharedEvents = (t: string) => events.filter((w) => t.toLowerCase().includes(w));
 
     // Candidates: ticker already in the title, or the title shares an event word with the claim.
