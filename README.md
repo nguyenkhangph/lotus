@@ -7,11 +7,13 @@ Khi không kiểm chứng được, Lotus trả `MISSING EVIDENCE`. Từ chối 
 
 Bài dự thi **Team1 Vietnam UniHack 2026** (Avalanche). Hạn nộp: 21/11/2026, 23:59 giờ Việt Nam. Giấy phép: [MIT](LICENSE).
 
+**Demo công khai (chỉ đọc):** https://lotus-azure-ten.vercel.app · thử API: `POST https://lotus-azure-ten.vercel.app/v1/score` → HTTP 402 kèm điều khoản x402.
+
 ### In English
 
 Lotus is a pay-per-call **evidence-scoring API for market claims** ("the Fed cut rates", "NATO invoked Article 5", "FOX pays a cash dividend"), paid with test USDC over an **x402-style flow on Avalanche Fuji**. It counts *independent* sources, measures the echo chamber, flags stale, impersonated, injected or shill content, and answers `MISSING_EVIDENCE` rather than guess. It never gives buy/sell calls or price targets, and refuses those questions for free before quoting.
 
-Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day/lifetime caps, token and payee allow-lists by address, one-time EIP-712 approvals signed by the human (via Telegram), a guardian kill switch, and burst auto-lock. The agent holds no key that can move funds. The unused part of each `upto` payment is refunded on-chain, and every answer's receipt hash is chained and anchored on `LotusReceipts`. All three contracts are verified on Snowtrace, and every flow below has real Fuji transactions. The Vietnamese stock desk reads live HNX disclosures. The other four desks run on clearly labelled synthetic fixtures.
+Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day/lifetime caps, token and payee allow-lists by address, one-time EIP-712 approvals signed by the human (via Telegram), a guardian kill switch, and burst auto-lock. The agent holds no key that can move funds. The unused part of each `upto` payment is refunded on-chain, and every answer's receipt hash is chained and anchored on `LotusReceipts`. All three contracts are verified on Snowtrace, and every flow below has real Fuji transactions. Live read-only demo: https://lotus-azure-ten.vercel.app The Vietnamese stock desk reads live HNX disclosures. The other four desks run on clearly labelled synthetic fixtures.
 
 ## Lotus làm gì
 
