@@ -8,7 +8,24 @@ Demo công khai ở **chế độ chỉ đọc** (`PUBLIC_DEMO=1`):
 
 Request đi qua tunnel hoặc reverse proxy luôn bị coi là đến từ bên ngoài, kể cả khi kết nối xuất phát từ `127.0.0.1`.
 
-## Cách 1: Render (khuyên dùng, có link cố định)
+## Cách 0: Vercel (miễn phí, link cố định, không "ngủ")
+
+Bản Vercel chạy `api/index.ts` → `src/public.ts`, là một app **chỉ đọc** và **không nạp bất kỳ private key nào**. Bot Telegram và luồng trả tiền vẫn chạy trên máy bạn bằng `npm run dev`.
+
+1. Chép sổ biên nhận thật vào repo, như bước 1 của Cách 1 bên dưới (`data/demo/ledger.jsonl`), rồi push.
+2. Vào https://vercel.com, đăng nhập bằng GitHub, chọn **Add New → Project**, rồi **Import** repo `lotus`.
+3. **Framework Preset:** `Other`. Không sửa Build/Output, vì `vercel.json` đã cấu hình sẵn.
+4. **Environment Variables** (đều là địa chỉ công khai):
+   | Tên | Giá trị |
+   |---|---|
+   | `TREASURY_ADDRESS` | `0xa917992F4228115cAb572933A2dc9124585ba500` |
+   | `JAR_FACTORY_ADDRESS` | `0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546` |
+   | `JAR_ADDRESS` | `0x805113113EC069205f59d72137c01244BfAA9619` |
+5. Bấm **Deploy**. Bạn sẽ có link dạng `https://lotus-xxx.vercel.app`.
+
+**Không** thêm `DEPLOYER_PRIVATE_KEY`, `AGENT_PRIVATE_KEY`, `APPROVER_PRIVATE_KEY`, `TELEGRAM_BOT_TOKEN`… lên Vercel.
+
+## Cách 1: Render (có link cố định)
 
 1. Chép sổ biên nhận thật vào repo. Sổ này chỉ chứa hash, kết luận và địa chỉ hũ, không có khoá:
    ```powershell

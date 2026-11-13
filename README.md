@@ -40,7 +40,7 @@ Người dùng ─► Agent (không giữ khoá) ─► POST /v1/score ─► 40
 | Bàn sống chứng khoán VN (RSS công bố HNX, giữ cookie phiên, lấy mã từ nội dung công bố) + fixture SYNTHETIC cho 4 bàn còn lại | `src/evidence/`, `data/fixtures/` | ✅ chạy thật với HNX ngày 13/11/2026 |
 | Red Team 22 kịch bản (28 kiểm tra) | `redteam/` | ✅ 28/28 |
 | Bot Telegram: phiếu duyệt có nút ✅/❌, `/check`, `/status`, `/lock` (khoá bằng khoá guardian), chỉ nhận lệnh từ chủ hũ, quá giờ không duyệt thì tự từ chối | `src/telegram/bot.ts` | ✅ |
-| Dashboard: hũ on-chain, khoản chờ duyệt, kết quả kèm link nguồn, sổ biên nhận, red team. Chế độ **demo công khai chỉ đọc** (`PUBLIC_DEMO=1`) và token cho quyền đầy đủ | `src/web/`, [`docs/DEPLOY.md`](docs/DEPLOY.md) | ✅ |
+| Dashboard: hũ on-chain, khoản chờ duyệt, kết quả kèm link nguồn, sổ biên nhận, red team. Chế độ **demo công khai chỉ đọc** (`PUBLIC_DEMO=1`, hoặc bản Vercel `api/index.ts` không nạp key nào) | `src/web/`, `src/public.ts`, [`docs/DEPLOY.md`](docs/DEPLOY.md) | ✅ |
 | Hoàn tiền on-chain phần chênh của giá `upto` (TREASURY → hũ) | `src/agent/jar.ts`, `src/app.ts` | ✅ |
 | Câu hỏi mua/bán và "kèo" bị từ chối **miễn phí**, trước khi báo giá | `src/app.ts` | ✅ |
 | Scheme `exact` (EIP-3009): kiểm chữ ký và gắn nonce vào `requestHash`; tự settle, hoặc gửi qua facilitator x402 bên ngoài (PayAI, Ultravioleta DAO, x402-rs) | `src/x402/` | ⚠️ có code và test với chain giả. **Chưa có giao dịch thật nào qua scheme này hay qua facilitator ngoài.** Mọi giao dịch Fuji ở dưới đều dùng scheme `lotus-jar` |
