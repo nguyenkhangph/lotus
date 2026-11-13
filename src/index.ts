@@ -68,6 +68,8 @@ app.use(
     startCheck,
     botEnabled: Boolean(botToken),
     allowLocalApprove: !botToken || env.DASHBOARD_APPROVE === "1",
+    publicDemo: env.PUBLIC_DEMO === "1",
+    token: env.DASHBOARD_TOKEN || undefined,
   }),
 );
 
@@ -75,6 +77,7 @@ app.listen(port, () => {
   console.log(`Lotus API + dashboard on http://localhost:${port} — ${cfg.network} (${cfg.chainId}), payTo ${cfg.treasury}`);
   console.log(`  exact settle : ${env.X402_FACILITATOR_URL ? "x402 facilitator " + env.X402_FACILITATOR_URL : env.FACILITATOR_PRIVATE_KEY ? "self (FACILITATOR_PRIVATE_KEY)" : "disabled"}`);
   console.log(`  refunds      : ${treasury ? "on-chain from TREASURY" : "recorded only (set TREASURY_PRIVATE_KEY to send)"}`);
+  console.log(`  dashboard    : ${env.PUBLIC_DEMO === "1" ? "PUBLIC read-only" : "full access from this machine only"}${env.DASHBOARD_TOKEN ? " (+ token)" : ""}`);
   console.log(`  agent        : ${agentReady ? "ready (jar " + jarAddr + ")" : "off (needs JAR_ADDRESS, AGENT_PRIVATE_KEY, APPROVER_PRIVATE_KEY)"}`);
 });
 

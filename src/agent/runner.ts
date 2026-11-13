@@ -116,10 +116,14 @@ export async function runCheck(o: RunOptions): Promise<RunRecord> {
       return rec;
     }
     const remaining = (await o.jar.remainingToday()) as bigint;
+    const caps = await o.jar.caps();
+    const spentLifetime = (await o.jar.spentLifetime()) as bigint;
+    const lifetimeLeft = caps.lifetime > spentLifetime ? (caps.lifetime as bigint) - spentLifetime : 0n;
     const pf = preflight(
       {
         kind: "buy_evidence", method: "POST", route: "/v1/score", body,
         maxAmount: o.maxPerCall ?? 500_000n, remainingToday: remaining,
+        perTxCap: caps.perTx as bigint, remainingLifetime: lifetimeLeft,
         chainId: o.cfg.chainId, network: o.cfg.network, allowedAssets: [o.cfg.asset], allowedPayTo: [o.cfg.treasury],
       },
       required,

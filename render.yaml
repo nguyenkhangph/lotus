@@ -1,0 +1,34 @@
+# Public read-only demo of Lotus on Render (free plan). Everything here is public testnet data.
+# No private key is needed for the read-only demo: the dashboard reads the jar and receipts from Fuji,
+# and POST /v1/score answers 402 with x402 payment terms. Never put DEPLOYER/AGENT/APPROVER keys here.
+services:
+  - type: web
+    name: lotus-demo
+    runtime: node
+    plan: free
+    buildCommand: npm ci --legacy-peer-deps
+    startCommand: npm run dev
+    healthCheckPath: /catalog
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: PUBLIC_DEMO
+        value: "1"
+      - key: NETWORK
+        value: avalanche-fuji
+      - key: CHAIN_ID
+        value: "43113"
+      - key: TREASURY_ADDRESS
+        value: "0xa917992F4228115cAb572933A2dc9124585ba500"
+      - key: JAR_FACTORY_ADDRESS
+        value: "0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546"
+      - key: RECEIPTS_ADDRESS
+        value: "0xD8cDc230225448b005DBCE3B935ac53e2057DAd8"
+      - key: JAR_ADDRESS
+        value: "0x805113113EC069205f59d72137c01244BfAA9619"
+      # Snapshot of the real receipt ledger (hash chain whose head is anchored on LotusReceipts).
+      - key: LEDGER_PATH
+        value: data/demo/ledger.jsonl
+      # Optional: a long random secret; open /?token=<it> to get full access (ask + approve).
+      - key: DASHBOARD_TOKEN
+        sync: false

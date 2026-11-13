@@ -13,6 +13,8 @@ export type BuyerIntent = {
   body: unknown;
   maxAmount: bigint; // per-call ceiling the user set
   remainingToday: bigint; // from the jar / wallet policy
+  perTxCap?: bigint; // the jar's on-chain per-transaction cap (checked here so a bad quote is never signed)
+  remainingLifetime?: bigint; // the jar's lifetime cap minus what it already spent
   chainId: number;
   network: string;
   allowedAssets: string[]; // addresses, never symbols
@@ -69,6 +71,8 @@ export function preflight(
     if (amount <= 0n) hard.push("BAD_AMOUNT");
     if (amount > intent.maxAmount) hard.push("AMOUNT_ABOVE_USER_MAX");
     if (amount > intent.remainingToday) hard.push("AMOUNT_ABOVE_REMAINING_CAP");
+    if (intent.perTxCap !== undefined && amount > intent.perTxCap) hard.push("AMOUNT_ABOVE_JAR_PER_TX_CAP");
+    if (intent.remainingLifetime !== undefined && amount > intent.remainingLifetime) hard.push("AMOUNT_ABOVE_JAR_LIFETIME_CAP");
     if (!r.extra?.expiresAt || r.extra.expiresAt <= now) hard.push("QUOTE_EXPIRED");
     if (opts.paidQuoteIds?.has(r.extra?.quoteId)) hard.push("QUOTE_ALREADY_PAID");
 

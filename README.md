@@ -5,7 +5,13 @@ Khi không kiểm chứng được, Lotus trả `MISSING EVIDENCE`. Từ chối 
 
 > Hoa sen mọc từ bùn mà không nhuốm bùn. Lotus lọc bằng chứng sạch giữa bùn tin đồn, "kèo" và tin giả.
 
-Bài dự thi **Team1 Vietnam UniHack 2026** (Avalanche). Hạn nộp: 21/11/2026, 23:59 giờ Việt Nam.
+Bài dự thi **Team1 Vietnam UniHack 2026** (Avalanche). Hạn nộp: 21/11/2026, 23:59 giờ Việt Nam. Giấy phép: [MIT](LICENSE).
+
+### In English
+
+Lotus is a pay-per-call **evidence-scoring API for market claims** ("the Fed cut rates", "NATO invoked Article 5", "FOX pays a cash dividend"), paid with test USDC over an **x402-style flow on Avalanche Fuji**. It counts *independent* sources, measures the echo chamber, flags stale, impersonated, injected or shill content, and answers `MISSING_EVIDENCE` rather than guess. It never gives buy/sell calls or price targets, and refuses those questions for free before quoting.
+
+Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day/lifetime caps, token and payee allow-lists by address, one-time EIP-712 approvals signed by the human (via Telegram), a guardian kill switch, and burst auto-lock. The agent holds no key that can move funds. The unused part of each `upto` payment is refunded on-chain, and every answer's receipt hash is chained and anchored on `LotusReceipts`. All three contracts are verified on Snowtrace, and every flow below has real Fuji transactions. The Vietnamese stock desk reads live HNX disclosures. The other four desks run on clearly labelled synthetic fixtures.
 
 ## Lotus làm gì
 
@@ -24,19 +30,20 @@ Người dùng ─► Agent (không giữ khoá) ─► POST /v1/score ─► 40
 
 | Thành phần | File | Trạng thái |
 |---|---|---|
-| Hũ có policy (cap theo lệnh/ngày/tổng, whitelist token **theo địa chỉ**, whitelist `payTo`, chữ ký EIP-712 từng lệnh, nonce một lần, hạn chữ ký, cửa sổ huỷ, kill switch, tự khoá khi dồn lệnh) | `contracts/LotusJar.sol` | ✅ 18 test |
+| Hũ có policy (cap theo lệnh/ngày/tổng, whitelist token **theo địa chỉ**, whitelist `payTo`, chữ ký EIP-712 từng lệnh, nonce một lần, hạn chữ ký, cửa sổ huỷ, kill switch, tự khoá khi dồn lệnh) | `contracts/LotusJar.sol` | ✅ có test, chạy thật trên Fuji |
 | Factory (API chỉ tin log từ hũ do factory tạo) | `contracts/LotusJarFactory.sol` | ✅ |
 | Neo biên nhận (chỉ hash lên chuỗi) | `contracts/LotusReceipts.sol` | ✅ |
 | API x402: 402 → xác minh → chấm → biên nhận; scheme `exact` (EIP-3009) và `lotus-jar` | `src/app.ts`, `src/x402/` | ✅ |
 | Bộ quy tắc: đếm nguồn độc lập, buồng vang, tin cũ, mạo danh, tài khoản mới / tương tác ảo, prompt injection, "kèo" tiếng Việt, mâu thuẫn số liệu và đơn vị, quy kết cho cơ quan chính thức phải có nguồn sơ cấp | `src/engine/` | ✅ |
-| Preflight người mua + chặn khi hai nguồn giá lệch | `src/buyer/` | ✅ |
-| Bàn sống chứng khoán VN (RSS công bố HNX) + fixture 4 bàn còn lại | `src/evidence/`, `data/fixtures/` | ✅ (chưa chạy thật với HNX từ máy build) |
+| Preflight người mua: chặn báo giá sai mạng, sai token, sai `payTo`, sai yêu cầu, vượt cap ngày, cap mỗi lần, cap trọn đời của hũ, **trước khi ký** | `src/buyer/preflight.ts` | ✅ |
+| Chặn lệch giá giữa hai oracle (cho hũ lệnh tuỳ chọn) | `src/buyer/oracle.ts` | ⚠️ chỉ có unit test, chưa chạy với oracle sống trên Fuji |
+| Bàn sống chứng khoán VN (RSS công bố HNX, giữ cookie phiên, lấy mã từ nội dung công bố) + fixture SYNTHETIC cho 4 bàn còn lại | `src/evidence/`, `data/fixtures/` | ✅ chạy thật với HNX ngày 13/11/2026 |
 | Red Team 22 kịch bản (28 kiểm tra) | `redteam/` | ✅ 28/28 |
 | Bot Telegram: phiếu duyệt có nút ✅/❌, `/check`, `/status`, `/lock` (khoá bằng khoá guardian), chỉ nhận lệnh từ chủ hũ, quá giờ không duyệt thì tự từ chối | `src/telegram/bot.ts` | ✅ |
-| Dashboard: hũ on-chain, khoản chờ duyệt, kết quả, sổ biên nhận, red team | `src/web/` (mở `http://localhost:8402`) | ✅ |
+| Dashboard: hũ on-chain, khoản chờ duyệt, kết quả kèm link nguồn, sổ biên nhận, red team. Chế độ **demo công khai chỉ đọc** (`PUBLIC_DEMO=1`) và token cho quyền đầy đủ | `src/web/`, [`docs/DEPLOY.md`](docs/DEPLOY.md) | ✅ |
 | Hoàn tiền on-chain phần chênh của giá `upto` (TREASURY → hũ) | `src/agent/jar.ts`, `src/app.ts` | ✅ |
 | Câu hỏi mua/bán và "kèo" bị từ chối **miễn phí**, trước khi báo giá | `src/app.ts` | ✅ |
-| Scheme `exact` settle được qua facilitator x402 chuẩn trên Avalanche (PayAI, Ultravioleta DAO, x402-rs) | `src/x402/facilitator.ts` | ✅ (chưa chạy thật với facilitator ngoài) |
+| Scheme `exact` (EIP-3009): kiểm chữ ký và gắn nonce vào `requestHash`; tự settle, hoặc gửi qua facilitator x402 bên ngoài (PayAI, Ultravioleta DAO, x402-rs) | `src/x402/` | ⚠️ có code và test với chain giả. **Chưa có giao dịch thật nào qua scheme này hay qua facilitator ngoài.** Mọi giao dịch Fuji ở dưới đều dùng scheme `lotus-jar` |
 | Verify hợp đồng trên Snowtrace (Routescan) | `scripts/verify.ts` | ✅ (chạy `npm run verify:fuji`) |
 | Test E2E trên EVM của Hardhat: agent → duyệt → hũ trả → API xác minh → neo biên nhận → hoàn tiền | `test/e2e.test.ts` | ✅ |
 
@@ -62,11 +69,20 @@ Nhận định *"NATO has invoked Article 5"* ra `MISSING_EVIDENCE` với `FLOOD
 
 Kill switch: giao dịch `Lock` gửi từ ví guardian (lệnh `/lock` trên Telegram), sau đó `Unlock` gửi từ ví chủ hũ. Xem tab Transactions của [hũ](https://testnet.snowtrace.io/address/0x805113113EC069205f59d72137c01244BfAA9619).
 
+### Kiểm chứng được gì trên chuỗi, cái gì không
+
+| Thông tin | Trên chuỗi? | Cách kiểm |
+|---|---|---|
+| Thanh toán, hoàn tiền, lock/unlock | ✅ | Giao dịch ở trên, và event `SpendExecuted` của hũ |
+| Kết luận (`SUPPORTED`, `MISSING_EVIDENCE`…) | ✅ dạng bytes32 | Trường `reasonCode` trong event `ReceiptAnchored` của `LotusReceipts` |
+| Hash biên nhận, hash gói bằng chứng, chuỗi nối tiếp | ✅ | `receiptHash`, `evidencePackHash`, `prevHash` trong cùng event; `head()` của hợp đồng |
+| Điểm số (vd. 45/100), mã lý do, nội dung nhận định | ❌ chỉ lưu off-chain | Lấy biên nhận ở `GET /receipts`, băm lại (`sha256` của JSON chuẩn hoá) rồi so với `receiptHash` đã neo. Sửa một trường là hash lệch (có test) |
+
 ## Chạy thử
 
 ```bash
 npm install --legacy-peer-deps
-npm test              # 26 test hợp đồng + E2E + bot, 9 test API
+npm test              # test hợp đồng + E2E (Hardhat) + bot + API
 npm run redteam       # bảng đạt/không đạt + hash của bộ kết quả
 npm run dev           # API + dashboard + bot Telegram trên :8402 (GET /, /catalog, POST /v1/score, /receipts)
 npm run jar -- status # xem hũ; `lock` / `unlock` (unlock chỉ bằng khoá chủ hũ)
@@ -114,7 +130,9 @@ Muốn dùng `/lock`, điền thêm `GUARDIAN_PRIVATE_KEY` (ví GUARDIAN cần k
 - Bàn sống đọc RSS công bố của HNX (gồm cả sàn UPCoM), rồi mở trang công bố để lấy mã cổ phiếu được nhắc trong nội dung tin (dạng *"cổ phiếu XXX"*). Văn bản doanh nghiệp tự nộp không ghi mã thì bị bỏ qua. Mã niêm yết trên HOSE (như HPG) chưa có trong bàn này nên luôn ra `MISSING EVIDENCE`. Lotus không bao giờ đoán.
 - Danh sách nguồn là ứng viên đã xác minh *tồn tại* ngày 12/11/2026, không phải cam kết độ tin cậy.
 - Chưa kiểm chứng feed oracle nào đang chạy trên Fuji. Bộ chặn lệch giá (`src/buyer/oracle.ts`) chỉ dùng cho hũ lệnh tuỳ chọn, và đó không phải tín hiệu giao dịch.
-- Nhóm không phải luật sư và chưa kiểm chứng văn bản pháp luật hiện hành. Các câu hỏi đã gửi ban tổ chức: *(điền câu trả lời)*.
+- Nhóm không phải luật sư và chưa kiểm chứng văn bản pháp luật hiện hành. Các câu hỏi về phạm vi pháp lý và điều kiện dự thi đã gửi ban tổ chức qua nhóm Builders Telegram và **đang chờ trả lời**. Mục này sẽ được cập nhật khi có câu trả lời.
+- Thanh toán qua scheme `exact` và qua facilitator x402 bên ngoài **chưa được chạy thật** (xem bảng thành phần ở trên).
+- Demo công khai chạy ở chế độ chỉ đọc: người xem không thấy các khoản chờ duyệt và không duyệt chi được.
 
 ## Cấu trúc
 
@@ -129,6 +147,6 @@ src/buyer/      preflight, chặn lệch oracle
 src/evidence/   FixtureProvider, HnxRssProvider
 src/ledger.ts   sổ biên nhận băm nối tiếp
 redteam/        22 kịch bản + runner
-scripts/        deploy Fuji, client demo cho agent
-docs/           kế hoạch gốc (Echo Score)
+scripts/        deploy + verify Fuji, client demo cho agent, quản trị hũ, duyệt công bố HNX
+docs/           DEPLOY.md (đưa demo lên public)
 ```

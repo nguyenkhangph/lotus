@@ -99,7 +99,11 @@
   <section>
     <div class="card" id="jarCard"><h2>Hũ bằng chứng</h2><div class="empty">Đang đọc hũ trên Fuji…</div></div>
 
-    <div class="card">
+    <div class="card" id="roNote" style="display:none">
+      <h2>Demo công khai (chỉ đọc)</h2>
+      <p class="muted" style="margin:0;font-size:13px">Hũ, sổ biên nhận và red team ở đây được đọc trực tiếp từ Avalanche Fuji. Chỉ chủ hũ mới gửi được nhận định và duyệt chi (qua Telegram). Thử API công khai:<br><code class="mono" style="font-size:12px">curl -X POST <span class="origin"></span>/v1/score -H "content-type: application/json" -d '{"claim":"NATO has invoked Article 5","desk":"gold_war"}'</code><br>→ HTTP 402 kèm điều khoản thanh toán x402.</p>
+    </div>
+    <div class="card" id="askCard">
       <h2>Hỏi Lotus</h2>
       <textarea id="claim" placeholder="Dán một nhận định thị trường, ví dụ: NATO has invoked Article 5"></textarea>
       <select id="desk"></select>
@@ -123,6 +127,8 @@
 
 <script>
 const $ = (id) => document.getElementById(id);
+const TOKEN = new URLSearchParams(location.search).get("token") || "";
+const H = (extra = {}) => ({ ...(TOKEN ? { "x-lotus-token": TOKEN } : {}), ...extra });
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const short = (a) => (a && a.length > 14 ? a.slice(0, 8) + "…" + a.slice(-6) : a || "—");
 const EXAMPLES = [
@@ -168,6 +174,11 @@ function jar(s) {
 }
 
 function pending(s) {
+  if (s.readOnly) {
+    $("pending").className = "empty";
+    $("pending").innerHTML = s.pendingCount ? `${s.pendingCount} khoản đang chờ chủ hũ duyệt trên Telegram.` : "Không có khoản chờ duyệt.";
+    return;
+  }
   if (!s.pending.length) { $("pending").className = "empty"; $("pending").innerHTML = "Không có khoản chờ duyệt."; return; }
   $("pending").className = "";
   $("pending").innerHTML = s.pending.map((c) => `
@@ -236,7 +247,7 @@ function redteam(s) {
 
 async function refresh() {
   try {
-    const s = await (await fetch("/api/state")).json();
+    const s = await (await fetch("/api/state", { headers: H() })).json();
     state = s;
     if (!desksLoaded) {
       $("desk").innerHTML = s.desks.map((d) => `<option value="${d.id}">${esc(d.name)}${d.live ? " · LIVE" : " · fixture"}</option>`).join("");
@@ -244,11 +255,13 @@ async function refresh() {
       desksLoaded = true;
     }
     badges(s); jar(s); pending(s); runs(s); ledger(s); redteam(s);
+    $("askCard").style.display = s.readOnly ? "none" : "";
+    $("roNote").style.display = s.readOnly ? "" : "none";
   } catch (e) { console.error(e); }
 }
 
 async function approve(runId, approved) {
-  await fetch("/api/approve", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ runId, approved }) });
+  await fetch("/api/approve", { method: "POST", headers: H({ "content-type": "application/json" }), body: JSON.stringify({ runId, approved }) });
   refresh();
 }
 
@@ -256,7 +269,7 @@ $("ask").onclick = async () => {
   const claim = $("claim").value.trim();
   if (!claim) return;
   $("ask").disabled = true;
-  const r = await fetch("/api/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ claim, desk: $("desk").value }) });
+  const r = await fetch("/api/check", { method: "POST", headers: H({ "content-type": "application/json" }), body: JSON.stringify({ claim, desk: $("desk").value }) });
   if (!r.ok) alert((await r.json()).error);
   $("ask").disabled = false;
   refresh();
@@ -264,6 +277,7 @@ $("ask").onclick = async () => {
 $("examples").innerHTML = EXAMPLES.map(([c, d], i) => `<button data-i="${i}">${esc(c.length > 34 ? c.slice(0, 32) + "…" : c)}</button>`).join("");
 $("examples").onclick = (e) => { const i = e.target.dataset.i; if (i === undefined) return; $("claim").value = EXAMPLES[i][0]; $("desk").value = EXAMPLES[i][1]; };
 
+document.querySelectorAll(".origin").forEach((e) => (e.textContent = location.origin));
 refresh();
 setInterval(refresh, 3000);
 </script>
