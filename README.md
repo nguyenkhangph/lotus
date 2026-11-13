@@ -58,6 +58,8 @@ Một vòng chạy thật, duyệt từ Telegram (13/11/2026), với nhận đ�
 
 Nhận định *"NATO has invoked Article 5"* ra `MISSING_EVIDENCE` với `FLOOD`, chỉ số buồng vang 0.846: [thanh toán](https://testnet.snowtrace.io/tx/0x8584484ae0951f28c4be239ace6a9dd39ef82fc8994777cbe3e1853cc1f861e0) · [biên nhận](https://testnet.snowtrace.io/tx/0x0bad1dab7a32e3a19873b8899d6174587457a25b477330ba89436b93f8b04f92)
 
+**Bàn sống (chứng khoán Việt Nam, dữ liệu thật từ HNX):** nhận định *"FOX chia cổ tức"* ra `SUPPORTED` 45/100. Lotus mở công bố [hnx.vn/…641922](https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html) (*"…đối với cổ phiếu FOX của CTCP Viễn thông FPT…"*), giao 1 nguồn độc lập, giữ 0.10 USDC và hoàn 0.35 USDC: [thanh toán](https://testnet.snowtrace.io/tx/0x4a9ecec68ab9b007a51e297c4a11794d723cd693305b9c250a4c8750db47f8be) · [biên nhận](https://testnet.snowtrace.io/tx/0x9b3e11106c90ad0ea4647c6190c6413caff058270611d3d89d91a01534d84926) · [hoàn tiền](https://testnet.snowtrace.io/tx/0xee563f8f3e0ae65faa3ef6362499e793e71c93bd4ac60d590f73ba83d8f510db). Mã trong dải bảng giá của trang (CEO, BVS…) hay trong tên công ty (FPT) không được tính.
+
 Kill switch: giao dịch `Lock` gửi từ ví guardian (lệnh `/lock` trên Telegram), sau đó `Unlock` gửi từ ví chủ hũ. Xem tab Transactions của [hũ](https://testnet.snowtrace.io/address/0x805113113EC069205f59d72137c01244BfAA9619).
 
 ## Chạy thử
@@ -109,7 +111,7 @@ Muốn dùng `/lock`, điền thêm `GUARDIAN_PRIVATE_KEY` (ví GUARDIAN cần k
 - **Chỉ chạy testnet (Avalanche Fuji, test USDC).** Tài sản mã hoá không phải phương tiện thanh toán hợp pháp tại Việt Nam. Lotus không nhận tiền gửi và không hứa lợi nhuận.
 - **Trên chuỗi chỉ lưu hash**, không lưu tên, nội dung nhận định hay nội dung nguồn.
 - **Một bàn sống** (chứng khoán VN qua RSS công bố của HNX). Bốn bàn còn lại dùng **fixture được ghi rõ là dữ liệu mẫu** (`deskLive: false`, mỗi mục có `synthetic: true`).
-- Bàn sống hiện ghép theo mã CK cộng từ khoá sự kiện, chưa đọc nội dung file công bố. Thiếu khớp thì kết quả là `MISSING EVIDENCE`, không bao giờ đoán.
+- Bàn sống đọc RSS công bố của HNX (gồm cả sàn UPCoM), rồi mở trang công bố để lấy mã cổ phiếu được nhắc trong nội dung tin (dạng *"cổ phiếu XXX"*). Văn bản doanh nghiệp tự nộp không ghi mã thì bị bỏ qua. Mã niêm yết trên HOSE (như HPG) chưa có trong bàn này nên luôn ra `MISSING EVIDENCE`. Lotus không bao giờ đoán.
 - Danh sách nguồn là ứng viên đã xác minh *tồn tại* ngày 12/11/2026, không phải cam kết độ tin cậy.
 - Chưa kiểm chứng feed oracle nào đang chạy trên Fuji. Bộ chặn lệch giá (`src/buyer/oracle.ts`) chỉ dùng cho hũ lệnh tuỳ chọn, và đó không phải tín hiệu giao dịch.
 - Nhóm không phải luật sư và chưa kiểm chứng văn bản pháp luật hiện hành. Các câu hỏi đã gửi ban tổ chức: *(điền câu trả lời)*.

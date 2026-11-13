@@ -195,6 +195,7 @@ function runs(s) {
     }
     const x = r.result || {}, rc = x.receipt || {};
     const links = [];
+    for (const u of (x.debate?.bull?.citations || []).filter((u) => /^https?:\/\//.test(u)).slice(0, 3)) links.push(`<a target="_blank" href="${esc(u)}">Nguồn: ${esc(new URL(u).hostname)} ↗</a>`);
     if ((r.preflightReasons || []).includes("FREE_REFUSAL")) links.push(`<span class="chip">Miễn phí · từ chối trước khi báo giá</span>`);
     if (r.payTx) links.push(`<a target="_blank" href="${s.explorer}/tx/${r.payTx}">Thanh toán ↗</a>`);
     if (rc.anchorTx) links.push(`<a target="_blank" href="${s.explorer}/tx/${rc.anchorTx}">Biên nhận on-chain ↗</a>`);

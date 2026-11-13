@@ -252,6 +252,8 @@ export function formatRun(r: RunRecord, explorer: string): string {
     `Chỉ số buồng vang: ${x.echoIndex}`,
     `Mã lý do: <code>${(x.reasonCodes ?? []).join(", ")}</code>`,
   ];
+  const cites: string[] = (x.debate?.bull?.citations ?? []).filter((u: string) => /^https?:\/\//.test(u)).slice(0, 3);
+  if (cites.length) lines.push(`Nguồn: ${cites.map((u, i) => `<a href="${esc(u)}">[${i + 1}] ${esc(new URL(u).hostname)}</a>`).join(" · ")}`);
   if (x.deskLive === false) lines.push("<i>Bàn này dùng dữ liệu mẫu (SYNTHETIC).</i>");
   const links = [];
   if (r.payTx) links.push(`<a href="${explorer}/tx/${r.payTx}">Thanh toán</a>`);

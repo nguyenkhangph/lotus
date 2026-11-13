@@ -183,3 +183,13 @@ describe("Telegram bot (fake Bot API)", () => {
     expect(guessDesk("US CPI rose last month")).to.equal("macro_whitehouse");
   });
 });
+
+describe("Telegram result shows source links", () => {
+  it("cites the primary disclosure URL", async () => {
+    const { formatRun } = await import("../src/telegram/bot");
+    const msg = formatRun({ runId: "r", claim: "FOX chia cổ tức", desk: "vn_stocks", status: "done", startedAt: "", payTx: "0xabc",
+      result: { verdict: "SUPPORTED", score: 45, independentSupport: 1, independentContra: 0, echoIndex: 0, reasonCodes: ["OK"], deskLive: true,
+        debate: { bull: { citations: ["https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html"] } }, receipt: {} } } as any, "https://testnet.snowtrace.io");
+    expect(msg).to.include('href="https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html"');
+  });
+});
