@@ -122,6 +122,8 @@ export function htmlToText(html: string): string {
   return html
     .replace(/<(script|style|nav|header|footer|noscript)[\s\S]*?<\/\1>/gi, " ")
     .replace(/<[^>]+>/g, " ")
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/\s+/g, " ")
@@ -140,7 +142,18 @@ export function mentionsTicker(text: string, ticker: string): boolean {
   return new RegExp(`(?<![\\p{L}\\p{N}])${ticker}(?![\\p{L}\\p{N}])`, "u").test(text);
 }
 
-/** Most frequent ticker-looking words in a disclosure page (used by the CLI and for display only). */
+/**
+ * The ticker a disclosure is ABOUT, read from its wording: "...đối với cổ phiếu FOX của CTCP...",
+ * "Mã chứng khoán: SHS", "mã CK: PVS". The page also carries a scrolling price strip (BVS, CAP, CEO...)
+ * and menus, so "any ticker anywhere on the page" would be wrong; this only trusts the disclosure text.
+ */
+const SUBJECT_RE = /(?:[cC]ổ phiếu|[mM]ã chứng khoán|[mM]ã CK|[mM]ã cổ phiếu|[mM]ã)\s*[:\-]?\s*([A-Z][A-Z0-9]{2})(?![\p{L}\p{N}])/u;
+export function disclosureTicker(text: string): string | undefined {
+  const m = text.match(SUBJECT_RE);
+  return m && !NOT_TICKERS.has(m[1]) ? m[1] : undefined;
+}
+
+/** Most frequent ticker-looking words in a disclosure page (debug only — includes the price strip). */
 export function tickersIn(text: string): string[] {
   const counts = new Map<string, number>();
   for (const m of tickerTokens(text)) {
@@ -197,8 +210,10 @@ export class HnxRssProvider implements EvidenceProvider {
         let body = it.title;
         if (!hasTicker(it.title)) {
           const text = await this.detail(it.link);
-          if (!text || !hasTicker(text)) return;
-          body = `${it.title} — ${text.slice(0, 280)}`;
+          const subject = text ? disclosureTicker(text) : undefined;
+          if (!subject || !tickers.includes(subject)) return;
+          const at = text!.indexOf(subject);
+          body = `${it.title} — ${text!.slice(Math.max(0, at - 120), at + 200)}`;
         }
         const shared = sharedEvents(it.title);
         out.push({
@@ -215,14 +230,14 @@ export class HnxRssProvider implements EvidenceProvider {
   }
 
   /** Lists recent disclosures with the tickers found on their pages (for picking demo claims). */
-  async browse(filter = "", limit = 15): Promise<{ title: string; tickers: string[]; url: string; publishedAt: string }[]> {
+  async browse(filter = "", limit = 15): Promise<{ title: string; ticker?: string; url: string; publishedAt: string }[]> {
     const all: HnxItem[] = [];
     for (const feed of this.feeds) all.push(...(await this.load(feed)));
     const picked = all.filter((it) => it.title.toLowerCase().includes(filter.toLowerCase())).slice(0, limit);
     return Promise.all(
       picked.map(async (it) => ({
         title: it.title.trim(),
-        tickers: tickersIn((await this.detail(it.link)) ?? "").slice(0, 3),
+        ticker: disclosureTicker((await this.detail(it.link)) ?? ""),
         url: publicHnxUrl(it.link),
         publishedAt: it.pubDate,
       })),

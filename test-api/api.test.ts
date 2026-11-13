@@ -9,7 +9,7 @@ import { loadConfig } from "../src/config";
 import { getDesk } from "../src/engine/desks";
 import { scoreClaim } from "../src/engine/score";
 import type { EvidenceItem } from "../src/engine/types";
-import { CookieClient, FixtureProvider, HnxRssProvider, mentionsTicker, parseRss, tickersIn } from "../src/evidence/providers";
+import { CookieClient, FixtureProvider, HnxRssProvider, disclosureTicker, mentionsTicker, parseRss, tickersIn } from "../src/evidence/providers";
 import { Ledger } from "../src/ledger";
 import { preflight } from "../src/buyer/preflight";
 import { requestHash } from "../src/util/hash";
@@ -63,7 +63,8 @@ describe("HNX live provider (shape of the real feed, 13/11/2026)", () => {
     <item><guid isPermaLink="false">641962</guid><link>http://hnx.vn:7978/tin-cung-cap-rss-vi_vn-641962-1.html</link><title>Nghị quyết Hội đồng quản trị</title><pubDate>Fri, 13 Nov 2026 10:51:31 +0700</pubDate></item>
   </channel></rss>`;
   const pages: Record<string, string> = {
-    "https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html": "<html><body><nav>HNX SHS PVS</nav><div>Mã chứng khoán: SHS. Ngày đăng ký cuối cùng trả cổ tức bằng tiền mặt.</div></body></html>",
+    // Real layout (13/11/2026): price strip with unrelated tickers, then the disclosure text naming FOX.
+    "https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html": "<html><body><div class='ticker'>BVS 27.400 CAP 37.700 CEO 12.100 DP3 60.000</div><h1>NGÀY ĐĂNG KÝ CUỐI CÙNG TRẢ CỔ TỨC BẰNG TIỀN MẶT, TRẢ CỔ PHIẾU THƯỞNG</h1><div>Thông báo ngày đăng ký cuối cùng lập danh sách cổ đông đối với cổ phi&#7871;u FOX của CTCP Viễn thông FPT như sau: 1. Ngày đăng ký cuối cùng: 10/12/2026</div></body></html>",
     "https://hnx.vn/tin-cung-cap-rss-vi_vn-641962-1.html": "<html><body><div>Mã chứng khoán: CEO. Nghị quyết HĐQT.</div></body></html>",
   };
   const client = { get: async (u: string) => (u.endsWith(".rss") ? xml : pages[u] ?? Promise.reject(new Error("404"))) };
@@ -74,17 +75,19 @@ describe("HNX live provider (shape of the real feed, 13/11/2026)", () => {
 
   it("finds the ticker on the disclosure page and links the public https URL", async () => {
     const p = new HnxRssProvider(client, 0, ["feed.rss"]);
-    const items = await p.fetch({ text: "SHS chia cổ tức tiền mặt", desk: "vn_stocks" }, getDesk("vn_stocks"));
+    const items = await p.fetch({ text: "FOX chia cổ tức tiền mặt", desk: "vn_stocks" }, getDesk("vn_stocks"));
     expect(items).to.have.length(1);
     expect(items[0].stance).to.equal("supports");
     expect(items[0].url).to.equal("https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html");
-    const r = scoreClaim({ text: "SHS chia cổ tức tiền mặt", desk: "vn_stocks", asOf: "2026-11-13T05:00:00Z" }, getDesk("vn_stocks"), items);
+    const r = scoreClaim({ text: "FOX chia cổ tức tiền mặt", desk: "vn_stocks", asOf: "2026-11-13T05:00:00Z" }, getDesk("vn_stocks"), items);
     expect(r.verdict).to.equal("SUPPORTED");
   });
 
-  it("a ticker that is not on the page (e.g. HPG, listed on HOSE) yields nothing", async () => {
+  it("a ticker that is not the subject (HPG, or CEO from the price strip, or FPT from the company name) yields nothing", async () => {
     const p = new HnxRssProvider(client, 0, ["feed.rss"]);
-    expect(await p.fetch({ text: "HPG chia cổ tức", desk: "vn_stocks" }, getDesk("vn_stocks"))).to.deep.equal([]);
+    for (const t of ["HPG", "CEO", "FPT", "BVS"]) {
+      expect(await p.fetch({ text: `${t} chia cổ tức`, desk: "vn_stocks" }, getDesk("vn_stocks")), t).to.deep.equal([]);
+    }
   });
 
   it("a dead feed yields nothing, never invented evidence", async () => {
@@ -95,7 +98,7 @@ describe("HNX live provider (shape of the real feed, 13/11/2026)", () => {
   it("browse lists disclosures with tickers found on their pages", async () => {
     const p = new HnxRssProvider(client, 0, ["feed.rss"]);
     const rows = await p.browse("cổ tức");
-    expect(rows[0].tickers[0]).to.equal("SHS");
+    expect(rows[0].ticker).to.equal("FOX");
   });
 
   it("CookieClient keeps the session cookie across the 'Object moved' redirect", async () => {
@@ -240,6 +243,8 @@ describe("ticker detection is Unicode-aware", () => {
   it("never reads PHI/THI/TIN out of Vietnamese uppercase words", () => {
     const text = "THÔNG TIN CỔ PHIẾU · THIẾT LẬP · Mã chứng khoán: SHS";
     expect(tickersIn(text)).to.deep.equal(["SHS"]);
+    expect(disclosureTicker(text)).to.equal("SHS");
+    expect(disclosureTicker("đối với cổ phiếu FOX của CTCP Viễn thông FPT")).to.equal("FOX");
     expect(mentionsTicker(text, "PHI")).to.equal(false);
     expect(mentionsTicker(text, "SHS")).to.equal(true);
   });
