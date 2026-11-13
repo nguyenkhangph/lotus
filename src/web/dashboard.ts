@@ -20,6 +20,8 @@ export type DashboardDeps = {
   publicDemo?: boolean;
   /** Optional secret: `x-lotus-token` header or `?token=` gives full access (pending cards, ask, approve). */
   token?: string;
+  /** Public contract addresses shown on the page. */
+  contracts?: { factory?: string; receipts?: string; jar?: string };
 };
 
 /**
@@ -43,6 +45,8 @@ export function dashboardRouter(d: DashboardDeps): Router {
   let jarCache: { at: number; v: JarStatus | null; err?: string } = { at: 0, v: null };
 
   r.get("/", (_req, res) => res.type("html").send(html));
+  // Images, favicons, OG card (on Vercel these are served by the CDN from public/ directly).
+  r.use(express.static(path.join(__dirname, "..", "..", "public"), { maxAge: "1d", index: false }));
 
   const fullAccess = (req: Request) => hasToken(req, d.token) || (!d.publicDemo && isDirectLocal(req));
 
@@ -65,6 +69,7 @@ export function dashboardRouter(d: DashboardDeps): Router {
     res.json({
       network: d.network,
       explorer: d.explorer,
+      contracts: d.contracts ?? {},
       botEnabled: d.botEnabled,
       jar: jarCache.v,
       jarError: jarCache.err,

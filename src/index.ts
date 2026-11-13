@@ -70,6 +70,7 @@ app.use(
     allowLocalApprove: !botToken || env.DASHBOARD_APPROVE === "1",
     publicDemo: env.PUBLIC_DEMO === "1",
     token: env.DASHBOARD_TOKEN || undefined,
+    contracts: { factory: env.JAR_FACTORY_ADDRESS, receipts: env.RECEIPTS_ADDRESS, jar: env.JAR_ADDRESS },
   }),
 );
 

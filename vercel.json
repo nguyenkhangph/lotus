@@ -9,5 +9,10 @@
       "includeFiles": "{src/web/index.html,redteam/report.json,data/fixtures/**,data/demo/**}"
     }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
 }

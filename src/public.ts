@@ -20,7 +20,7 @@ import { dashboardRouter } from "./web/dashboard";
 /** Serverless disks are read-only: copy the committed ledger snapshot to a writable temp file. */
 export function writableLedger(snapshot: string): Ledger {
   const tmp = path.join(os.tmpdir(), "lotus-ledger.jsonl");
-  if (!fs.existsSync(tmp)) {
+  if (!fs.existsSync(tmp) || fs.statSync(tmp).size === 0) {
     try {
       fs.copyFileSync(snapshot, tmp);
     } catch {
@@ -43,7 +43,7 @@ export function buildPublicApp(env: NodeJS.ProcessEnv = process.env) {
     ledger,
     evidence: new DeskRouter({ vn_stocks: new HnxRssProvider() }, new FixtureProvider()),
   });
-  const jarAddr = env.JAR_ADDRESS;
+  const jarAddr = env.JAR_ADDRESS ?? "0x805113113EC069205f59d72137c01244BfAA9619";
   app.use(
     dashboardRouter({
       hub: new ApprovalHub(),
@@ -54,6 +54,7 @@ export function buildPublicApp(env: NodeJS.ProcessEnv = process.env) {
       botEnabled: false,
       allowLocalApprove: false,
       publicDemo: true,
+      contracts: { factory: env.JAR_FACTORY_ADDRESS ?? "0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546", receipts: env.RECEIPTS_ADDRESS ?? "0xD8cDc230225448b005DBCE3B935ac53e2057DAd8", jar: env.JAR_ADDRESS ?? "0x805113113EC069205f59d72137c01244BfAA9619" },
     }),
   );
   return app;
