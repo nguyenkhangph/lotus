@@ -71,6 +71,8 @@ npm run jar -- status # xem hũ; `lock` / `unlock` (unlock chỉ bằng khoá ch
 npm run verify:fuji   # verify mã nguồn hợp đồng trên Snowtrace
 ```
 
+Cần Node ≥ 22.15. Các script chạy với `--use-system-ca` vì `hnx.vn` không gửi kèm chứng chỉ trung gian: Windows và `curl` tự bù được, còn Node mặc định thì không.
+
 Hardhat biên dịch bằng `solc` lấy từ npm (`node_modules/solc`), nên chạy được cả khi mạng chặn binaries.soliditylang.org.
 
 ### Deploy lên Fuji

@@ -9,12 +9,12 @@
     "test:api": "mocha -r ts-node/register/transpile-only \"test-api/**/*.test.ts\"",
     "redteam": "ts-node --transpile-only redteam/run.ts",
     "typecheck": "tsc --noEmit -p .",
-    "dev": "ts-node --transpile-only src/index.ts",
+    "dev": "node --use-system-ca -r ts-node/register/transpile-only src/index.ts",
     "deploy:fuji": "hardhat run scripts/deploy.ts --network fuji",
-    "demo:agent": "ts-node --transpile-only scripts/agent-demo.ts",
+    "demo:agent": "node --use-system-ca -r ts-node/register/transpile-only scripts/agent-demo.ts",
     "verify:fuji": "hardhat run scripts/verify.ts --network fuji",
     "jar": "ts-node --transpile-only scripts/jar.ts",
-    "hnx": "ts-node --transpile-only scripts/hnx.ts"
+    "hnx": "node --use-system-ca -r ts-node/register/transpile-only scripts/hnx.ts"
   },
   "keywords": [],
   "author": "",
@@ -43,5 +43,8 @@
   "dependencies": {
     "express": "^4.22.3"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": ">=22.15"
+  }
 }
