@@ -4,10 +4,14 @@
  *   npm run jar -- lock      (GUARDIAN_PRIVATE_KEY, or the owner key)
  *   npm run jar -- unlock    (owner only = DEPLOYER_PRIVATE_KEY; the bot can never unlock)
  *   npm run jar -- extend 30 (owner only; jar expires 30 days from now, other timing kept)
+ *   npm run jar -- refund-backlog 0 1 2 3          (dry run: shows what would be refunded)
+ *   npm run jar -- refund-backlog 0 1 2 3 --send   (TREASURY_PRIVATE_KEY sends each receipt's refundDue to the jar)
+ *     For receipts written before automatic refunds existed. Check on Snowtrace first: never refund an index twice.
  */
 import { Contract, JsonRpcProvider, Wallet } from "ethers";
 import { loadConfig } from "../src/config";
-import { lockJar, readJar, unlockJar } from "../src/agent/jar";
+import fs from "fs";
+import { lockJar, readJar, sendRefund, unlockJar } from "../src/agent/jar";
 
 async function main() {
   const cmd = process.argv[2] ?? "status";
@@ -41,8 +45,27 @@ async function main() {
     await tx.wait();
     const fmt = (t: bigint) => new Date(Number(t) * 1000).toISOString();
     console.log(`expiresAt ${fmt(oldExp)} -> ${fmt(exp)}, tx ${tx.hash}`);
+  } else if (cmd === "refund-backlog") {
+    const args = process.argv.slice(3);
+    const send = args.includes("--send");
+    const idx = args.filter((a) => /^\d+$/.test(a)).map(Number);
+    if (!idx.length) throw new Error("usage: npm run jar -- refund-backlog <index...> [--send]");
+    const path = fs.existsSync(cfg.ledgerPath) ? cfg.ledgerPath : "data/demo/ledger.jsonl";
+    const rows = fs.readFileSync(path, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+    const picked = idx.map((i) => {
+      const r = rows.find((x) => x.index === i);
+      if (!r) throw new Error(`receipt #${i} not in ${path}`);
+      return { i, amount: BigInt(r.pricing?.refundDue ?? 0), pay: r.payment?.ref };
+    }).filter((p) => p.amount > 0n);
+    const total = picked.reduce((a, p) => a + p.amount, 0n);
+    for (const p of picked) console.log(`#${p.i}  refund ${Number(p.amount) / 1e6} USDC -> ${jar}  (payment ${p.pay})`);
+    console.log(`total ${Number(total) / 1e6} USDC from ${path}`);
+    if (!send) { console.log("dry run. Add --send to transfer."); return; }
+    if (!process.env.TREASURY_PRIVATE_KEY) throw new Error("TREASURY_PRIVATE_KEY needed");
+    const treasury = new Wallet(process.env.TREASURY_PRIVATE_KEY, provider);
+    for (const p of picked) console.log(`#${p.i} refunded, tx ${await sendRefund(cfg, treasury, jar, p.amount)}`);
   } else {
-    throw new Error("usage: npm run jar -- status|lock|unlock|extend <days>");
+    throw new Error("usage: npm run jar -- status|lock|unlock|extend <days>|refund-backlog <index...> [--send]");
   }
 }
 

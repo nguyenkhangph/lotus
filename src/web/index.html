@@ -278,7 +278,7 @@ const VI = { SUPPORTED: "CÓ BẰNG CHỨNG", WEAK: "BẰNG CHỨNG YẾU", CONT
 const BAD = ["PROMPT_INJECTION", "IMPERSONATION", "SHILL_LANGUAGE", "TRADE_REQUEST", "FLOOD", "CONTRADICTION", "UNIT_MISMATCH"];
 const WARN = ["ECHO_DUPLICATE", "STALE", "NEW_ACCOUNT", "ENGAGEMENT_ANOMALY", "SCREENSHOT_ONLY", "MISSING_PRIMARY", "NO_EVIDENCE"];
 const EXAMPLES = [["NATO has invoked Article 5", "gold_war"], ["FOX chia cổ tức", "vn_stocks"], ["US CPI rose last month", "macro_whitehouse"], ["The Fed cut rates by 50 bp", "macro_whitehouse"], ["Nên mua ETH ngay không?", "btc_ta"]];
-const CURL = () => `curl -i -X POST ${location.origin}/v1/score \\\n  -H "content-type: application/json" \\\n  -d '{"claim":"NATO has invoked Article 5","desk":"gold_war"}'`;
+const CURL = () => `curl -i -X POST ${location.origin}/v1/score \\\n  -H "content-type: application/json" \\\n  -d '{"claim":"FOX chia co tuc","desk":"vn_stocks"}'`;
 let desksLoaded = false;
 
 function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 1800); }

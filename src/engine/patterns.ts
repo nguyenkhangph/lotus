@@ -42,8 +42,25 @@ export const TRADE_REQUEST_PATTERNS: RegExp[] = [
   /có nên (vào|xuống tiền)/i,
 ];
 
+/** Strip Vietnamese diacritics (and đ→d) so "Nen mua ETH" is caught like "Nên mua ETH". */
+export function foldDiacritics(t: string): string {
+  return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+}
+
+const folded = new WeakMap<RegExp, RegExp>();
+function foldedPattern(p: RegExp): RegExp {
+  let f = folded.get(p);
+  if (!f) {
+    f = new RegExp(foldDiacritics(p.source), p.flags);
+    folded.set(p, f);
+  }
+  return f;
+}
+
+/** Matches either the text as written or its diacritic-free form (people often type Vietnamese without accents). */
 export function matchesAny(text: string, patterns: RegExp[]): boolean {
-  return patterns.some((p) => p.test(text));
+  const plain = foldDiacritics(text);
+  return patterns.some((p) => p.test(text) || foldedPattern(p).test(plain));
 }
 
 export function normalizeText(t: string): string {
