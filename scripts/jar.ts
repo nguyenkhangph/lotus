@@ -4,9 +4,9 @@
  *   npm run jar -- lock      (GUARDIAN_PRIVATE_KEY, or the owner key)
  *   npm run jar -- unlock    (owner only = DEPLOYER_PRIVATE_KEY; the bot can never unlock)
  *   npm run jar -- extend 30 (owner only; jar expires 30 days from now, other timing kept)
- *   npm run jar -- refund-backlog 0 1 2 3          (dry run: shows what would be refunded)
- *   npm run jar -- refund-backlog 0 1 2 3 --send   (TREASURY_PRIVATE_KEY sends each receipt's refundDue to the jar)
- *     For receipts written before automatic refunds existed. Check on Snowtrace first: never refund an index twice.
+ *   npm run jar -- refund-backlog            (checks every receipt against the explorer: refunded or not)
+ *   npm run jar -- refund-backlog --send     (TREASURY_PRIVATE_KEY refunds only the receipts with no refund on-chain)
+ *     Optional receipt numbers limit it, e.g. refund-backlog 0 1 2 3 --send.
  *   npm run jar -- rules "Mỗi lần tối đa 0,5 USDC. Mỗi ngày không quá 3 USDC."          (preview + simulation)
  *   npm run jar -- wallets   (main wallet, spending jar, invoice wallet)
  *   npm run jar -- sweep     (pays the invoice wallet out by its on-chain split; any key with gas, here AGENT_PRIVATE_KEY)
@@ -18,6 +18,7 @@ import fs from "fs";
 import { lockJar, readJar, sendRefund, unlockJar } from "../src/agent/jar";
 import { previewRules } from "../src/rules/service";
 import { readWallets, sweepInbox } from "../src/agent/wallets";
+import { fetchJarTransfers, matchRefunds } from "../src/agent/refunds";
 
 async function main() {
   const cmd = process.argv[2] ?? "status";
@@ -52,24 +53,37 @@ async function main() {
     const fmt = (t: bigint) => new Date(Number(t) * 1000).toISOString();
     console.log(`expiresAt ${fmt(oldExp)} -> ${fmt(exp)}, tx ${tx.hash}`);
   } else if (cmd === "refund-backlog") {
+    // Checks the explorer first: only receipts with no matching treasury → jar refund are sent, so nothing is refunded twice.
     const args = process.argv.slice(3);
     const send = args.includes("--send");
-    const idx = args.filter((a) => /^\d+$/.test(a)).map(Number);
-    if (!idx.length) throw new Error("usage: npm run jar -- refund-backlog <index...> [--send]");
+    const force = args.includes("--force");
+    const want = args.filter((a) => /^\d+$/.test(a)).map(Number);
     const path = fs.existsSync(cfg.ledgerPath) ? cfg.ledgerPath : "data/demo/ledger.jsonl";
     const rows = fs.readFileSync(path, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
-    const picked = idx.map((i) => {
-      const r = rows.find((x) => x.index === i);
-      if (!r) throw new Error(`receipt #${i} not in ${path}`);
-      return { i, amount: BigInt(r.pricing?.refundDue ?? 0), pay: r.payment?.ref };
-    }).filter((p) => p.amount > 0n);
-    const total = picked.reduce((a, p) => a + p.amount, 0n);
-    for (const p of picked) console.log(`#${p.i}  refund ${Number(p.amount) / 1e6} USDC -> ${jar}  (payment ${p.pay})`);
-    console.log(`total ${Number(total) / 1e6} USDC from ${path}`);
-    if (!send) { console.log("dry run. Add --send to transfer."); return; }
+    let matches: ReturnType<typeof matchRefunds> | null = null;
+    try {
+      matches = matchRefunds(rows, await fetchJarTransfers(jar, cfg.asset, cfg.chainId), jar, cfg.treasury);
+    } catch (e: any) {
+      console.log(`  ⚠ Không đọc được lịch sử giao dịch trên explorer (${e?.message}). Hãy tự kiểm tra trên Snowtrace.`);
+    }
+    const usd = (x: bigint) => (Number(x) / 1e6).toFixed(2);
+    const todo: { i: number; amount: bigint }[] = [];
+    for (const r of rows.sort((x: any, y: any) => x.index - y.index)) {
+      if (want.length && !want.includes(r.index)) continue;
+      const due = BigInt(r.pricing?.refundDue ?? 0);
+      const m = matches?.find((x) => x.index === r.index);
+      const tag = !m ? "chưa kiểm tra" : m.status === "refunded" ? `đã hoàn (tx ${m.refundTx})` : m.status === "missing" ? "CHƯA HOÀN" : m.status === "nothing_due" ? "không cần hoàn" : "không thấy giao dịch thanh toán";
+      console.log(`  #${r.index}  ${usd(due)} USDC  ${tag}`);
+      if (due > 0n && (m ? m.status === "missing" : force)) todo.push({ i: r.index, amount: due });
+    }
+    const total = todo.reduce((x, p) => x + p.amount, 0n);
+    console.log(`\n  Sẽ hoàn: ${todo.length ? todo.map((p) => "#" + p.i).join(", ") : "không có"} · tổng ${usd(total)} USDC từ treasury về hũ ${jar}`);
+    if (!matches && !force) console.log("  (Không kiểm tra được explorer nên không gửi gì. Đã tự kiểm tra trên Snowtrace thì thêm --force cùng danh sách số.)");
+    if (!send || !todo.length) { if (todo.length) console.log("  Chạy thử. Thêm --send để gửi."); return; }
+    if (!matches && !want.length) throw new Error("Với --force, ghi rõ số biên nhận cần hoàn, ví dụ: refund-backlog 0 1 2 3 --send --force");
     if (!process.env.TREASURY_PRIVATE_KEY) throw new Error("TREASURY_PRIVATE_KEY needed");
     const treasury = new Wallet(process.env.TREASURY_PRIVATE_KEY, provider);
-    for (const p of picked) console.log(`#${p.i} refunded, tx ${await sendRefund(cfg, treasury, jar, p.amount)}`);
+    for (const p of todo) console.log(`  #${p.i} đã hoàn ${usd(p.amount)} USDC, tx ${await sendRefund(cfg, treasury, jar, p.amount)}`);
   } else if (cmd === "wallets") {
     const w = await readWallets(cfg, provider, await readJar(cfg, jar, provider), process.env.INBOX_ADDRESS || undefined);
     console.log(`  Ví chính     ${w.main.address}  ${w.main.usdc} USDC · ${w.main.avax} AVAX  (agent không có khoá)`);
