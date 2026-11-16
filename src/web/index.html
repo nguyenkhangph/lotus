@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<script>
+(function(){try{var q=new URLSearchParams(location.search).get("theme");var s=null;try{s=localStorage.getItem("lotus-theme")}catch(e){}var t=(q==="vn"||q==="default")?q:(s==="vn"||s==="default")?s:"default";document.documentElement.setAttribute("data-theme",t);if(q==="vn"||q==="default"){try{localStorage.setItem("lotus-theme",q)}catch(e){}}}catch(e){document.documentElement.setAttribute("data-theme","default")}})();
+</script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lotus — evidence scores for market claims</title>
@@ -20,7 +23,7 @@
 <meta name="twitter:image" content="https://lotus-azure-ten.vercel.app/og.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   :root {
     --bg: #0b0f14; --panel: rgba(255,255,255,.035); --panel2: rgba(255,255,255,.06);
@@ -174,6 +177,184 @@
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a2029; border: 1px solid var(--border2);
            padding: 10px 16px; border-radius: 12px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 50; }
   .toast.on { opacity: 1; }
+
+  /* ---- Theme toggle (both themes) ---- */
+  .theme-switch { display: inline-flex; align-items: center; gap: 2px; margin-right: 10px; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+  .theme-switch-k { margin-right: 4px; }
+  .theme-switch button {
+    border: 0; background: transparent; color: var(--muted); cursor: pointer;
+    font: 600 12.5px var(--sans); padding: 4px 8px; border-radius: 8px;
+  }
+  .theme-switch button:hover { color: var(--text); }
+  .theme-switch button[aria-pressed="true"] { color: var(--text); background: var(--panel2); border: 1px solid var(--border); }
+  .theme-switch-sep { color: var(--dim); margin: 0 1px; }
+  @media (max-width: 820px) {
+    .theme-switch-k { display: none; }
+    .navright .theme-switch { display: inline-flex; }
+  }
+
+  .t-vn, .vn-only { display: none; }
+  .features .card + .card { margin-top: 0; }
+  @media (max-width: 820px) { #badges { display: none; } }
+
+  /* ---- Việt Nam: đêm sơn mài ---- */
+  html[data-theme="vn"] {
+    --bg: #140e10;
+    --panel: rgba(244, 234, 216, .045);
+    --panel2: rgba(198, 163, 91, .08);
+    --border: rgba(198, 163, 91, .18);
+    --border2: rgba(198, 163, 91, .32);
+    --text: #f4ead8;
+    --muted: #c4b8a4;
+    --dim: #8a7d6e;
+    --son: #b42318;
+    --gold: #c6a35b;
+    --gold-bright: #e0c078;
+    --sen: #e8a0b4;
+    --lotus: #e8a0b4;
+    --coral: #d4866a;
+    --jade: #3db89a;
+    --amber: #e0b15a;
+    --red: #e0574f;
+    --grad: linear-gradient(135deg, #b42318 0%, #c6a35b 100%);
+    --grad-gold: linear-gradient(135deg, #b8934a, #e0c078);
+    --sans: "Be Vietnam Pro", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --serif: "Lora", Georgia, "Times New Roman", serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  html[data-theme="vn"] .t-default { display: none; }
+  html[data-theme="vn"] .t-vn { display: inline; }
+  html[data-theme="vn"] .vn-only { display: block; }
+  html[data-theme="vn"] .timeline.vn-only { display: flex; }
+  html[data-theme="vn"] body {
+    background-color: var(--bg);
+    background-image:
+      url("/assets/motif-dong-son.svg"),
+      url("/assets/motif-may.svg"),
+      radial-gradient(900px 520px at 88% -8%, rgba(180, 35, 24, .16), transparent 58%),
+      radial-gradient(720px 420px at -8% 36%, rgba(28, 58, 74, .45), transparent 62%),
+      radial-gradient(600px 380px at 50% 100%, rgba(198, 163, 91, .07), transparent 55%);
+    background-repeat: no-repeat;
+    background-position: 96% -6%, -2% 99%, 0 0, 0 0, 0 0;
+    background-size: 480px, 560px, auto, auto, auto;
+  }
+  html[data-theme="vn"] nav {
+    background: rgba(20, 14, 16, .82);
+    box-shadow: 0 1px 0 rgba(224, 192, 120, .12);
+  }
+  html[data-theme="vn"] .brand { font-family: var(--serif); font-weight: 600; }
+  html[data-theme="vn"] .navlinks a:hover { color: var(--gold-bright); }
+  html[data-theme="vn"] a.link, html[data-theme="vn"] td.mono a, html[data-theme="vn"] .links a { color: var(--gold-bright); }
+  html[data-theme="vn"] .hero::after { background:
+      linear-gradient(90deg, var(--bg) 16%, rgba(20,14,16,.82) 46%, rgba(20,14,16,.15) 72%, transparent 86%),
+      linear-gradient(0deg, var(--bg) 0%, transparent 28%); }
+  html[data-theme="vn"] .eyebrow {
+    color: var(--gold-bright);
+    background: rgba(198, 163, 91, .12);
+    border-color: rgba(198, 163, 91, .38);
+  }
+  html[data-theme="vn"] h1,
+  html[data-theme="vn"] .sh h2,
+  html[data-theme="vn"] .feature h4,
+  html[data-theme="vn"] .claim,
+  html[data-theme="vn"] .bal,
+  html[data-theme="vn"] .score b,
+  html[data-theme="vn"] .big,
+  html[data-theme="vn"] .stat b { font-family: var(--serif); }
+  html[data-theme="vn"] h1 { line-height: 1.12; letter-spacing: -.03em; }
+  html[data-theme="vn"] .lead { color: #e2d6c4; }
+  html[data-theme="vn"] .btn:hover { background: rgba(198, 163, 91, .16); border-color: var(--gold); }
+  html[data-theme="vn"] .btn.primary {
+    background: var(--grad-gold); color: #1a1008;
+    box-shadow: 0 8px 28px rgba(198, 163, 91, .32);
+  }
+  html[data-theme="vn"] .btn.primary:hover { background: linear-gradient(135deg, #c6a35b, #ead49a); }
+  html[data-theme="vn"] .stat { background: rgba(20, 14, 16, .7); }
+  html[data-theme="vn"] .stat b { color: var(--gold-bright); }
+  html[data-theme="vn"] .card h3 { color: var(--gold); letter-spacing: .06em; }
+  html[data-theme="vn"] .jar-top img { filter: drop-shadow(0 10px 30px rgba(198, 163, 91, .35)); }
+  html[data-theme="vn"] .bal { color: var(--gold-bright); }
+  html[data-theme="vn"] .bar { background: rgba(244, 234, 216, .08); }
+  html[data-theme="vn"] .kv { grid-template-columns: 118px 1fr; }
+  html[data-theme="vn"] textarea:focus, html[data-theme="vn"] select:focus {
+    border-color: rgba(198, 163, 91, .7); box-shadow: 0 0 0 3px rgba(198, 163, 91, .18);
+  }
+  html[data-theme="vn"] select option { background: #1a1418; }
+  html[data-theme="vn"] .chipbtn:hover { border-color: var(--gold); }
+  html[data-theme="vn"] pre.code { color: #e6dccb; }
+  html[data-theme="vn"] .approval {
+    border-color: rgba(198, 163, 91, .45);
+    background: linear-gradient(180deg, rgba(198, 163, 91, .12), rgba(180, 35, 24, .05));
+  }
+  html[data-theme="vn"] .v-REFUSE { color: var(--sen); }
+  html[data-theme="vn"] .v-pending { color: var(--gold-bright); }
+  html[data-theme="vn"] .v-MISSING_EVIDENCE { color: #c9c0b4; }
+  html[data-theme="vn"] .tag { background: rgba(244,234,216,.06); color: #ddd2c2; }
+  html[data-theme="vn"] .tag.bad { background: rgba(180,35,24,.14); color: #f0a3a0; border-color: rgba(180,35,24,.35); }
+  html[data-theme="vn"] .tag.warn { background: rgba(224,177,90,.1); color: #e8c98a; border-color: rgba(224,177,90,.28); }
+  html[data-theme="vn"] #how::before, html[data-theme="vn"] #contracts::before {
+    content: ""; position: absolute; pointer-events: none; z-index: 0;
+    background-repeat: no-repeat; background-size: contain;
+  }
+  html[data-theme="vn"] #how, html[data-theme="vn"] #contracts { position: relative; }
+  html[data-theme="vn"] #how::before {
+    right: -2%; top: -10px; width: 260px; height: 260px;
+    background-image: url("/assets/motif-dong-son.svg"); opacity: .2;
+  }
+  html[data-theme="vn"] #contracts::before {
+    right: -1%; top: -24px; width: 240px; height: 90px;
+    background-image: url("/assets/motif-may.svg"); opacity: .22;
+  }
+  html[data-theme="vn"] #how > *, html[data-theme="vn"] #contracts > * { position: relative; z-index: 1; }
+
+  html[data-theme="vn"] .hist {
+    border-bottom: 1px dotted rgba(198,163,91,.55); cursor: help; text-decoration: none;
+  }
+  html[data-theme="vn"] .notes {
+    margin-top: 28px; padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--r);
+    background: var(--panel); font-size: 12.5px; color: var(--muted); line-height: 1.55;
+  }
+  html[data-theme="vn"] .notes h3 {
+    margin: 0 0 10px; font-family: var(--serif); font-size: 16px; color: var(--gold-bright);
+    letter-spacing: 0; text-transform: none; font-weight: 600;
+  }
+  html[data-theme="vn"] .notes dl { margin: 0; }
+  html[data-theme="vn"] .notes dt { color: var(--gold); font-weight: 600; display: inline; }
+  html[data-theme="vn"] .notes dd { display: inline; margin: 0 0 0 .35em; }
+  html[data-theme="vn"] .notes dd::after { content: ""; display: block; height: 8px; }
+
+  html[data-theme="vn"] .timeline {
+    flex-wrap: wrap; gap: 6px 0; align-items: center; margin: 56px 0 0;
+    padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--r);
+    background: var(--panel); font-size: 13px; color: var(--muted);
+  }
+  html[data-theme="vn"] .timeline strong {
+    font-family: var(--serif); color: var(--gold-bright); font-weight: 600; margin-right: 10px;
+    font-size: 15px;
+  }
+  html[data-theme="vn"] .timeline ol { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 0; margin: 8px 0 6px; padding: 0; align-items: center; }
+  html[data-theme="vn"] .timeline li { display: inline-flex; align-items: center; }
+  html[data-theme="vn"] .timeline li span { padding: 4px 8px; border: 1px solid var(--border); border-radius: 999px; background: rgba(20,14,16,.4); color: var(--text); font-size: 12px; }
+  html[data-theme="vn"] .timeline li:not(:last-child)::after { content: "→"; margin: 0 8px; color: var(--gold); }
+  html[data-theme="vn"] .timeline .caveat { margin: 0; font-size: 12px; font-style: italic; }
+
+  html[data-theme="vn"] .vision {
+    margin-top: 16px; padding: 18px 22px; border: 1px solid var(--border); border-radius: var(--r);
+    background: linear-gradient(90deg, rgba(28,58,74,.35), rgba(198,163,91,.08));
+  }
+  html[data-theme="vn"] .vision p { margin: 0; font-size: 14px; color: var(--muted); }
+  html[data-theme="vn"] .vision b { color: var(--gold-bright); font-weight: 600; }
+  html[data-theme="vn"] .vision i { font-style: italic; }
+
+  html[data-theme="vn"] .meter-hint { font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+
+  @media (max-width: 720px) {
+    html[data-theme="vn"] body {
+      background-size: 300px, 400px, auto, auto, auto;
+      background-position: 110% -4%, -8% 99%, 0 0, 0 0, 0 0;
+    }
+    html[data-theme="vn"] .timeline li:not(:last-child)::after { margin: 0 5px; }
+  }
 </style>
 </head>
 <body>
@@ -184,7 +365,15 @@
       <a href="#dashboard">Dashboard</a><a href="#how">Cách hoạt động</a><a href="#contracts">Hợp đồng</a>
       <a href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
-    <div class="navright" id="badges"></div>
+    <div class="navright">
+      <div class="theme-switch" role="group" aria-label="Giao diện">
+        <span class="theme-switch-k">Giao diện</span>
+        <button type="button" id="themeDefault" data-theme-set="default" aria-pressed="true">Mặc định</button>
+        <span class="theme-switch-sep" aria-hidden="true">|</span>
+        <button type="button" id="themeVn" data-theme-set="vn" aria-pressed="false">Việt Nam</button>
+      </div>
+      <div id="badges"></div>
+    </div>
   </div>
 </nav>
 
@@ -200,8 +389,8 @@
       <a class="btn" href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener">Mã nguồn ↗</a>
     </div>
     <div class="stats">
-      <div class="stat"><b id="stBal">—</b><span>USDC trong hũ (Fuji)</span></div>
-      <div class="stat"><b id="stReceipts">—</b><span>biên nhận băm nối tiếp</span></div>
+      <div class="stat"><b id="stBal">—</b><span><span class="t-default">USDC trong hũ (Fuji)</span><span class="t-vn">USDC trong Hũ Âu Cơ (Fuji)</span></span></div>
+      <div class="stat"><b id="stReceipts">—</b><span><span class="t-default">biên nhận băm nối tiếp</span><span class="t-vn">Sổ Trống đồng · biên nhận băm nối tiếp</span></span></div>
       <div class="stat"><b id="stRed">—</b><span>kiểm tra red team đạt</span></div>
       <div class="stat"><b>3/3</b><span>hợp đồng verify (Exact Match)</span></div>
     </div>
@@ -210,14 +399,14 @@
 
 <main class="wrap">
   <section id="dashboard">
-    <div class="sh"><h2>Dashboard</h2><p>Hũ và biên nhận được đọc trực tiếp từ Avalanche Fuji.</p></div>
+    <div class="sh"><h2>Dashboard</h2><p><span class="t-default">Hũ và biên nhận được đọc trực tiếp từ Avalanche Fuji.</span><span class="t-vn">Hũ Âu Cơ và Sổ Trống đồng được đọc trực tiếp từ Avalanche Fuji.</span></p></div>
     <div class="grid">
       <div>
-        <div class="card" id="jarCard"><h3>Hũ bằng chứng</h3><div class="empty">Đang đọc hũ trên Fuji…</div></div>
+        <div class="card" id="jarCard"><h3><span class="t-default">Hũ bằng chứng</span><span class="t-vn">Hũ Âu Cơ</span></h3><div class="empty"><span class="t-default">Đang đọc hũ trên Fuji…</span><span class="t-vn">Đang đọc Hũ Âu Cơ trên Fuji…</span></div></div>
 
         <div class="card" id="roNote" style="display:none">
           <h3>Demo công khai</h3>
-          <p class="muted" style="margin:0;font-size:14px">Chỉ chủ hũ mới gửi được nhận định và duyệt chi (qua Telegram). Ai cũng gọi thử được API: Lotus trả <b>402</b> kèm điều khoản thanh toán x402.</p>
+          <p class="muted" style="margin:0;font-size:14px"><span class="t-default">Chỉ chủ hũ mới gửi được nhận định và duyệt chi (qua Telegram).</span><span class="t-vn">Chỉ chủ Hũ Âu Cơ mới gửi được nhận định và duyệt chi (Hội nghị Diên Hồng, qua Telegram).</span> Ai cũng gọi thử được API: Lotus trả <b>402</b> kèm điều khoản thanh toán x402.</p>
           <pre class="code" id="curl"></pre>
           <button class="btn" style="margin-top:12px" id="copyCurl">Sao chép lệnh</button>
         </div>
@@ -226,7 +415,7 @@
           <h3>Hỏi Lotus</h3>
           <textarea id="claim" placeholder="Dán một nhận định, ví dụ: NATO has invoked Article 5"></textarea>
           <select id="desk"></select>
-          <button class="btn primary" style="margin-top:12px;width:100%;justify-content:center" id="ask">Chấm bằng chứng (trả qua hũ)</button>
+          <button class="btn primary" style="margin-top:12px;width:100%;justify-content:center" id="ask"><span class="t-default">Chấm bằng chứng (trả qua hũ)</span><span class="t-vn">Chấm bằng chứng (trả qua Hũ Âu Cơ)</span></button>
           <div class="chips" id="examples"></div>
         </div>
 
@@ -236,7 +425,7 @@
       <div>
         <div class="card"><h3><span>Kết quả gần đây</span><span id="feedSrc" style="text-transform:none;letter-spacing:0;font-weight:500"></span></h3><div id="runs"></div></div>
         <div class="split">
-          <div class="card"><h3>Sổ biên nhận</h3><div id="ledger"></div></div>
+          <div class="card"><h3><span class="t-default">Sổ biên nhận</span><span class="t-vn">Sổ Trống đồng</span></h3><div id="ledger"></div></div>
           <div class="card"><h3>Red Team</h3><div id="redteam"></div></div>
         </div>
       </div>
@@ -244,14 +433,28 @@
   </section>
 
   <section id="how">
-    <div class="sh"><h2>Cách hoạt động</h2><p>Agent không giữ khoá. Tiền chỉ rời hũ khi con người duyệt và mọi luật trên chuỗi đều đạt.</p></div>
+    <div class="sh"><h2>Cách hoạt động</h2><p><span class="t-default">Agent không giữ khoá. Tiền chỉ rời hũ khi con người duyệt và mọi luật trên chuỗi đều đạt.</span><span class="t-vn">Sứ giả Văn Lang (agent) không giữ khoá. Tiền chỉ rời Hũ Âu Cơ khi <abbr class="hist" title="Hội nghị Diên Hồng: năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão; họ quyết đánh. Ẩn dụ: người phải duyệt trước khi chi.">Hội nghị Diên Hồng</abbr> duyệt và luật <abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt 1077). Tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> trên chuỗi đều đạt.</span></p></div>
     <div class="features">
-      <div class="card feature"><img src="/assets/feature-approval.webp" alt="" /><h4>Con người duyệt từng khoản</h4><p>Agent nhận báo giá 402, kiểm tra trước (mạng, token, người nhận, hạn mức), rồi gửi phiếu duyệt lên Telegram. Không ai bấm trong 2 phút thì tự từ chối.</p></div>
-      <div class="card feature"><img src="/assets/feature-limits.webp" alt="" /><h4>Hũ có hạn mức trên chuỗi</h4><p><span class="mono">LotusJar</span> giới hạn chi theo lần, ngày và trọn đời, chỉ nhận token và người nhận trong whitelist, chữ ký EIP-712 dùng một lần. Có kill switch và tự khoá khi có lệnh dồn dập.</p></div>
-      <div class="card feature"><img src="/assets/feature-receipts.webp" alt="" /><h4>Biên nhận không sửa được</h4><p>Mỗi câu trả lời có một biên nhận băm nối tiếp, được neo lên <span class="mono">LotusReceipts</span>. Phần phí <span class="mono">upto</span> không dùng đến được hoàn về hũ ngay trên chuỗi.</p></div>
+      <div class="card feature"><img src="/assets/feature-approval.webp" alt="" /><h4><span class="t-default">Con người duyệt từng khoản</span><span class="t-vn">Hội nghị Diên Hồng — con người duyệt từng khoản</span></h4><p><span class="t-default">Agent nhận báo giá 402, kiểm tra trước (mạng, token, người nhận, hạn mức), rồi gửi phiếu duyệt lên Telegram. Không ai bấm trong 2 phút thì tự từ chối.</span><span class="t-vn">Sứ giả Văn Lang (agent) nhận báo giá 402, kiểm tra trước (mạng, token, người nhận, hạn mức), rồi gửi phiếu duyệt lên Telegram. Không ai bấm trong 2 phút thì tự từ chối.</span></p></div>
+      <div class="card feature"><img src="/assets/feature-limits.webp" alt="" /><h4><span class="t-default">Hũ có hạn mức trên chuỗi</span><span class="t-vn">Nam quốc sơn hà — hạn mức là ranh giới</span></h4><p><span class="t-default"><span class="mono">LotusJar</span> giới hạn chi theo lần, ngày và trọn đời, chỉ nhận token và người nhận trong whitelist, chữ ký EIP-712 dùng một lần. Có kill switch và tự khoá khi có lệnh dồn dập.</span><span class="t-vn"><span class="mono">LotusJar</span> (Hũ Âu Cơ) giới hạn chi theo lần, ngày và trọn đời. Hạn mức là ranh giới (Nam quốc sơn hà). Kill switch gọi là <abbr class="hist" title="Cọc Bạch Đằng: trận 938 (Ngô Quyền thắng Nam Hán) và 1288 (Trần Hưng Đạo thắng Nguyên), dùng cọc đóng lòng sông để chặn thuyền.">Cọc Bạch Đằng</abbr>; người bảo vệ chỉ được khoá là <abbr class="hist" title="Thánh Gióng (Phù Đổng Thiên Vương): nhân vật truyền thuyết thời Hùng, đánh giặc Ân rồi bay về trời. Ẩn dụ: chỉ khoá, không được chi.">Thánh Gióng</abbr>.</span></p></div>
+      <div class="card feature"><img src="/assets/feature-receipts.webp" alt="" /><h4><span class="t-default">Biên nhận không sửa được</span><span class="t-vn">Sổ Trống đồng — biên nhận không sửa được</span></h4><p><span class="t-default">Mỗi câu trả lời có một biên nhận băm nối tiếp, được neo lên <span class="mono">LotusReceipts</span>. Phần phí <span class="mono">upto</span> không dùng đến được hoàn về hũ ngay trên chuỗi.</span><span class="t-vn">Mỗi câu trả lời có một biên nhận băm nối tiếp (<abbr class="hist" title="Sổ Trống đồng: ẩn dụ từ trống đồng văn hoá Đông Sơn (khoảng thế kỷ 7 TCN–thế kỷ 1/2 SCN). Dấu ấn không tẩy, không phải sổ kế toán cổ.">Sổ Trống đồng</abbr>), được neo lên <span class="mono">LotusReceipts</span>. Phần phí <span class="mono">upto</span> không dùng đến được hoàn về Hũ Âu Cơ ngay trên chuỗi.</span></p></div>
     </div>
     <div class="flow"><span>POST /v1/score</span><i>→</i><span>402 + requestHash</span><i>→</i><span>preflight</span><i>→</i><span>✅ duyệt trên Telegram</span><i>→</i><span>LotusJar trả USDC</span><i>→</i><span>X-PAYMENT</span><i>→</i><span>chấm bằng chứng</span><i>→</i><span>biên nhận + hoàn tiền</span></div>
-  </section>
+
+  <aside class="notes vn-only" id="history-notes">
+    <h3>Chú thích lịch sử</h3>
+    <dl>
+      <div><dt>Hũ Âu Cơ.</dt><dd>Âu Cơ là mẹ trăm con trong truyền thuyết Lạc Long Quân–Âu Cơ (Lĩnh Nam chích quái). Ẩn dụ: mẹ giữ của cho con.</dd></div>
+      <div><dt>Nam quốc sơn hà.</dt><dd>Bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt năm 1077). “Hạn mức là ranh giới.” Tác quyền mang tính truyền thống.</dd></div>
+      <div><dt>Cọc Bạch Đằng.</dt><dd>Trận 938 (Ngô Quyền thắng Nam Hán) và 1288 (Trần Hưng Đạo thắng Nguyên): cọc đóng lòng sông để chặn thuyền. Ẩn dụ nút khoá hũ.</dd></div>
+      <div><dt>Hội nghị Diên Hồng.</dt><dd>Năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão họp ở điện Diên Hồng; họ quyết “đánh”. Ẩn dụ: người phải duyệt trước khi chi.</dd></div>
+      <div><dt>Sổ Trống đồng.</dt><dd>Trống đồng văn hoá Đông Sơn (khoảng thế kỷ 7 TCN–thế kỷ 1/2 SCN). Ẩn dụ dấu ấn không tẩy, không khẳng định trống đồng từng là sổ kế toán.</dd></div>
+      <div><dt>Thánh Gióng.</dt><dd>Nhân vật truyền thuyết thời Hùng (Phù Đổng Thiên Vương): đánh giặc Ân rồi bay về trời. Ẩn dụ người bảo vệ chỉ được khoá, không được chi.</dd></div>
+      <div><dt>Sứ giả Văn Lang.</dt><dd>Văn Lang là nhà nước đầu tiên trong sử liệu truyền thống (đời Hùng Vương). Sứ giả chỉ chuyển lệnh, không cầm khoá quỹ.</dd></div>
+    </dl>
+  </aside>
+</section>
+
 
   <section id="contracts">
     <div class="sh"><h2>Hợp đồng trên Fuji</h2><p>Cả ba đã verify mã nguồn trên Snowtrace (Exact Match).</p></div>
@@ -259,9 +462,27 @@
   </section>
 </main>
 
+
+<div class="wrap">
+  <div class="timeline vn-only" id="timeline">
+    <strong>Từ Văn Lang đến Lotus</strong>
+    <ol>
+      <li><span class="hist" title="Văn Lang: nhà nước đầu tiên trong sử liệu truyền thống, đời Hùng Vương. Thuộc truyền thuyết / sử liệu truyền thống.">Văn Lang <i>(truyền thuyết)</i></span></li>
+      <li><span class="hist" title="Âu Lạc: nhà nước của An Dương Vương sau khi nhập Âu Việt và Lạc Việt, kinh đô Cổ Loa. Niên đại truyền thống khoảng 257–179 TCN.">Âu Lạc</span></li>
+      <li><span class="hist" title="Năm 938, Ngô Quyền thắng Nam Hán trên sông Bạch Đằng, dùng cọc đóng lòng sông.">Bạch Đằng 938</span></li>
+      <li><span class="hist" title="Trận Như Nguyệt 1077 (Lý Thường Kiệt kháng Tống). Bài Nam quốc sơn hà được truyền là của ông; tác quyền mang tính truyền thống.">Như Nguyệt 1077</span></li>
+      <li><span class="hist" title="1284: hội nghị Diên Hồng, do Thượng hoàng Trần Thánh Tông triệu tập (đời vua Trần Nhân Tông). 1288: Trần Hưng Đạo thắng Nguyên trên sông Bạch Đằng.">Diên Hồng 1284 · Bạch Đằng 1288</span></li>
+      <li><span>Lotus</span></li>
+    </ol>
+    <p class="caveat">Đây là phép liên tưởng văn hoá trên giao diện, không phải phả hệ lịch sử của sản phẩm.</p>
+  </div>
+  <div class="vision vn-only">
+    <p><b>Tầm nhìn — Quỹ Lạc Hồng</b> · kênh tiết kiệm / lợi suất (hướng tới trái phiếu token hoá). <i>Chưa có trên demo này, không phải tính năng đang chạy.</i> “Lạc Hồng” là tên văn học chỉ dòng dõi Lạc Long Quân và Âu Cơ trong truyền thuyết.</p>
+  </div>
+</div>
 <footer>
   <div class="wrap">
-    <span>Lotus · chỉ chạy testnet Avalanche Fuji · trên chuỗi chỉ lưu hash · không phải tư vấn đầu tư</span>
+    <span>Lotus · <span class="t-default">chỉ chạy testnet Avalanche Fuji</span><span class="t-vn">Hũ Âu Cơ · chỉ chạy testnet Avalanche Fuji</span> · trên chuỗi chỉ lưu hash · không phải tư vấn đầu tư</span>
     <span><a class="link" href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener">GitHub</a> · MIT</span>
   </div>
 </footer>
@@ -281,6 +502,49 @@ const EXAMPLES = [["NATO has invoked Article 5", "gold_war"], ["FOX chia cổ t�
 const CURL = () => `curl -i -X POST ${location.origin}/v1/score \\\n  -H "content-type: application/json" \\\n  -d '{"claim":"FOX chia co tuc","desk":"vn_stocks"}'`;
 let desksLoaded = false;
 
+const DESK_NAME_VN = { btc_ta: "Bitcoin — on-chain và kỹ thuật", macro_whitehouse: "Vĩ mô và Nhà Trắng", gold_war: "Vàng và chiến sự", vn_stocks: "Chứng khoán Việt Nam (công bố chính thức)", us_stocks: "Chứng khoán Mỹ (công bố / sở / cơ quan)" };
+const TITLES = { default: "Lotus — evidence scores for market claims", vn: "Lotus — Hũ Âu Cơ · chấm bằng chứng tin thị trường" };
+let lastState = null;
+
+function currentTheme() { return document.documentElement.getAttribute("data-theme") === "vn" ? "vn" : "default"; }
+function t(def, vn) { return currentTheme() === "vn" ? vn : def; }
+function setTheme(next, persist) {
+  const theme = next === "vn" ? "vn" : "default";
+  document.documentElement.setAttribute("data-theme", theme);
+  document.title = TITLES[theme];
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", theme === "vn" ? "#140e10" : "#0B0F14");
+  const defBtn = document.getElementById("themeDefault");
+  const vnBtn = document.getElementById("themeVn");
+  if (defBtn && vnBtn) {
+    defBtn.setAttribute("aria-pressed", theme === "default" ? "true" : "false");
+    vnBtn.setAttribute("aria-pressed", theme === "vn" ? "true" : "false");
+  }
+  if (persist !== false) {
+    try { localStorage.setItem("lotus-theme", theme); } catch (e) {}
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set("theme", theme);
+      history.replaceState({}, "", u);
+    } catch (e) {}
+  }
+  if (lastState) {
+    if (desksLoaded) applyDeskNames(lastState);
+    jar(lastState); pending(lastState); runs(lastState); ledger(lastState); contracts(lastState);
+  }
+}
+function applyDeskNames(s) {
+  const sel = $("desk");
+  if (!sel || !s.desks) return;
+  const prev = sel.value;
+  sel.innerHTML = s.desks.map((d) => {
+    const name = currentTheme() === "vn" ? (DESK_NAME_VN[d.id] || d.name) : d.name;
+    return `<option value="${d.id}">${esc(name)}${d.live ? " · LIVE" : " · fixture"}</option>`;
+  }).join("");
+  if (prev) sel.value = prev;
+}
+
+
 function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 1800); }
 function copy(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast("Đã sao chép lệnh curl"), () => toast("Không sao chép được, hãy bôi đen lệnh để copy")); }
 const tag = (c) => `<span class="tag ${BAD.includes(c) ? "bad" : WARN.includes(c) ? "warn" : c === "OK" ? "ok" : ""}">${esc(c)}</span>`;
@@ -297,25 +561,26 @@ function badges(s) {
 
 function jar(s) {
   const j = s.jar;
-  if (!j) { $("jarCard").innerHTML = `<h3>Hũ bằng chứng</h3><div class="empty">${esc(s.jarError ? "Không đọc được hũ: " + s.jarError : "Đang đọc hũ trên Fuji…")}</div>`; return; }
+  if (!j) { $("jarCard").innerHTML = `<h3>${t("Hũ bằng chứng", "Hũ Âu Cơ")}</h3><div class="empty">${esc(s.jarError ? t("Không đọc được hũ: ", "Không đọc được Hũ Âu Cơ: ") + s.jarError : t("Đang đọc hũ trên Fuji…", "Đang đọc Hũ Âu Cơ trên Fuji…"))}</div>`; return; }
   $("stBal").textContent = (+j.balance).toFixed(2);
   const used = Math.max(0, +j.perDay - +j.remainingToday);
   const pd = +j.perDay ? (used / +j.perDay) * 100 : 0, pl = +j.lifetime ? (+j.spentLifetime / +j.lifetime) * 100 : 0;
   $("jarCard").innerHTML = `
-    <h3>Hũ bằng chứng <span class="state ${j.locked ? "locked" : "open"}">${j.locked ? "ĐÃ KHOÁ" : "ĐANG MỞ"}</span></h3>
+    <h3>${t("Hũ bằng chứng", "Hũ Âu Cơ")} <span class="state ${j.locked ? "locked" : "open"}">${j.locked ? t("ĐÃ KHOÁ", "CỌC BẠCH ĐẰNG") : t("ĐANG MỞ", "ĐANG MỞ")}</span></h3>
     <div class="jar-top"><img src="/assets/jar.webp" alt="" /><div><div class="bal">${(+j.balance).toFixed(2)}<small>test USDC</small></div>
       <div class="muted" style="font-size:12.5px;margin-top:6px">≤ ${j.perTx} USDC mỗi lần · hết hạn ${new Date(j.expiresAt * 1000).toLocaleDateString("vi-VN")}</div></div></div>
     <div class="meter"><div class="meter-label"><span>Đã chi hôm nay</span><span>${used.toFixed(2)} / ${j.perDay}</span></div><div class="bar"><i style="width:${pd}%"></i></div></div>
     <div class="meter"><div class="meter-label"><span>Đã chi trọn đời</span><span>${(+j.spentLifetime).toFixed(2)} / ${j.lifetime}</span></div><div class="bar jade"><i style="width:${pl}%"></i></div></div>
     <dl class="kv">
-      <dt>Hũ</dt><dd><a class="link" target="_blank" rel="noopener" href="${s.explorer}/address/${j.address}">${short(j.address)} ↗</a></dd>
-      <dt>Chủ</dt><dd>${short(j.owner)}</dd><dt>Duyệt</dt><dd>${short(j.approver)}</dd><dt>Bảo vệ</dt><dd>${short(j.guardian)} <span class="muted">· chỉ khoá</span></dd>
-    </dl>`;
+      <dt>${t("Hũ", "Hũ Âu Cơ")}</dt><dd><a class="link" target="_blank" rel="noopener" href="${s.explorer}/address/${j.address}">${short(j.address)} ↗</a></dd>
+      <dt>Chủ</dt><dd>${short(j.owner)}</dd><dt>${t("Duyệt", "Duyệt · Diên Hồng")}</dt><dd>${short(j.approver)}</dd><dt>${t("Bảo vệ", "Bảo vệ · Thánh Gióng")}</dt><dd>${short(j.guardian)} <span class="muted">${t("· chỉ khoá", "· chỉ khoá · Cọc Bạch Đằng")}</span></dd>
+    </dl>
+    ${currentTheme() === "vn" ? `<p class="meter-hint"><abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt, trận Như Nguyệt 1077. Tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> — hạn mức là ranh giới.</p>` : ""}`;
 }
 
 function pending(s) {
   const el = $("pending");
-  if (s.readOnly) { el.className = "empty"; el.innerHTML = s.pendingCount ? `${s.pendingCount} khoản đang chờ chủ hũ duyệt trên Telegram.` : "Không có khoản chờ duyệt."; return; }
+  if (s.readOnly) { el.className = "empty"; el.innerHTML = s.pendingCount ? `${s.pendingCount} ${t("khoản đang chờ chủ hũ duyệt trên Telegram.", "khoản đang chờ Hội nghị Diên Hồng duyệt trên Telegram.")}` : "Không có khoản chờ duyệt."; return; }
   if (!s.pending.length) { el.className = "empty"; el.innerHTML = "Không có khoản chờ duyệt."; return; }
   el.className = "";
   el.innerHTML = s.pending.map((c) => `
@@ -368,7 +633,7 @@ function runs(s) {
   }
   const rec = s.ledger.recent || [];
   if (!rec.length) { $("feedSrc").textContent = ""; $("runs").innerHTML = `<div class="empty"><img src="/assets/empty.webp" alt="" />Chưa có lượt nào.</div>`; return; }
-  $("feedSrc").textContent = "từ sổ biên nhận · giao dịch thật trên Fuji";
+  $("feedSrc").textContent = t("từ sổ biên nhận · giao dịch thật trên Fuji", "từ Sổ Trống đồng · giao dịch thật trên Fuji");
   $("runs").innerHTML = rec.slice(0, 8).map((r) => {
     const links = [];
     if (r.payment?.ref) links.push(tx(s, r.payment.ref, "Thanh toán"));
@@ -379,7 +644,7 @@ function runs(s) {
 }
 
 function ledger(s) {
-  if (!s.ledger.recent.length) { $("ledger").innerHTML = `<div class="empty">Chưa có biên nhận.</div>`; return; }
+  if (!s.ledger.recent.length) { $("ledger").innerHTML = `<div class="empty">${t("Chưa có biên nhận.", "Chưa có dòng trong Sổ Trống đồng.")}</div>`; return; }
   $("ledger").innerHTML = `<div class="scroll"><table><tr><th>#</th><th>Kết luận</th><th>hash</th><th>prev</th></tr>${s.ledger.recent.map((r) =>
     `<tr><td>${r.index}</td><td class="v-${r.verdict}" style="font:600 11.5px var(--mono)">${esc(r.verdict)}</td><td class="mono">${short(r.hash)}</td><td class="mono">${short(r.prevHash)}</td></tr>`).join("")}</table></div>
     <p class="muted" style="font-size:12.5px;margin:12px 0 0">Chuỗi ${s.ledger.intact ? "nguyên vẹn ✓" : "BỊ SỬA ✗"} · head <span class="mono">${short(s.ledger.head)}</span></p>`;
@@ -394,7 +659,7 @@ function redteam(s) {
 
 function contracts(s) {
   const c = s.contracts || {};
-  const rows = [["LotusJarFactory", c.factory, "Tạo hũ; API chỉ tin hũ do factory này tạo"], ["LotusReceipts", c.receipts, "Neo hash biên nhận và kết luận"], ["LotusJar (hũ demo)", c.jar || s.jar?.address, "Hũ có hạn mức, whitelist, kill switch"]];
+  const rows = [["LotusJarFactory", c.factory, t("Tạo hũ; API chỉ tin hũ do factory này tạo", "Tạo Hũ Âu Cơ; API chỉ tin hũ do factory này tạo")], ["LotusReceipts", c.receipts, t("Neo hash biên nhận và kết luận", "Neo hash Sổ Trống đồng (biên nhận) và kết luận")], [t("LotusJar (hũ demo)", "LotusJar (Hũ Âu Cơ)"), c.jar || s.jar?.address, t("Hũ có hạn mức, whitelist, kill switch", "Hũ Âu Cơ: hạn mức, Nam quốc sơn hà, Cọc Bạch Đằng (kill switch)")]];
   $("contractsTable").innerHTML = `<tr><th>Hợp đồng</th><th>Địa chỉ</th><th>Vai trò</th></tr>` + rows.filter((r) => r[1]).map(([n, a, d]) =>
     `<tr><td style="font-weight:600">${n}</td><td class="mono"><a target="_blank" rel="noopener" href="${s.explorer}/address/${a}#code">${short(a)} ↗</a></td><td class="muted">${d}</td></tr>`).join("");
 }
@@ -403,12 +668,12 @@ async function refresh() {
   try {
     const s = await (await fetch("/api/state", { headers: H() })).json();
     if (!desksLoaded) {
-      $("desk").innerHTML = s.desks.map((d) => `<option value="${d.id}">${esc(d.name)}${d.live ? " · LIVE" : " · fixture"}</option>`).join("");
+      applyDeskNames(s);
       $("desk").value = "gold_war"; desksLoaded = true;
     }
     $("askCard").style.display = s.readOnly ? "none" : "";
     $("roNote").style.display = s.readOnly ? "" : "none";
-    badges(s); jar(s); pending(s); runs(s); ledger(s); redteam(s); contracts(s);
+    lastState = s; badges(s); jar(s); pending(s); runs(s); ledger(s); redteam(s); contracts(s);
   } catch (e) { console.error(e); }
 }
 async function approve(runId, approved) {
@@ -428,6 +693,9 @@ $("curl").textContent = CURL();
 const oneLine = () => CURL().replace(/\\\n\s*/g, "");
 $("copyCurl").onclick = () => copy(oneLine());
 $("tryApi").onclick = () => { const n = $("roNote"); if (n.style.display !== "none") n.scrollIntoView({ behavior: "smooth", block: "center" }); copy(oneLine()); };
+document.getElementById("themeDefault").onclick = () => setTheme("default");
+document.getElementById("themeVn").onclick = () => setTheme("vn");
+setTheme(currentTheme(), false);
 refresh(); setInterval(refresh, 4000);
 </script>
 </body>

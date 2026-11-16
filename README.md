@@ -15,6 +15,25 @@ Lotus is a pay-per-call **evidence-scoring API for market claims** ("the Fed cut
 
 Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day/lifetime caps, token and payee allow-lists by address, one-time EIP-712 approvals signed by the human (via Telegram), a guardian kill switch, and burst auto-lock. The agent holds no key that can move funds. The unused part of each `upto` payment is refunded on-chain, and every answer's receipt hash is chained and anchored on `LotusReceipts`. All three contracts are verified on Snowtrace, and every flow below has real Fuji transactions. Live read-only demo: https://lotus-azure-ten.vercel.app The Vietnamese stock desk reads live HNX disclosures. The other four desks run on clearly labelled synthetic fixtures.
 
+
+## Giao diện
+
+Demo có hai giao diện, chọn trên thanh điều hướng (**Giao diện: Mặc định | Việt Nam**). Lần mở đầu dùng **Mặc định** (đúng bản đang chạy trên Vercel). Trình duyệt nhớ lựa chọn (`localStorage`); có thể mở sẵn bản Việt Nam bằng `?theme=vn`.
+
+Bản **Việt Nam** dùng phong cách đêm sơn mài và các tên ẩn dụ lịch sử (chỉ chữ trên trang, không đổi tên hợp đồng, scheme, route hay id bàn):
+
+| Mặc định | Bản Việt Nam | Chú thích ngắn (đúng sự thật; truyền thuyết được ghi rõ) |
+|---|---|---|
+| Hũ bằng chứng (`LotusJar`) | Hũ Âu Cơ | Truyền thuyết Lạc Long Quân–Âu Cơ: mẹ giữ của cho con |
+| Hạn mức / bộ quy tắc | Nam quốc sơn hà — hạn mức là ranh giới | Bài thơ được truyền là của Lý Thường Kiệt, trận Như Nguyệt 1077; tác quyền mang tính truyền thống |
+| Kill switch / khoá hũ | Cọc Bạch Đằng | Trận 938 (Ngô Quyền) và 1288 (Trần Hưng Đạo) |
+| Người duyệt | Hội nghị Diên Hồng | Năm 1284, Thượng hoàng Trần Thánh Tông triệu bô lão (đời vua Trần Nhân Tông) |
+| Sổ biên nhận (`LotusReceipts`) | Sổ Trống đồng | Văn hoá Đông Sơn, khoảng thế kỷ 7 TCN–thế kỷ 1/2 SCN; ẩn dụ dấu ấn, không phải sổ kế toán cổ |
+| Bảo vệ (guardian) | Thánh Gióng | Nhân vật truyền thuyết thời Hùng; chỉ khoá, không được chi |
+| Agent | Sứ giả Văn Lang | Văn Lang trong sử liệu truyền thống; sứ giả không cầm khoá quỹ |
+
+**Quỹ Lạc Hồng** chỉ hiện trên bản Việt Nam, ghi rõ là tầm nhìn (tiết kiệm / lợi suất), *chưa chạy*. Dải “Từ Văn Lang đến Lotus” là phép liên tưởng văn hoá, không phải phả hệ của sản phẩm.
+
 ## Lotus làm gì
 
 ```
