@@ -13,7 +13,7 @@ Bài dự thi **Team1 Vietnam UniHack 2026** (Avalanche). Hạn nộp: 21/11/202
 
 Lotus is a pay-per-call **evidence-scoring API for market claims** ("the Fed cut rates", "NATO invoked Article 5", "FOX pays a cash dividend"), paid with test USDC over an **x402-style flow on Avalanche Fuji**. It counts *independent* sources, measures the echo chamber, flags stale, impersonated, injected or shill content, and answers `MISSING_EVIDENCE` rather than guess. It never gives buy/sell calls or price targets, and refuses those questions for free before quoting.
 
-Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day/lifetime caps, token and payee allow-lists by address, one-time EIP-712 approvals signed by the human (via Telegram), a guardian kill switch, and burst auto-lock. The agent holds no key that can move funds. The unused part of each `upto` payment is refunded on-chain, and every answer's receipt hash is chained and anchored on `LotusReceipts`. All three contracts are verified on Snowtrace, and every flow below has real Fuji transactions. Live read-only demo: https://lotus-azure-ten.vercel.app The Vietnamese stock desk reads live HNX disclosures. The other four desks run on clearly labelled synthetic fixtures.
+Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day/lifetime caps, token and payee allow-lists by address, one-time EIP-712 approvals signed by the human (via Telegram), a guardian kill switch, and burst auto-lock. The agent holds no key that can move funds. The unused part of each `upto` payment is refunded on-chain, and every answer's receipt hash is chained and anchored on `LotusReceipts`. Invoice money lands in `LotusInbox`, which can only pay out by the owner's split (main wallet / spending jar). All four contracts are verified on Snowtrace, and every flow below has real Fuji transactions. Live read-only demo: https://lotus-azure-ten.vercel.app The Vietnamese stock desk reads live HNX disclosures. The other four desks run on clearly labelled synthetic fixtures.
 
 
 ## Giao diện
@@ -112,6 +112,7 @@ Ba hợp đồng đều **đã verify mã nguồn (Exact Match)** trên Snowtrac
 | LotusJarFactory | [`0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546`](https://testnet.snowtrace.io/address/0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546#code) |
 | LotusReceipts | [`0xD8cDc230225448b005DBCE3B935ac53e2057DAd8`](https://testnet.snowtrace.io/address/0xD8cDc230225448b005DBCE3B935ac53e2057DAd8#code) |
 | LotusJar (hũ demo) | [`0x805113113EC069205f59d72137c01244BfAA9619`](https://testnet.snowtrace.io/address/0x805113113EC069205f59d72137c01244BfAA9619#code) |
+| LotusInbox (ví hoá đơn) | [`0xd878Ba74d2bbc1AA4eA669578D13E94db202fA20`](https://testnet.snowtrace.io/address/0xd878Ba74d2bbc1AA4eA669578D13E94db202fA20#code) |
 
 Một vòng chạy thật, duyệt từ Telegram (13/11/2026), với nhận định *"Did the White House put a 100% tariff on gold exports today?"*, kết quả `MISSING_EVIDENCE`:
 

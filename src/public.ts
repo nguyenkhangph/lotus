@@ -56,8 +56,8 @@ export function buildPublicApp(env: NodeJS.ProcessEnv = process.env) {
       allowLocalApprove: false,
       publicDemo: true,
       treasury: cfg.treasury,
-      wallets: (j) => readWallets(cfg, provider, j, env.INBOX_ADDRESS || undefined),
-      contracts: { factory: env.JAR_FACTORY_ADDRESS ?? "0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546", receipts: env.RECEIPTS_ADDRESS ?? "0xD8cDc230225448b005DBCE3B935ac53e2057DAd8", jar: env.JAR_ADDRESS ?? "0x805113113EC069205f59d72137c01244BfAA9619", inbox: env.INBOX_ADDRESS || undefined },
+      wallets: (j) => readWallets(cfg, provider, j, env.INBOX_ADDRESS || "0xd878Ba74d2bbc1AA4eA669578D13E94db202fA20"),
+      contracts: { factory: env.JAR_FACTORY_ADDRESS ?? "0xCD336298223605c0c6c792Bcd7bd2a3F4DCc9546", receipts: env.RECEIPTS_ADDRESS ?? "0xD8cDc230225448b005DBCE3B935ac53e2057DAd8", jar: env.JAR_ADDRESS ?? "0x805113113EC069205f59d72137c01244BfAA9619", inbox: env.INBOX_ADDRESS || "0xd878Ba74d2bbc1AA4eA669578D13E94db202fA20" },
     }),
   );
   return app;
