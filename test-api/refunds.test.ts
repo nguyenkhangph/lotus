@@ -39,3 +39,15 @@ describe("refund backlog: match receipts to on-chain refunds", () => {
     expect(matchRefunds(rows, done, JAR, TREASURY).filter((x) => x.status === "missing")).to.deep.equal([]);
   });
 });
+
+describe("public demo shows the refund of every receipt", () => {
+  it("each receipt in the snapshot carries its on-chain refund tx", async () => {
+    const { buildPublicApp } = await import("../src/public");
+    const request = (await import("supertest")).default;
+    const app = buildPublicApp({ FUJI_RPC_URL: "http://127.0.0.1:9", TREASURY_ADDRESS: TREASURY } as any);
+    const s = await request(app).get("/api/state");
+    const recent = s.body.ledger.recent;
+    expect(recent.length).to.equal(rows.length);
+    expect(recent.every((r: any) => /^0x[0-9a-f]{64}$/.test(r.refundTx))).to.equal(true);
+  });
+});

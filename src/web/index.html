@@ -693,7 +693,7 @@ function runs(s) {
   $("runs").innerHTML = rec.slice(0, 8).map((r) => {
     const links = [];
     if (r.payment?.ref) links.push(tx(s, r.payment.ref, "Thanh toán"));
-    if (r.pricing && +r.pricing.refundDue > 0) links.push(`<span class="muted">hoàn ${(r.pricing.refundDue / 1e6).toFixed(2)} USDC</span>`);
+    if (r.pricing && +r.pricing.refundDue > 0) links.push(r.refundTx ? tx(s, r.refundTx, `Hoàn ${(r.pricing.refundDue / 1e6).toFixed(2)} USDC`) : `<span class="muted">hoàn ${(r.pricing.refundDue / 1e6).toFixed(2)} USDC</span>`);
     links.push(`<span class="muted mono">#${r.index} · ${short(r.hash)}</span>`);
     return resultCard({ x: r, claimHash: r.claimHash, desk: r.desk, links });
   }).join("");

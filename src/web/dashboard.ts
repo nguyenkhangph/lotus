@@ -26,6 +26,8 @@ export type DashboardDeps = {
   contracts?: { factory?: string; receipts?: string; jar?: string; inbox?: string };
   /** Lotus treasury (payTo), so "chỉ trả cho Lotus" maps to an address in the rules preview. */
   treasury?: string;
+  /** Receipt index → on-chain refund tx (shown as a link next to each receipt). */
+  refunds?: Record<string, string>;
   /** Main wallet / spending jar / invoice wallet balances (read after the jar). */
   wallets?: (jar: JarStatus) => Promise<WalletsStatus>;
 };
@@ -99,7 +101,7 @@ export function dashboardRouter(d: DashboardDeps): Router {
       pending: full ? d.hub.listPending() : [],
       pendingCount: d.hub.listPending().length,
       runs: full ? d.hub.recentRuns() : d.hub.recentRuns().filter((x) => x.status === "done").map(({ card, approvedBy, ...rest }) => rest),
-      ledger: { intact: d.ledger.verify() === -1, count: receipts.length, head: d.ledger.head(), recent: receipts.slice(-12).reverse() },
+      ledger: { intact: d.ledger.verify() === -1, count: receipts.length, head: d.ledger.head(), recent: receipts.slice(-12).reverse().map((x: any) => (d.refunds?.[String(x.index)] ? { ...x, refundTx: d.refunds[String(x.index)] } : x)) },
       redteam,
     });
   });

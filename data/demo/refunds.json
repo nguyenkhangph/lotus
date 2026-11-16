@@ -1,0 +1,12 @@
+{
+  "_note": "On-chain refund (treasury -> jar) of each receipt's unused upto part. #0-#3 were refunded later (16/11/2026) because automatic refunds did not exist yet when they were written.",
+  "0": "0xa103d4cf933febb863748fd18049eb4c7e82ffef3655097d4faa8f44b30db331",
+  "1": "0x0cdebd83e5edd88d6412d3b3a7a4ecd125ceaff490d821d23f32c43240553dea",
+  "2": "0x28544499620078c7490419c06ad3c2a9eeade6049e9c1d1b0f4225e2bd2c2cc8",
+  "3": "0x31ebcd0c7177040a2fdd13189f02fad877e365f417dbf0ac68fe91150af03c88",
+  "4": "0x340757dcae6155cf0b098de77f3d6357201acff90ca3bc68dbab058e1902d7ac",
+  "5": "0x012fe09983ca75cc8e7d18736caba1d29932084afdd9009ef3d670c8058f4bfb",
+  "6": "0xee563f8f3e0ae65faa3ef6362499e793e71c93bd4ac60d590f73ba83d8f510db",
+  "7": "0xa7a55763e158f5ac8229651305c42dd4a3e42a151bb9f71f6fc47e07a346181b",
+  "8": "0xc43ec68bfc19454df3457840d69071561cd72e97ae3122c2ed4f8009ad786092"
+}
