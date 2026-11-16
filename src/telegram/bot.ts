@@ -9,6 +9,7 @@
 import { DESKS } from "../engine/desks";
 import type { ApprovalHub } from "../agent/hub";
 import type { ApprovalCard, RunRecord } from "../agent/runner";
+import { previewRules, type RulesPreview } from "../rules/service";
 import type { JarStatus } from "../agent/jar";
 
 export class TelegramApi {
@@ -34,6 +35,8 @@ export type BotDeps = {
   jarStatus: () => Promise<JarStatus>;
   lock?: () => Promise<string>;
   dashboardUrl?: string;
+  /** Lotus treasury address, for "chỉ trả cho Lotus" in /rules. */
+  treasury?: string;
 };
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -107,6 +110,15 @@ export class LotusBot {
       case "/pending": {
         const p = this.d.hub.listPending();
         return this.say(chatId, p.length ? p.map((c) => `• ${esc(c.claim)} — ${c.amountHuman} USDC`).join("\n") : "Không có khoản chờ duyệt.");
+      }
+      case "/rules":
+      case "/quytac": {
+        const body = text.replace(/^\/\S+\s*/, "").trim();
+        if (!body) return this.say(chatId, "Cách dùng: <code>/rules Mỗi lần tối đa 0,5 USDC. Mỗi ngày không quá 3 USDC. Quá 5 lệnh trong 1 phút thì khoá hũ.</code>\nBot chỉ xem trước và mô phỏng; chủ hũ tự ký thay đổi.");
+        if (!this.d.treasury) return this.say(chatId, "Chưa cấu hình TREASURY_ADDRESS.");
+        let st: JarStatus | null = null;
+        try { st = await this.d.jarStatus(); } catch { st = null; }
+        return this.say(chatId, formatRules(previewRules(body, st, this.d.treasury)));
       }
       case "/check": {
         const parsed = parseCheck(text);
@@ -264,10 +276,23 @@ export function formatRun(r: RunRecord, explorer: string): string {
   return lines.join("\n");
 }
 
+export function formatRules(p: RulesPreview): string {
+  const L: string[] = ["📜 <b>Xem trước quy tắc</b>" + (p.live ? "" : " <i>(không đọc được hũ, so với cấu hình demo)</i>")];
+  if (p.understood.length) L.push("<b>Đã hiểu:</b>\n" + p.understood.map((u) => `✅ ${esc(u.text)}`).join("\n"));
+  if (p.unknown.length) L.push("<b>Chưa áp dụng:</b>\n" + p.unknown.map((u) => `⚠️ <i>${esc(u.clause)}</i> — ${esc(u.why)}`).join("\n"));
+  if (p.warnings.length) L.push(p.warnings.map((w) => `ℹ️ ${esc(w)}`).join("\n"));
+  L.push("<b>Mô phỏng (hiện tại → mới):</b>\n" + p.scenarios.map((s) =>
+    `• ${esc(s.title)}\n   ${s.current.paid} được chi (${s.current.spent} USDC) → <b>${s.proposed.paid} được chi (${s.proposed.spent} USDC)</b>${s.proposed.blocked ? `, chặn: ${esc(s.proposed.first)}` : ""}`).join("\n"));
+  if (p.command) L.push(`🔑 Bot không giữ khoá chủ. Chủ hũ ký trên máy mình:\n<code>${esc(p.command)}</code>`);
+  else L.push("Không có gì thay đổi trên hợp đồng.");
+  return L.join("\n\n");
+}
+
 const HELP =
   `🪷 <b>Lotus</b> — chấm bằng chứng cho tin thị trường, trả phí x402 trên Avalanche Fuji.\n\n` +
   `• Gõ thẳng một nhận định, hoặc <code>/check [desk] nội dung</code>\n` +
   `• Mỗi khoản chi cần bạn bấm ✅ Duyệt\n` +
   `• <code>/status</code> số dư và hạn mức · <code>/lock</code> khoá hũ ngay\n` +
-  `• <code>/desks</code> danh sách bàn nguồn\n\n` +
+  `• <code>/desks</code> danh sách bàn nguồn\n` +
+  `• <code>/rules</code> viết quy tắc chi tiêu bằng tiếng Việt, xem trước và mô phỏng\n\n` +
   `<i>Lotus không tư vấn đầu tư, không giá mục tiêu, không dự báo. Chỉ testnet.</i>`;

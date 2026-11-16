@@ -193,9 +193,25 @@
     .navright .theme-switch { display: inline-flex; }
   }
 
+
+  /* ---- Rules (Vietnamese) ---- */
+  .rules-grid { display: grid; grid-template-columns: 380px minmax(0,1fr); gap: 20px; align-items: start; }
+  .rules-grid > div { min-width: 0; }
+  @media (max-width: 1020px) { .rules-grid { grid-template-columns: minmax(0,1fr); } }
+  .rl { list-style: none; margin: 0; padding: 0; font-size: 13.5px; }
+  .rl li { padding: 5px 0; display: flex; gap: 8px; }
+  .rl .q { color: var(--muted); font-style: italic; }
+  .diff td.new { font-weight: 600; } .diff td.chg { color: var(--amber); }
+  .sim td { vertical-align: top; } .sim .ok { color: var(--jade); font-weight: 600; } .sim .no { color: var(--lotus); }
+  .sim small { display: block; color: var(--muted); font-size: 11.5px; }
+  .callrow { font: 12px var(--mono); padding: 6px 0; border-top: 1px solid var(--border); }
+  .callrow:first-child { border-top: 0; }
+  .note-key { margin-top: 12px; font-size: 13px; color: var(--muted); }
+
   .t-vn, .vn-only { display: none; }
   .features .card + .card { margin-top: 0; }
-  @media (max-width: 820px) { #badges { display: none; } }
+  .navlinks a { white-space: nowrap; }
+  @media (max-width: 1500px) { #badges { display: none; } }
 
   /* ---- Việt Nam: đêm sơn mài ---- */
   html[data-theme="vn"] {
@@ -362,7 +378,7 @@
   <div class="wrap">
     <a class="brand" href="#"><img src="/assets/logo.png" alt="" />Lotus</a>
     <div class="navlinks">
-      <a href="#dashboard">Dashboard</a><a href="#how">Cách hoạt động</a><a href="#contracts">Hợp đồng</a>
+      <a href="#dashboard">Dashboard</a><a href="#rules">Quy tắc</a><a href="#how">Cách hoạt động</a><a href="#contracts">Hợp đồng</a>
       <a href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
     <div class="navright">
@@ -429,6 +445,20 @@
           <div class="card"><h3>Red Team</h3><div id="redteam"></div></div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="sh"><h2>Quy tắc bằng tiếng Việt</h2><p><span class="t-default">Viết quy tắc chi tiêu như nói chuyện. Lotus chuyển thành tham số hợp đồng, mô phỏng trước, rồi chủ hũ tự ký. Câu nào không hiểu thì báo ra, không đoán.</span><span class="t-vn"><abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt; tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> viết bằng lời: Lotus chuyển thành tham số Hũ Âu Cơ, mô phỏng trước, rồi chủ hũ tự ký. Câu nào không hiểu thì báo ra, không đoán.</span></p></div>
+    <div class="rules-grid">
+      <div class="card">
+        <h3>Quy tắc của chủ hũ</h3>
+        <textarea id="rulesText" style="min-height:150px">Mỗi lần tối đa 0,5 USDC. Mỗi ngày không quá 3 USDC. Tổng cộng 100 USDC. Chỉ trả cho Lotus. Quá 5 lệnh trong 1 phút thì khoá hũ. Hết hạn sau 30 ngày.</textarea>
+        <button class="btn primary" style="margin-top:12px;width:100%;justify-content:center" id="rulesBtn">Xem trước &amp; mô phỏng</button>
+        <div class="chips" id="rulesEx"></div>
+        <p class="note-key">Không gửi giao dịch nào. Thay đổi chỉ có hiệu lực khi chủ hũ ký <span class="mono">setCaps</span> / <span class="mono">setTiming</span> / <span class="mono">setPayTo</span> bằng ví của mình. Agent và bot không giữ khoá này.</p>
+      </div>
+      <div id="rulesOut"><div class="card"><div class="empty">Bấm “Xem trước &amp; mô phỏng” để xem hũ sẽ làm gì với các khoản chi giả lập.</div></div></div>
     </div>
   </section>
 
@@ -696,7 +726,53 @@ $("tryApi").onclick = () => { const n = $("roNote"); if (n.style.display !== "no
 document.getElementById("themeDefault").onclick = () => setTheme("default");
 document.getElementById("themeVn").onclick = () => setTheme("vn");
 setTheme(currentTheme(), false);
+
+const RULE_EX = [
+  "Mỗi lần không quá 0,2 USDC, chờ 2 phút rồi mới chi",
+  "Mỗi ngày tối đa 1 USDC. Quá 3 lệnh trong 1 phút thì khoá hũ",
+  "Moi lan toi da 0.3 USDC va het han sau 7 ngay",
+  "Mỗi tuần tối đa 10 USDC",
+];
+const fmtT = (s) => (s % 3600 === 0 ? s / 3600 + " giờ" : s % 60 === 0 ? s / 60 + " phút" : s + " giây");
+function rulesView(p) {
+  const row = (label, a, b) => `<tr><td>${label}</td><td>${esc(a)}</td><td class="new ${a !== b ? "chg" : ""}">${esc(b)}</td></tr>`;
+  const c = p.current, n = p.proposed, d8 = (t) => new Date(t * 1000).toLocaleDateString("vi-VN");
+  const params = `<table class="diff"><tr><th>Tham số hợp đồng</th><th>Hiện tại${p.live ? "" : " (demo)"}</th><th>Theo quy tắc</th></tr>
+    ${row("Mỗi lần (USDC)", c.perTx, n.perTx)}${row("Mỗi ngày (USDC)", c.perDay, n.perDay)}${row("Tổng (USDC)", c.lifetime, n.lifetime)}
+    ${row("Chờ trước khi chi", c.delay ? fmtT(c.delay) : "không", n.delay ? fmtT(n.delay) : "không")}
+    ${row("Tự khoá khi dồn dập", c.burstMax ? `> ${c.burstMax} lệnh / ${fmtT(c.burstWindow)}` : "tắt", n.burstMax ? `> ${n.burstMax} lệnh / ${fmtT(n.burstWindow)}` : "tắt")}
+    ${row("Hết hạn", d8(c.expiresAt), d8(n.expiresAt))}</table>`;
+  const und = p.understood.map((u) => `<li>✅ <span>${esc(u.text)} <span class="q">“${esc(u.clause)}”</span></span></li>`).join("");
+  const unk = p.unknown.map((u) => `<li>⚠️ <span><span class="q">“${esc(u.clause)}”</span> — ${esc(u.why)}</span></li>`).join("");
+  const warn = p.warnings.map((w) => `<li>ℹ️ <span>${esc(w)}</span></li>`).join("");
+  const cell = (x) => `<span class="${x.blocked ? (x.paid ? "" : "no") : "ok"}">${x.paid} được chi · ${x.spent} USDC</span><small>${esc(x.blocked ? x.first : "Tất cả được chi")}</small>`;
+  const sim = `<table class="sim"><tr><th>Kịch bản giả lập</th><th>Quy tắc hiện tại</th><th>Quy tắc mới</th></tr>${p.scenarios.map((s) =>
+    `<tr><td>${esc(s.title)}</td><td>${cell(s.current)}</td><td>${cell(s.proposed)}</td></tr>`).join("")}</table>`;
+  const calls = p.calls.length
+    ? p.calls.map((x) => `<div class="callrow"><b>${x.fn}</b>(${esc(x.args)}) <span class="muted">— ${esc(x.why)}</span></div>`).join("") +
+      `<pre class="code" id="rulesCmd">${esc(p.command)}</pre><button class="btn" style="margin-top:10px" id="rulesCopy">Sao chép lệnh ký</button>`
+    : `<div class="empty">Không có gì thay đổi trên hợp đồng.</div>`;
+  return `<div class="card"><h3>Lotus hiểu thế nào</h3><ul class="rl">${und}${unk}${warn}</ul><div style="margin-top:14px;overflow-x:auto">${params}</div></div>
+    <div class="card"><h3>Mô phỏng trước khi chi</h3><div style="overflow-x:auto">${sim}</div>
+      <p class="note-key">Bộ mô phỏng kiểm tra đúng thứ tự như <span class="mono">LotusJar.request()</span>. Test <span class="mono">rules-sim</span> chạy cùng các kịch bản này trên hợp đồng thật và cho kết quả giống hệt.</p></div>
+    <div class="card"><h3>Chủ hũ ký</h3>${calls}</div>`;
+}
+async function previewRulesUi() {
+  const text = $("rulesText").value.trim(); if (!text) return;
+  $("rulesBtn").disabled = true;
+  try {
+    const r = await fetch("/api/rules/preview", { method: "POST", headers: H({ "content-type": "application/json" }), body: JSON.stringify({ text }) });
+    const p = await r.json();
+    if (!r.ok) { toast(p.error || "Lỗi"); return; }
+    $("rulesOut").innerHTML = rulesView(p);
+    const b = $("rulesCopy"); if (b) b.onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(p.command) : Promise.reject()).then(() => toast("Đã sao chép lệnh ký"), () => toast("Hãy bôi đen lệnh để copy"));
+  } catch (e) { toast("Không gọi được API"); } finally { $("rulesBtn").disabled = false; }
+}
+$("rulesBtn").onclick = previewRulesUi;
+$("rulesEx").innerHTML = RULE_EX.map((c, i) => `<button class="chipbtn" data-i="${i}">${esc(c)}</button>`).join("");
+$("rulesEx").onclick = (e) => { const i = e.target.dataset.i; if (i === undefined) return; $("rulesText").value = RULE_EX[i]; previewRulesUi(); };
 refresh(); setInterval(refresh, 4000);
+previewRulesUi();
 </script>
 </body>
 </html>

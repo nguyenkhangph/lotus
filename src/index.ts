@@ -70,6 +70,7 @@ app.use(
     allowLocalApprove: !botToken || env.DASHBOARD_APPROVE === "1",
     publicDemo: env.PUBLIC_DEMO === "1",
     token: env.DASHBOARD_TOKEN || undefined,
+    treasury: cfg.treasury,
     contracts: { factory: env.JAR_FACTORY_ADDRESS, receipts: env.RECEIPTS_ADDRESS, jar: env.JAR_ADDRESS },
   }),
 );
@@ -94,6 +95,7 @@ if (botToken && startCheck && jarStatus) {
     jarStatus,
     lock: guardian ? () => lockJar(jarAddr!, guardian) : undefined,
     dashboardUrl: env.DASHBOARD_URL,
+    treasury: cfg.treasury,
   });
   bot.start();
   console.log(`  telegram     : on${env.TELEGRAM_OWNER_ID ? "" : " (send /start to the bot to get your TELEGRAM_OWNER_ID)"}${guardian ? ", /lock enabled" : ", /lock needs GUARDIAN_PRIVATE_KEY"}`);

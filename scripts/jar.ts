@@ -7,11 +7,14 @@
  *   npm run jar -- refund-backlog 0 1 2 3          (dry run: shows what would be refunded)
  *   npm run jar -- refund-backlog 0 1 2 3 --send   (TREASURY_PRIVATE_KEY sends each receipt's refundDue to the jar)
  *     For receipts written before automatic refunds existed. Check on Snowtrace first: never refund an index twice.
+ *   npm run jar -- rules "Mỗi lần tối đa 0,5 USDC. Mỗi ngày không quá 3 USDC."          (preview + simulation)
+ *   npm run jar -- rules "…" --send   (owner signs setCaps / setTiming / setPayTo with DEPLOYER_PRIVATE_KEY)
  */
 import { Contract, JsonRpcProvider, Wallet } from "ethers";
 import { loadConfig } from "../src/config";
 import fs from "fs";
 import { lockJar, readJar, sendRefund, unlockJar } from "../src/agent/jar";
+import { previewRules } from "../src/rules/service";
 
 async function main() {
   const cmd = process.argv[2] ?? "status";
@@ -64,8 +67,33 @@ async function main() {
     if (!process.env.TREASURY_PRIVATE_KEY) throw new Error("TREASURY_PRIVATE_KEY needed");
     const treasury = new Wallet(process.env.TREASURY_PRIVATE_KEY, provider);
     for (const p of picked) console.log(`#${p.i} refunded, tx ${await sendRefund(cfg, treasury, jar, p.amount)}`);
+  } else if (cmd === "rules") {
+    const args = process.argv.slice(3);
+    const send = args.includes("--send");
+    const text = args.filter((a) => a !== "--send").join(" ").trim();
+    if (!text) throw new Error('usage: npm run jar -- rules "<quy tắc tiếng Việt>" [--send]');
+    const st = await readJar(cfg, jar, provider);
+    const now = (await provider.getBlock("latest"))!.timestamp;
+    const p = previewRules(text, st, cfg.treasury, now);
+    for (const u of p.understood) console.log(`  ✔ ${u.text}`);
+    for (const u of p.unknown) console.log(`  ⚠ "${u.clause}": ${u.why}`);
+    for (const w of p.warnings) console.log(`  ℹ ${w}`);
+    console.log("\n  Mô phỏng (hiện tại → mới):");
+    for (const s of p.scenarios) console.log(`  - ${s.title}: ${s.current.paid} được chi → ${s.proposed.paid} được chi${s.proposed.blocked ? ` (chặn: ${s.proposed.first})` : ""}`);
+    if (!p.calls.length) { console.log("\n  Không có gì thay đổi trên hợp đồng."); return; }
+    console.log("\n  Giao dịch chủ hũ sẽ ký:");
+    for (const c of p.calls) console.log(`  · ${c.fn}(${c.args})  — ${c.why}`);
+    if (!send) { console.log("\n  Chạy thử. Thêm --send để ký bằng ví chủ (DEPLOYER_PRIVATE_KEY)."); return; }
+    if (p.unknown.length) throw new Error("Còn câu chưa hiểu. Sửa hoặc bỏ các câu đó rồi chạy lại, để thứ được ký đúng với thứ anh đã viết.");
+    if (!process.env.DEPLOYER_PRIVATE_KEY) throw new Error("DEPLOYER_PRIVATE_KEY (jar owner) needed");
+    const owner = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
+    for (const c of p.calls) {
+      const tx = await owner.sendTransaction({ to: jar, data: c.data });
+      await tx.wait();
+      console.log(`  ${c.fn} ✓ tx ${tx.hash}`);
+    }
   } else {
-    throw new Error("usage: npm run jar -- status|lock|unlock|extend <days>|refund-backlog <index...> [--send]");
+    throw new Error("usage: npm run jar -- status|lock|unlock|extend <days>|refund-backlog <index...> [--send]|rules \"…\" [--send]");
   }
 }
 

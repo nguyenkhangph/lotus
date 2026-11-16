@@ -34,6 +34,23 @@ Bản **Việt Nam** dùng phong cách đêm sơn mài và các tên ẩn dụ l
 
 **Quỹ Lạc Hồng** chỉ hiện trên bản Việt Nam, ghi rõ là tầm nhìn (tiết kiệm / lợi suất), *chưa chạy*. Dải “Từ Văn Lang đến Lotus” là phép liên tưởng văn hoá, không phải phả hệ của sản phẩm.
 
+## Quy tắc chi tiêu bằng tiếng Việt
+
+Chủ hũ viết quy tắc như nói chuyện, có dấu hay không dấu đều được. Ví dụ: *"Mỗi lần tối đa 0,5 USDC. Mỗi ngày không quá 3 USDC. Chỉ trả cho Lotus. Quá 5 lệnh trong 1 phút thì khoá hũ. Hết hạn sau 30 ngày."* Lotus làm ba việc:
+
+1. **Dịch sang tham số hợp đồng** (`perTx`, `perDay`, `lifetime`, `delay`, `expiresAt`, `burstWindow/burstMax`, whitelist người nhận). Bộ đọc là luật cố định, không dùng mô hình ngôn ngữ. Câu nào không hiểu, hoặc hợp đồng chưa hỗ trợ (ví dụ hạn mức theo tuần), thì báo ra và **không áp dụng**, không đoán.
+2. **Mô phỏng trước khi chi** 6 kịch bản: trả phí bình thường, agent bị dụ trả quá mức, chuyển cho ví lạ, prompt injection gửi lệnh dồn dập, gọi liên tục cả buổi, và chi sau khi hết hạn. Kết quả theo quy tắc hiện tại và quy tắc mới được đặt cạnh nhau. Test `test/rules-sim.test.ts` chạy cùng các kịch bản này trên `LotusJar` thật và yêu cầu kết quả từng khoản trùng với bộ mô phỏng.
+3. **Chủ hũ tự ký** đúng các lệnh `setCaps` / `setTiming` / `setPayTo` có thay đổi. Agent và bot không giữ khoá chủ.
+
+Dùng ở đâu: mục **Quy tắc** trên trang demo (cả bản công khai), lệnh `/rules …` trên Telegram, hoặc dòng lệnh:
+
+```bash
+npm run jar -- rules "Mỗi ngày không quá 3 USDC. Quá 5 lệnh trong 1 phút thì khoá hũ"          # xem trước + mô phỏng
+npm run jar -- rules "Mỗi ngày không quá 3 USDC. Quá 5 lệnh trong 1 phút thì khoá hũ" --send   # ký bằng ví chủ
+```
+
+`--send` từ chối chạy nếu còn câu chưa hiểu, để thứ được ký luôn đúng với thứ chủ hũ đã viết.
+
 ## Lotus làm gì
 
 ```

@@ -17,6 +17,11 @@ export type JarStatus = {
   owner: string;
   approver: string;
   guardian: string;
+  /** Timing and the treasury whitelist bit, used by the rules preview. */
+  delay?: number;
+  burstWindow?: number;
+  burstMax?: number;
+  treasuryAllowed?: boolean;
 };
 
 export async function readJar(cfg: LotusConfig, jarAddr: string, provider: Provider): Promise<JarStatus> {
@@ -24,9 +29,9 @@ export async function readJar(cfg: LotusConfig, jarAddr: string, provider: Provi
   const usdc = new Contract(cfg.asset, ERC20_ABI, provider);
   const d = 10 ** cfg.assetDecimals;
   const h = (x: bigint) => (Number(x) / d).toString();
-  const [bal, rem, caps, spent, locked, exp, owner, approver, guardian] = await Promise.all([
+  const [bal, rem, caps, spent, locked, exp, owner, approver, guardian, delay, bw, bm, tAllowed] = await Promise.all([
     usdc.balanceOf(jarAddr), jar.remainingToday(), jar.caps(), jar.spentLifetime(), jar.locked(), jar.expiresAt(),
-    jar.owner(), jar.approver(), jar.guardian(),
+    jar.owner(), jar.approver(), jar.guardian(), jar.delay(), jar.burstWindow(), jar.burstMax(), jar.payToAllowed(cfg.treasury),
   ]);
   return {
     address: jarAddr,
@@ -41,6 +46,10 @@ export async function readJar(cfg: LotusConfig, jarAddr: string, provider: Provi
     owner,
     approver,
     guardian,
+    delay: Number(delay),
+    burstWindow: Number(bw),
+    burstMax: Number(bm),
+    treasuryAllowed: tAllowed,
   };
 }
 

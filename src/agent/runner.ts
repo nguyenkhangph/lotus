@@ -24,6 +24,10 @@ export const JAR_ABI = [
   "function caps() view returns (uint256 perTx, uint256 perDay, uint256 lifetime)",
   "function spentLifetime() view returns (uint256)",
   "function expiresAt() view returns (uint64)",
+  "function delay() view returns (uint64)",
+  "function burstWindow() view returns (uint32)",
+  "function burstMax() view returns (uint32)",
+  "function payToAllowed(address) view returns (bool)",
   "event SpendExecuted(bytes32 indexed id, address indexed token, address indexed payTo, uint256 amount, bytes32 requestHash)",
 ];
 
