@@ -206,6 +206,8 @@
   .sim small { display: block; color: var(--muted); font-size: 11.5px; }
   .callrow { font: 12px var(--mono); padding: 6px 0; border-top: 1px solid var(--border); }
   .callrow:first-child { border-top: 0; }
+  @keyframes flash { from { box-shadow: 0 0 0 2px var(--lotus); } to { box-shadow: 0 0 0 0 transparent; } }
+  .card.flash { animation: flash 1.2s ease-out; }
   .note-key { margin-top: 12px; font-size: 13px; color: var(--muted); }
 
   .t-vn, .vn-only { display: none; }
@@ -455,6 +457,7 @@
         <h3>Quy tắc của chủ hũ</h3>
         <textarea id="rulesText" style="min-height:150px">Mỗi lần tối đa 0,5 USDC. Mỗi ngày không quá 3 USDC. Tổng cộng 100 USDC. Chỉ trả cho Lotus. Quá 5 lệnh trong 1 phút thì khoá hũ. Hết hạn sau 30 ngày.</textarea>
         <button class="btn primary" style="margin-top:12px;width:100%;justify-content:center" id="rulesBtn">Xem trước &amp; mô phỏng</button>
+        <p class="muted" id="rulesStamp" style="font-size:12px;margin:8px 0 0;text-align:center"></p>
         <div class="chips" id="rulesEx"></div>
         <p class="note-key">Không gửi giao dịch nào. Thay đổi chỉ có hiệu lực khi chủ hũ ký <span class="mono">setCaps</span> / <span class="mono">setTiming</span> / <span class="mono">setPayTo</span> bằng ví của mình. Agent và bot không giữ khoá này.</p>
       </div>
@@ -753,26 +756,37 @@ function rulesView(p) {
       `<pre class="code" id="rulesCmd">${esc(p.command)}</pre><button class="btn" style="margin-top:10px" id="rulesCopy">Sao chép lệnh ký</button>`
     : `<div class="empty">Không có gì thay đổi trên hợp đồng.</div>`;
   return `<div class="card"><h3>Lotus hiểu thế nào</h3><ul class="rl">${und}${unk}${warn}</ul><div style="margin-top:14px;overflow-x:auto">${params}</div></div>
-    <div class="card"><h3>Mô phỏng trước khi chi</h3><div style="overflow-x:auto">${sim}</div>
+    <div class="card" id="rulesSim" style="scroll-margin-top:84px"><h3>Mô phỏng trước khi chi</h3><div style="overflow-x:auto">${sim}</div>
       <p class="note-key">Bộ mô phỏng kiểm tra đúng thứ tự như <span class="mono">LotusJar.request()</span>. Test <span class="mono">rules-sim</span> chạy cùng các kịch bản này trên hợp đồng thật và cho kết quả giống hệt.</p></div>
     <div class="card"><h3>Chủ hũ ký</h3>${calls}</div>`;
 }
-async function previewRulesUi() {
-  const text = $("rulesText").value.trim(); if (!text) return;
-  $("rulesBtn").disabled = true;
+async function previewRulesUi(user = true) {
+  const text = $("rulesText").value.trim(); if (!text) { toast("Nhập quy tắc trước đã"); return; }
+  const btn = $("rulesBtn"), label = btn.textContent;
+  btn.disabled = true; btn.textContent = "Đang mô phỏng…";
   try {
-    const r = await fetch("/api/rules/preview", { method: "POST", headers: H({ "content-type": "application/json" }), body: JSON.stringify({ text }) });
+    const [r] = await Promise.all([
+      fetch("/api/rules/preview", { method: "POST", headers: H({ "content-type": "application/json" }), body: JSON.stringify({ text }) }),
+      new Promise((ok) => setTimeout(ok, user ? 400 : 0)),
+    ]);
     const p = await r.json();
     if (!r.ok) { toast(p.error || "Lỗi"); return; }
     $("rulesOut").innerHTML = rulesView(p);
     const b = $("rulesCopy"); if (b) b.onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(p.command) : Promise.reject()).then(() => toast("Đã sao chép lệnh ký"), () => toast("Hãy bôi đen lệnh để copy"));
-  } catch (e) { toast("Không gọi được API"); } finally { $("rulesBtn").disabled = false; }
+    if (user) {
+      const t = new Date().toLocaleTimeString("vi-VN");
+      $("rulesStamp").textContent = `Kết quả mới nhất lúc ${t}`;
+      document.querySelectorAll("#rulesOut .card").forEach((c) => { c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); });
+      $("rulesSim").scrollIntoView({ behavior: "smooth", block: "start" });
+      toast(`Đã mô phỏng ${p.scenarios.length} kịch bản · ${p.understood.length} câu hiểu, ${p.unknown.length} câu chưa áp dụng`);
+    }
+  } catch (e) { toast("Không gọi được API"); } finally { btn.disabled = false; btn.textContent = label; }
 }
-$("rulesBtn").onclick = previewRulesUi;
+$("rulesBtn").onclick = () => previewRulesUi(true);
 $("rulesEx").innerHTML = RULE_EX.map((c, i) => `<button class="chipbtn" data-i="${i}">${esc(c)}</button>`).join("");
 $("rulesEx").onclick = (e) => { const i = e.target.dataset.i; if (i === undefined) return; $("rulesText").value = RULE_EX[i]; previewRulesUi(); };
 refresh(); setInterval(refresh, 4000);
-previewRulesUi();
+previewRulesUi(false);
 </script>
 </body>
 </html>
