@@ -231,7 +231,8 @@
   .features .card + .card { margin-top: 0; }
   .navlinks a { white-space: nowrap; }
   #badges { display: flex; gap: 6px; flex-wrap: nowrap; }
-  @media (max-width: 1680px) { #badges { display: none; } }
+  #heroBadges { display: none; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  @media (max-width: 1680px) { #badges { display: none; } #heroBadges { display: flex; } }
 
   /* ---- Việt Nam: đêm sơn mài ---- */
   html[data-theme="vn"] {
@@ -416,6 +417,7 @@
 <header class="hero">
   <div class="wrap">
     <span class="eyebrow">Avalanche Fuji · x402 · Team1 UniHack 2026</span>
+    <div id="heroBadges"></div>
     <h1>Bằng chứng sạch<br /><span class="g">giữa bùn tin đồn.</span></h1>
     <p class="lead">Lotus chấm bằng chứng đằng sau tin thị trường, trả phí theo từng lần hỏi bằng test USDC. Không đủ nguồn độc lập thì trả lời <b>MISSING EVIDENCE</b>, không bao giờ đoán.
       <small>Pay-per-call evidence scores for market claims · policy-guarded jar · human approval · on-chain receipts. Not investment advice.</small></p>
@@ -612,6 +614,7 @@ function badges(s) {
   b.push(`<span class="pill ${s.ledger.intact ? "" : "warn"}"><span class="dot"></span>ledger ${s.ledger.intact ? "intact" : "BROKEN"}</span>`);
   if (s.readOnly) b.push(`<span class="pill warn"><span class="dot"></span>read-only demo</span>`);
   $("badges").innerHTML = b.join("");
+  $("heroBadges").innerHTML = b.join("");
   $("stReceipts").textContent = s.ledger.count;
   $("stRed").textContent = s.redteam ? `${s.redteam.passed}/${s.redteam.total}` : "—";
 }
