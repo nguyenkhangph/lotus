@@ -50,7 +50,7 @@ npm run jar -- wallets          # số dư ba ví
 npm run jar -- sweep            # chia tiền trong ví hoá đơn
 ```
 
-Trên Telegram: `/wallets` và `/sweep`. Trên web: mục **Ba ví**, có nút tạo link thanh toán EIP-681 cho ví hoá đơn.
+Trên Telegram: `/wallets` và `/sweep`. Giao dịch chia thật trên Fuji: [tx](https://testnet.snowtrace.io/tx/0xc7bdf9207efabbaaff3c0473b86328f6eac3a679f91046c00fdc98f5b40138b7). Trên web: mục **Ba ví**, có nút tạo link thanh toán EIP-681 cho ví hoá đơn.
 
 ## Quy tắc chi tiêu bằng tiếng Việt
 
@@ -125,6 +125,8 @@ Nhận định *"NATO has invoked Article 5"* ra `MISSING_EVIDENCE` với `FLOOD
 **Bàn sống (chứng khoán Việt Nam, dữ liệu thật từ HNX):** nhận định *"FOX chia cổ tức"* ra `SUPPORTED` 45/100. Lotus mở công bố [hnx.vn/…641922](https://hnx.vn/tin-cung-cap-rss-vi_vn-641922-0.html) (*"…đối với cổ phiếu FOX của CTCP Viễn thông FPT…"*), giao 1 nguồn độc lập, giữ 0.10 USDC và hoàn 0.35 USDC: [thanh toán](https://testnet.snowtrace.io/tx/0x4a9ecec68ab9b007a51e297c4a11794d723cd693305b9c250a4c8750db47f8be) · [biên nhận](https://testnet.snowtrace.io/tx/0x9b3e11106c90ad0ea4647c6190c6413caff058270611d3d89d91a01534d84926) · [hoàn tiền](https://testnet.snowtrace.io/tx/0xee563f8f3e0ae65faa3ef6362499e793e71c93bd4ac60d590f73ba83d8f510db). Mã trong dải bảng giá của trang (CEO, BVS…) hay trong tên công ty (FPT) không được tính.
 
 Kill switch: giao dịch `Lock` gửi từ ví guardian (lệnh `/lock` trên Telegram), sau đó `Unlock` gửi từ ví chủ hũ. Xem tab Transactions của [hũ](https://testnet.snowtrace.io/address/0x805113113EC069205f59d72137c01244BfAA9619).
+
+**Ví hoá đơn chia tiền:** khách trả 20 test USDC vào `LotusInbox`, lệnh `/sweep` trên Telegram (ví agent chỉ trả gas) chia đúng 80/20: 16 USDC về ví chính, 4 USDC về hũ chi tiêu. Agent không chọn được người nhận, hợp đồng tự chia: [tx](https://testnet.snowtrace.io/tx/0xc7bdf9207efabbaaff3c0473b86328f6eac3a679f91046c00fdc98f5b40138b7)
 
 ### Kiểm chứng được gì trên chuỗi, cái gì không
 
