@@ -34,6 +34,24 @@ Bản **Việt Nam** dùng phong cách đêm sơn mài và các tên ẩn dụ l
 
 **Quỹ Lạc Hồng** chỉ hiện trên bản Việt Nam, ghi rõ là tầm nhìn (tiết kiệm / lợi suất), *chưa chạy*. Dải “Từ Văn Lang đến Lotus” là phép liên tưởng văn hoá, không phải phả hệ của sản phẩm.
 
+## Ba ví tách biệt
+
+| Ví | Hợp đồng | Agent làm được gì | Ai đổi được quy tắc |
+|---|---|---|---|
+| **Ví chính** (tiết kiệm) | ví của chủ (EOA) | Không gì cả: không có khoá, không được cấp quyền | Chủ |
+| **Hũ chi tiêu** | `LotusJar` | Xin chi trong hạn mức, chủ duyệt từng khoản | Chủ (`setCaps`, `setTiming`, `setPayTo`) |
+| **Ví hoá đơn** (chỉ nhận) | `LotusInbox` | Không chuyển được cho ai. Ai cũng gọi được `sweep`, nhưng hợp đồng tự chia theo tỷ lệ chủ đặt | Chủ (`setSplit`) |
+
+Luồng tiền: khách trả hoá đơn vào ví hoá đơn → `sweep` chia, mặc định 80% về ví chính và 20% về hũ chi tiêu → agent chỉ chi được phần trong hũ, trong hạn mức. `LotusInbox` không có hàm chuyển tiền nào khác, và không nhận AVAX (test `test/LotusInbox.test.ts`).
+
+```bash
+npm run deploy:inbox            # deploy + verify LotusInbox (INBOX_JAR_PERCENT=20 mặc định), rồi điền INBOX_ADDRESS
+npm run jar -- wallets          # số dư ba ví
+npm run jar -- sweep            # chia tiền trong ví hoá đơn
+```
+
+Trên Telegram: `/wallets` và `/sweep`. Trên web: mục **Ba ví**, có nút tạo link thanh toán EIP-681 cho ví hoá đơn.
+
 ## Quy tắc chi tiêu bằng tiếng Việt
 
 Chủ hũ viết quy tắc như nói chuyện, có dấu hay không dấu đều được. Ví dụ: *"Mỗi lần tối đa 0,5 USDC. Mỗi ngày không quá 3 USDC. Chỉ trả cho Lotus. Quá 5 lệnh trong 1 phút thì khoá hũ. Hết hạn sau 30 ngày."* Lotus làm ba việc:

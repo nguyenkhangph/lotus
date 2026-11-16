@@ -4,6 +4,7 @@ import path from "path";
 import { DESKS } from "../engine/desks";
 import type { ApprovalHub } from "../agent/hub";
 import type { JarStatus } from "../agent/jar";
+import type { WalletsStatus } from "../agent/wallets";
 import type { Ledger } from "../ledger";
 import { previewRules } from "../rules/service";
 
@@ -22,9 +23,11 @@ export type DashboardDeps = {
   /** Optional secret: `x-lotus-token` header or `?token=` gives full access (pending cards, ask, approve). */
   token?: string;
   /** Public contract addresses shown on the page. */
-  contracts?: { factory?: string; receipts?: string; jar?: string };
+  contracts?: { factory?: string; receipts?: string; jar?: string; inbox?: string };
   /** Lotus treasury (payTo), so "chỉ trả cho Lotus" maps to an address in the rules preview. */
   treasury?: string;
+  /** Main wallet / spending jar / invoice wallet balances (read after the jar). */
+  wallets?: (jar: JarStatus) => Promise<WalletsStatus>;
 };
 
 /**
@@ -46,6 +49,7 @@ export function dashboardRouter(d: DashboardDeps): Router {
   const r = express.Router();
   const html = fs.readFileSync(path.join(__dirname, "index.html"), "utf8");
   let jarCache: { at: number; v: JarStatus | null; err?: string } = { at: 0, v: null };
+  let walletsCache: WalletsStatus | null = null;
 
   r.get("/", (_req, res) => res.type("html").send(html));
   // Images, favicons, OG card (on Vercel these are served by the CDN from public/ directly).
@@ -59,6 +63,13 @@ export function dashboardRouter(d: DashboardDeps): Router {
         jarCache = { at: Date.now(), v: await d.jarStatus() };
       } catch (e: any) {
         jarCache = { at: Date.now(), v: jarCache.v, err: e?.shortMessage ?? e?.message };
+      }
+      if (d.wallets && jarCache.v) {
+        try {
+          walletsCache = await d.wallets(jarCache.v);
+        } catch {
+          /* keep the last good read */
+        }
       }
     }
   };
@@ -80,6 +91,7 @@ export function dashboardRouter(d: DashboardDeps): Router {
       botEnabled: d.botEnabled,
       jar: jarCache.v,
       jarError: jarCache.err,
+      wallets: walletsCache,
       desks: Object.values(DESKS).map((x) => ({ id: x.id, name: x.name, live: x.live })),
       readOnly: !full,
       canApproveHere: full && d.allowLocalApprove,

@@ -7,6 +7,7 @@ import { EthersChain } from "./x402/chain";
 import { ApprovalHub } from "./agent/hub";
 import { JAR_ABI, runCheck } from "./agent/runner";
 import { lockJar, readJar, sendRefund } from "./agent/jar";
+import { readWallets, sweepInbox } from "./agent/wallets";
 import { LotusBot, TelegramApi } from "./telegram/bot";
 import { dashboardRouter } from "./web/dashboard";
 
@@ -71,7 +72,8 @@ app.use(
     publicDemo: env.PUBLIC_DEMO === "1",
     token: env.DASHBOARD_TOKEN || undefined,
     treasury: cfg.treasury,
-    contracts: { factory: env.JAR_FACTORY_ADDRESS, receipts: env.RECEIPTS_ADDRESS, jar: env.JAR_ADDRESS },
+    wallets: (j) => readWallets(cfg, provider, j, env.INBOX_ADDRESS || undefined),
+    contracts: { factory: env.JAR_FACTORY_ADDRESS, receipts: env.RECEIPTS_ADDRESS, jar: env.JAR_ADDRESS, inbox: env.INBOX_ADDRESS || undefined },
   }),
 );
 
@@ -96,6 +98,8 @@ if (botToken && startCheck && jarStatus) {
     lock: guardian ? () => lockJar(jarAddr!, guardian) : undefined,
     dashboardUrl: env.DASHBOARD_URL,
     treasury: cfg.treasury,
+    wallets: async () => readWallets(cfg, provider, await jarStatus(), env.INBOX_ADDRESS || undefined),
+    sweep: env.INBOX_ADDRESS && env.AGENT_PRIVATE_KEY ? () => sweepInbox(cfg, env.INBOX_ADDRESS!, new Wallet(env.AGENT_PRIVATE_KEY!, provider)) : undefined,
   });
   bot.start();
   console.log(`  telegram     : on${env.TELEGRAM_OWNER_ID ? "" : " (send /start to the bot to get your TELEGRAM_OWNER_ID)"}${guardian ? ", /lock enabled" : ", /lock needs GUARDIAN_PRIVATE_KEY"}`);

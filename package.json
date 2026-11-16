@@ -12,6 +12,7 @@
     "dev": "node --use-system-ca -r ts-node/register/transpile-only src/index.ts",
     "deploy:fuji": "hardhat run scripts/deploy.ts --network fuji",
     "demo:agent": "node --use-system-ca -r ts-node/register/transpile-only scripts/agent-demo.ts",
+    "deploy:inbox": "hardhat run scripts/deploy-inbox.ts --network fuji",
     "verify:fuji": "hardhat run scripts/verify.ts --network fuji",
     "jar": "ts-node --transpile-only scripts/jar.ts",
     "hnx": "node --use-system-ca -r ts-node/register/transpile-only scripts/hnx.ts"

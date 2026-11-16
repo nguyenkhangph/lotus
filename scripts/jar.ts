@@ -8,6 +8,8 @@
  *   npm run jar -- refund-backlog 0 1 2 3 --send   (TREASURY_PRIVATE_KEY sends each receipt's refundDue to the jar)
  *     For receipts written before automatic refunds existed. Check on Snowtrace first: never refund an index twice.
  *   npm run jar -- rules "Mỗi lần tối đa 0,5 USDC. Mỗi ngày không quá 3 USDC."          (preview + simulation)
+ *   npm run jar -- wallets   (main wallet, spending jar, invoice wallet)
+ *   npm run jar -- sweep     (pays the invoice wallet out by its on-chain split; any key with gas, here AGENT_PRIVATE_KEY)
  *   npm run jar -- rules "…" --send   (owner signs setCaps / setTiming / setPayTo with DEPLOYER_PRIVATE_KEY)
  */
 import { Contract, JsonRpcProvider, Wallet } from "ethers";
@@ -15,6 +17,7 @@ import { loadConfig } from "../src/config";
 import fs from "fs";
 import { lockJar, readJar, sendRefund, unlockJar } from "../src/agent/jar";
 import { previewRules } from "../src/rules/service";
+import { readWallets, sweepInbox } from "../src/agent/wallets";
 
 async function main() {
   const cmd = process.argv[2] ?? "status";
@@ -67,6 +70,17 @@ async function main() {
     if (!process.env.TREASURY_PRIVATE_KEY) throw new Error("TREASURY_PRIVATE_KEY needed");
     const treasury = new Wallet(process.env.TREASURY_PRIVATE_KEY, provider);
     for (const p of picked) console.log(`#${p.i} refunded, tx ${await sendRefund(cfg, treasury, jar, p.amount)}`);
+  } else if (cmd === "wallets") {
+    const w = await readWallets(cfg, provider, await readJar(cfg, jar, provider), process.env.INBOX_ADDRESS || undefined);
+    console.log(`  Ví chính     ${w.main.address}  ${w.main.usdc} USDC · ${w.main.avax} AVAX  (agent không có khoá)`);
+    console.log(`  Hũ chi tiêu  ${w.jar.address}  ${w.jar.usdc} USDC  (agent chi trong hạn mức, còn ${w.jar.remainingToday}/${w.jar.perDay} hôm nay)`);
+    if (w.inbox) console.log(`  Ví hoá đơn   ${w.inbox.address}  ${w.inbox.usdc} USDC  (chỉ nhận; chia: ${w.inbox.shares.map((x) => `${x.percent}% ${x.role}`).join(", ")})`);
+    else console.log("  Ví hoá đơn   chưa triển khai: npm run deploy:inbox, rồi điền INBOX_ADDRESS");
+  } else if (cmd === "sweep") {
+    const inbox = process.env.INBOX_ADDRESS;
+    const key = process.env.AGENT_PRIVATE_KEY ?? process.env.DEPLOYER_PRIVATE_KEY;
+    if (!inbox || !key) throw new Error("INBOX_ADDRESS and AGENT_PRIVATE_KEY (or DEPLOYER_PRIVATE_KEY) needed");
+    console.log("swept, tx", await sweepInbox(cfg, inbox, new Wallet(key, provider)));
   } else if (cmd === "rules") {
     const args = process.argv.slice(3);
     const send = args.includes("--send");
@@ -93,7 +107,7 @@ async function main() {
       console.log(`  ${c.fn} ✓ tx ${tx.hash}`);
     }
   } else {
-    throw new Error("usage: npm run jar -- status|lock|unlock|extend <days>|refund-backlog <index...> [--send]|rules \"…\" [--send]");
+    throw new Error("usage: npm run jar -- status|lock|unlock|extend <days>|refund-backlog <index...> [--send]|wallets|sweep|rules \"…\" [--send]");
   }
 }
 

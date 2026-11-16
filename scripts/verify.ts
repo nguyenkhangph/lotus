@@ -1,7 +1,7 @@
 /**
  * Verifies the deployed Lotus contracts on Snowtrace (Routescan) so anyone can read the source.
  *   npm run verify:fuji
- * Uses JAR_FACTORY_ADDRESS, RECEIPTS_ADDRESS, JAR_ADDRESS from .env. The jar's constructor
+ * Uses JAR_FACTORY_ADDRESS, RECEIPTS_ADDRESS, JAR_ADDRESS, INBOX_ADDRESS from .env. The jar's constructor
  * arguments are read back from the chain (the jar never changed its config since deployment).
  */
 import hre, { ethers } from "hardhat";
@@ -39,6 +39,12 @@ async function main() {
       burstMax: await jar.burstMax(),
     };
     await verify(env.JAR_ADDRESS, [cfg], "contracts/LotusJar.sol:LotusJar");
+  }
+  if (env.INBOX_ADDRESS) {
+    // Constructor args = owner + the split at deployment (valid as long as setSplit was never called).
+    const inbox = await ethers.getContractAt("LotusInbox", env.INBOX_ADDRESS);
+    const shares = (await inbox.shares()).map((s: any) => ({ to: s.to, bps: s.bps, label: s.label }));
+    await verify(env.INBOX_ADDRESS, [await inbox.owner(), shares], "contracts/LotusInbox.sol:LotusInbox");
   }
 }
 

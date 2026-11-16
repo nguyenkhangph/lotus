@@ -11,6 +11,7 @@ import type { ApprovalHub } from "../agent/hub";
 import type { ApprovalCard, RunRecord } from "../agent/runner";
 import { previewRules, type RulesPreview } from "../rules/service";
 import type { JarStatus } from "../agent/jar";
+import type { WalletsStatus } from "../agent/wallets";
 
 export class TelegramApi {
   constructor(private token: string, private fetchImpl: typeof fetch = fetch) {}
@@ -37,6 +38,10 @@ export type BotDeps = {
   dashboardUrl?: string;
   /** Lotus treasury address, for "chỉ trả cho Lotus" in /rules. */
   treasury?: string;
+  /** Main wallet / spending jar / invoice wallet. */
+  wallets?: () => Promise<WalletsStatus>;
+  /** Pays the invoice wallet out by its on-chain split (any key with gas may call it). */
+  sweep?: () => Promise<string>;
 };
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -110,6 +115,25 @@ export class LotusBot {
       case "/pending": {
         const p = this.d.hub.listPending();
         return this.say(chatId, p.length ? p.map((c) => `• ${esc(c.claim)} — ${c.amountHuman} USDC`).join("\n") : "Không có khoản chờ duyệt.");
+      }
+      case "/wallets":
+      case "/vi": {
+        if (!this.d.wallets) return this.say(chatId, "Chưa cấu hình ví.");
+        try {
+          return this.say(chatId, formatWallets(await this.d.wallets(), this.d.explorer));
+        } catch (e: any) {
+          return this.say(chatId, `Không đọc được ví: ${esc(e?.shortMessage ?? e?.message ?? "lỗi")}`);
+        }
+      }
+      case "/sweep": {
+        if (!this.d.sweep) return this.say(chatId, "Chưa có ví hoá đơn (INBOX_ADDRESS) hoặc ví agent để trả gas.");
+        try {
+          const tx = await this.d.sweep();
+          return this.say(chatId, `🧾 Đã chia tiền trong ví hoá đơn theo tỷ lệ trên hợp đồng: <a href="${this.d.explorer}/tx/${tx}">giao dịch</a>`);
+        } catch (e: any) {
+          const m = String(e?.shortMessage ?? e?.message ?? "");
+          return this.say(chatId, /NothingToSweep/.test(m) ? "Ví hoá đơn đang trống." : `Không chia được: ${esc(m.slice(0, 200))}`);
+        }
       }
       case "/rules":
       case "/quytac": {
@@ -276,6 +300,22 @@ export function formatRun(r: RunRecord, explorer: string): string {
   return lines.join("\n");
 }
 
+export function formatWallets(w: WalletsStatus, explorer: string): string {
+  const a = (x: string) => `<a href="${explorer}/address/${x}">${short(x)}</a>`;
+  const L = [
+    "👛 <b>Ba ví tách biệt</b>",
+    `🏦 <b>Ví chính</b> ${a(w.main.address)}: ${w.main.usdc} USDC · ${w.main.avax} AVAX\n   Agent không có khoá, không được cấp quyền.`,
+    `🫙 <b>Hũ chi tiêu</b> ${a(w.jar.address)}: ${w.jar.usdc} USDC${w.jar.locked ? " · 🔒 đang khoá" : ""}\n   Agent chỉ xin chi ở đây, còn ${w.jar.remainingToday}/${w.jar.perDay} USDC hôm nay.`,
+  ];
+  if (w.inbox) {
+    const split = w.inbox.shares.map((s) => `${s.percent}% ${s.role === "main" ? "ví chính" : s.role === "jar" ? "hũ chi tiêu" : short(s.to)}`).join(" · ");
+    L.push(`🧾 <b>Ví hoá đơn</b> ${a(w.inbox.address)}: ${w.inbox.usdc} USDC\n   Chỉ nhận. Rút ra chỉ theo tỷ lệ: ${split}. Gõ <code>/sweep</code> để chia.`);
+  } else {
+    L.push("🧾 <b>Ví hoá đơn</b>: chưa triển khai (<code>npm run deploy:inbox</code>).");
+  }
+  return L.join("\n\n");
+}
+
 export function formatRules(p: RulesPreview): string {
   const L: string[] = ["📜 <b>Xem trước quy tắc</b>" + (p.live ? "" : " <i>(không đọc được hũ, so với cấu hình demo)</i>")];
   if (p.understood.length) L.push("<b>Đã hiểu:</b>\n" + p.understood.map((u) => `✅ ${esc(u.text)}`).join("\n"));
@@ -294,5 +334,6 @@ const HELP =
   `• Mỗi khoản chi cần bạn bấm ✅ Duyệt\n` +
   `• <code>/status</code> số dư và hạn mức · <code>/lock</code> khoá hũ ngay\n` +
   `• <code>/desks</code> danh sách bàn nguồn\n` +
+  `• <code>/wallets</code> ba ví: ví chính, hũ chi tiêu, ví hoá đơn · <code>/sweep</code> chia tiền hoá đơn\n` +
   `• <code>/rules</code> viết quy tắc chi tiêu bằng tiếng Việt, xem trước và mô phỏng\n\n` +
   `<i>Lotus không tư vấn đầu tư, không giá mục tiêu, không dự báo. Chỉ testnet.</i>`;

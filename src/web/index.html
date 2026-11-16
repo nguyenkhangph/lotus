@@ -194,6 +194,23 @@
   }
 
 
+
+  /* ---- Three wallets ---- */
+  .wallets3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: stretch; }
+  @media (max-width: 1020px) { .wallets3 { grid-template-columns: minmax(0,1fr); } }
+  .wallets3 > .card { margin-top: 0; display: flex; flex-direction: column; }
+  .wbal { font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
+  .wbal small { font-size: 13px; color: var(--muted); font-weight: 500; margin-left: 6px; }
+  .wrole { font-size: 13.5px; color: var(--muted); margin: 6px 0 12px; }
+  .wcan { list-style: none; padding: 0; margin: 0 0 12px; font-size: 13px; }
+  .wcan li { padding: 3px 0; }
+  .wfoot { margin-top: auto; font-size: 12.5px; }
+  .wflow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; font: 12px var(--mono); color: var(--muted); }
+  .wflow span { padding: 6px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); color: #cfd5dd; }
+  html[data-theme="vn"] .wflow span { color: var(--text); }
+  .invoice { display: flex; gap: 8px; margin-top: 10px; }
+  .invoice input { flex: 1; min-width: 0; font: 14px var(--sans); color: var(--text); background: rgba(0,0,0,.25); border: 1px solid var(--border2); border-radius: 10px; padding: 8px 10px; }
+
   /* ---- Rules (Vietnamese) ---- */
   .rules-grid { display: grid; grid-template-columns: 380px minmax(0,1fr); gap: 20px; align-items: start; }
   .rules-grid > div { min-width: 0; }
@@ -380,7 +397,7 @@
   <div class="wrap">
     <a class="brand" href="#"><img src="/assets/logo.png" alt="" />Lotus</a>
     <div class="navlinks">
-      <a href="#dashboard">Dashboard</a><a href="#rules">Quy tắc</a><a href="#how">Cách hoạt động</a><a href="#contracts">Hợp đồng</a>
+      <a href="#dashboard">Dashboard</a><a href="#wallets">Ba ví</a><a href="#rules">Quy tắc</a><a href="#how">Cách hoạt động</a><a href="#contracts">Hợp đồng</a>
       <a href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
     <div class="navright">
@@ -450,6 +467,12 @@
     </div>
   </section>
 
+  <section id="wallets">
+    <div class="sh"><h2>Ba ví tách biệt</h2><p>Mỗi ví một quyền, do hợp đồng ép chứ không do lời hứa của agent. Agent chỉ chạm được vào hũ chi tiêu, và chỉ trong hạn mức.</p></div>
+    <div class="wallets3" id="walletCards"><div class="card"><div class="empty">Đang đọc ví trên Fuji…</div></div></div>
+    <div class="wflow"><span>Khách trả hoá đơn</span><i>→</i><span>Ví hoá đơn (chỉ nhận)</span><i>→</i><span>chia theo tỷ lệ trên hợp đồng</span><i>→</i><span>Ví chính</span><i>+</i><span>Hũ chi tiêu</span><i>→</i><span>agent chi trong hạn mức, chủ duyệt</span></div>
+  </section>
+
   <section id="rules">
     <div class="sh"><h2>Quy tắc bằng tiếng Việt</h2><p><span class="t-default">Viết quy tắc chi tiêu như nói chuyện. Lotus chuyển thành tham số hợp đồng, mô phỏng trước, rồi chủ hũ tự ký. Câu nào không hiểu thì báo ra, không đoán.</span><span class="t-vn"><abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt; tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> viết bằng lời: Lotus chuyển thành tham số Hũ Âu Cơ, mô phỏng trước, rồi chủ hũ tự ký. Câu nào không hiểu thì báo ra, không đoán.</span></p></div>
     <div class="rules-grid">
@@ -490,7 +513,7 @@
 
 
   <section id="contracts">
-    <div class="sh"><h2>Hợp đồng trên Fuji</h2><p>Cả ba đã verify mã nguồn trên Snowtrace (Exact Match).</p></div>
+    <div class="sh"><h2>Hợp đồng trên Fuji</h2><p>Mã nguồn đã verify trên Snowtrace (Exact Match).</p></div>
     <div class="card" style="overflow-x:auto"><table id="contractsTable"></table></div>
   </section>
 </main>
@@ -563,7 +586,7 @@ function setTheme(next, persist) {
   }
   if (lastState) {
     if (desksLoaded) applyDeskNames(lastState);
-    jar(lastState); pending(lastState); runs(lastState); ledger(lastState); contracts(lastState);
+    jar(lastState); wallets(lastState); pending(lastState); runs(lastState); ledger(lastState); contracts(lastState);
   }
 }
 function applyDeskNames(s) {
@@ -692,9 +715,52 @@ function redteam(s) {
 
 function contracts(s) {
   const c = s.contracts || {};
-  const rows = [["LotusJarFactory", c.factory, t("Tạo hũ; API chỉ tin hũ do factory này tạo", "Tạo Hũ Âu Cơ; API chỉ tin hũ do factory này tạo")], ["LotusReceipts", c.receipts, t("Neo hash biên nhận và kết luận", "Neo hash Sổ Trống đồng (biên nhận) và kết luận")], [t("LotusJar (hũ demo)", "LotusJar (Hũ Âu Cơ)"), c.jar || s.jar?.address, t("Hũ có hạn mức, whitelist, kill switch", "Hũ Âu Cơ: hạn mức, Nam quốc sơn hà, Cọc Bạch Đằng (kill switch)")]];
+  const rows = [["LotusJarFactory", c.factory, t("Tạo hũ; API chỉ tin hũ do factory này tạo", "Tạo Hũ Âu Cơ; API chỉ tin hũ do factory này tạo")], ["LotusReceipts", c.receipts, t("Neo hash biên nhận và kết luận", "Neo hash Sổ Trống đồng (biên nhận) và kết luận")], [t("LotusJar (hũ demo)", "LotusJar (Hũ Âu Cơ)"), c.jar || s.jar?.address, t("Hũ có hạn mức, whitelist, kill switch", "Hũ Âu Cơ: hạn mức, Nam quốc sơn hà, Cọc Bạch Đằng (kill switch)")], ["LotusInbox (ví hoá đơn)", c.inbox, "Chỉ nhận; tiền ra chỉ theo tỷ lệ chủ đặt"]];
   $("contractsTable").innerHTML = `<tr><th>Hợp đồng</th><th>Địa chỉ</th><th>Vai trò</th></tr>` + rows.filter((r) => r[1]).map(([n, a, d]) =>
     `<tr><td style="font-weight:600">${n}</td><td class="mono"><a target="_blank" rel="noopener" href="${s.explorer}/address/${a}#code">${short(a)} ↗</a></td><td class="muted">${d}</td></tr>`).join("");
+}
+
+const FUJI_USDC = "0x5425890298aed601595a70AB815c96711a31Bc65";
+function walletsView(s) {
+  const w = s.wallets, j = s.jar;
+  const addr = (a) => a ? `<a class="link mono" target="_blank" rel="noopener" href="${s.explorer}/address/${a}">${short(a)} ↗</a>` : "—";
+  const jarName = t("Hũ chi tiêu", "Hũ Âu Cơ · hũ chi tiêu");
+  const main = w?.main ?? (j ? { address: j.owner, usdc: "—", avax: "—" } : null);
+  const jarW = w?.jar ?? (j ? { address: j.address, usdc: j.balance, remainingToday: j.remainingToday, perDay: j.perDay, locked: j.locked } : null);
+  if (!main || !jarW) return `<div class="card"><div class="empty">${esc(s.jarError ? "Không đọc được ví: " + s.jarError : "Đang đọc ví trên Fuji…")}</div></div>`;
+  const inbox = w?.inbox;
+  const split = inbox ? inbox.shares.map((x) => `${x.percent}% ${x.role === "main" ? "ví chính" : x.role === "jar" ? "hũ chi tiêu" : short(x.to)}`).join(" · ") : "";
+  return `
+    <div class="card"><h3>🏦 Ví chính</h3>
+      <div class="wbal">${isNaN(+main.usdc) ? "—" : (+main.usdc).toFixed(2)}<small>USDC · ${esc(main.avax)} AVAX</small></div>
+      <div class="wrole">Tiền tiết kiệm và khoá chủ của mọi hợp đồng.</div>
+      <ul class="wcan"><li>⛔ Agent: không có khoá, không được cấp quyền</li><li>✅ Chủ: nạp hũ, đổi quy tắc, mở khoá hũ</li></ul>
+      <div class="wfoot">${addr(main.address)}</div></div>
+    <div class="card"><h3>🫙 ${jarName} ${jarW.locked ? `<span class="state locked">ĐÃ KHOÁ</span>` : ""}</h3>
+      <div class="wbal">${(+jarW.usdc).toFixed(2)}<small>USDC</small></div>
+      <div class="wrole">Tiền agent được phép xin chi, còn ${esc(jarW.remainingToday)}/${esc(jarW.perDay)} USDC hôm nay.</div>
+      <ul class="wcan"><li>🟡 Agent: xin chi trong hạn mức, chủ bấm duyệt</li><li>⛔ Agent: không rút, không đổi quy tắc</li></ul>
+      <div class="wfoot">${addr(jarW.address)} · <span class="mono">LotusJar</span></div></div>
+    <div class="card"><h3>🧾 Ví hoá đơn</h3>
+      ${inbox ? `<div class="wbal">${(+inbox.usdc).toFixed(2)}<small>USDC chờ chia</small></div>
+        <div class="wrole">Chỉ nhận. Tiền chỉ ra được qua <span class="mono">sweep</span>: ${esc(split)}.</div>
+        <ul class="wcan"><li>⛔ Agent: không chuyển được cho ai khác</li><li>✅ Ai cũng gọi được <span class="mono">sweep</span>, hợp đồng tự chia</li></ul>
+        <div style="font-size:12.5px;color:var(--muted)">Tạo link thanh toán (EIP-681, mở bằng ví di động):</div>
+        <div class="invoice"><input id="invAmt" type="number" min="0.01" step="0.01" value="5" aria-label="Số USDC" /><button class="btn" id="invBtn">Sao chép link</button></div>
+        <div class="wfoot" style="margin-top:12px">${addr(inbox.address)} · <span class="mono">LotusInbox</span></div>`
+      : `<div class="wrole">Chưa triển khai trên demo này. Chủ chạy <span class="mono">npm run deploy:inbox</span> rồi điền <span class="mono">INBOX_ADDRESS</span>.</div>
+        <ul class="wcan"><li>Chỉ nhận tiền</li><li>Tiền ra chỉ theo tỷ lệ chủ đặt (mặc định 80% ví chính, 20% hũ chi tiêu)</li></ul>`}
+    </div>`;
+}
+function wallets(s) {
+  $("walletCards").innerHTML = walletsView(s);
+  const b = $("invBtn");
+  if (b && s.wallets?.inbox) b.onclick = () => {
+    const amt = Math.round(Number($("invAmt").value) * 1e6);
+    if (!(amt > 0)) return toast("Nhập số USDC");
+    const uri = `ethereum:${FUJI_USDC}@43113/transfer?address=${s.wallets.inbox.address}&uint256=${amt}`;
+    (navigator.clipboard ? navigator.clipboard.writeText(uri) : Promise.reject()).then(() => toast("Đã sao chép link thanh toán"), () => toast(uri));
+  };
 }
 
 async function refresh() {
@@ -706,7 +772,7 @@ async function refresh() {
     }
     $("askCard").style.display = s.readOnly ? "none" : "";
     $("roNote").style.display = s.readOnly ? "" : "none";
-    lastState = s; badges(s); jar(s); pending(s); runs(s); ledger(s); redteam(s); contracts(s);
+    lastState = s; badges(s); jar(s); if (!document.activeElement || document.activeElement.id !== "invAmt") wallets(s); pending(s); runs(s); ledger(s); redteam(s); contracts(s);
   } catch (e) { console.error(e); }
 }
 async function approve(runId, approved) {
