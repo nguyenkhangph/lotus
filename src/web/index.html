@@ -299,7 +299,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
   /* wallets / rules */
   .wallets3 > .card:nth-child(2) { border-color: rgba(240,108,155,.32); }
   .wflow { margin-top: 16px; }
-  .wflow span, .flow span { border-radius: 999px; font-family: var(--sans); font-size: 12.5px; }
+  .wflow > span, .flow > span { border-radius: 999px; font-family: var(--sans); font-size: 12.5px; }
 
   /* ledger + red team: their own full-width row, equal columns, same height */
   .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; margin-top: 20px; }
@@ -313,6 +313,60 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
   .scroll::-webkit-scrollbar-thumb:hover { background: rgba(190,220,228,.3); }
   .scroll table th { position: sticky; top: 0; background: #121c20; z-index: 1; }
   #ledger td, #ledger th { white-space: nowrap; }
+
+  /* ---------- atmosphere: grid + seed network + section bands ---------- */
+  html, body { overflow-x: clip; }
+  body { --gridc: rgba(240,108,155,.075); --netc: 240,108,155; --netc2: 231,194,125; }
+  html[data-theme="vn"] body { --gridc: rgba(198,163,91,.07); --netc: 198,163,91; --netc2: 232,160,180; }
+  body::before { content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background-image: linear-gradient(var(--gridc) 1px, transparent 1px), linear-gradient(90deg, var(--gridc) 1px, transparent 1px);
+    background-size: 56px 56px; background-position: center top;
+    -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 30%, #000 30%, transparent 85%); mask-image: radial-gradient(ellipse 85% 70% at 50% 30%, #000 30%, transparent 85%); }
+  #net { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; opacity: .9; }
+  .hero { background: transparent; }
+  .hero::after { background: linear-gradient(90deg, var(--bg) 22%, rgba(13,20,23,.55) 52%, rgba(13,20,23,.15) 80%), linear-gradient(0deg, var(--bg) 0%, transparent 30%); }
+  html[data-theme="vn"] .hero::after { background: linear-gradient(90deg, var(--bg) 22%, rgba(20,14,16,.6) 52%, rgba(20,14,16,.15) 80%), linear-gradient(0deg, var(--bg) 0%, transparent 30%); }
+
+  .receipt-wrap { isolation: isolate; }
+  .halo { position: absolute; z-index: -1; left: 50%; top: 50%; width: 560px; height: 560px; transform: translate(-50%, -48%); border-radius: 50%; pointer-events: none;
+    border: 1.5px solid rgba(var(--netc), .7);
+    box-shadow: 0 0 120px 12px rgba(var(--netc), .3), inset 0 0 90px rgba(var(--netc), .3), 0 0 2px rgba(var(--netc), .9);
+    background: radial-gradient(circle, transparent 60%, rgba(var(--netc), .07) 70%, transparent 71%); }
+  .halo::before, .halo::after { content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(var(--netc2), .18); inset: -60px; }
+  .halo::after { inset: -130px; border-color: rgba(var(--netc), .09); }
+  @media (max-width: 600px) { .halo { width: 360px; height: 360px; } }
+
+  .ticker { position: relative; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(13,20,23,.6); backdrop-filter: blur(6px); overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  html[data-theme="vn"] .ticker { background: rgba(20,14,16,.6); }
+  .ticker-track { display: flex; gap: 44px; width: max-content; padding: 13px 0; animation: tick 70s linear infinite; font-size: 13.5px; color: var(--muted); white-space: nowrap; }
+  .ticker:hover .ticker-track { animation-play-state: paused; }
+  @keyframes tick { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } .ticker { overflow-x: auto; } }
+  .tk { display: inline-flex; align-items: center; gap: 8px; }
+  .tk i { width: 7px; height: 7px; border-radius: 2px; background: var(--muted); }
+  .tk i.v-SUPPORTED, .tk i.v-WEAK { background: var(--jade); } .tk i.v-MISSING_EVIDENCE { background: #8fa1a8; } .tk i.v-REFUSE { background: var(--lotus); } .tk i.v-CONTESTED, .tk i.v-CONTRADICTED { background: var(--amber); }
+  .tk b { color: var(--text); font-weight: 600; }
+  .tk em { font-style: normal; font: 600 12px var(--mono); }
+  .tk a { color: var(--muted); } .tk a:hover { color: var(--text); }
+
+  main section { position: relative; isolation: isolate; padding: 92px 0 76px; }
+  main section::after { content: ""; position: absolute; z-index: -1; top: 0; bottom: 0; left: 50%; width: 100vw; transform: translateX(-50%); border-top: 1px solid var(--border); pointer-events: none; }
+  main section:nth-of-type(even)::after { background: linear-gradient(180deg, rgba(214,236,240,.035), rgba(214,236,240,.012) 60%, transparent); }
+  html[data-theme="vn"] main section:nth-of-type(even)::after { background: linear-gradient(180deg, rgba(244,234,216,.035), transparent 70%); }
+
+  .sh { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 28px; max-width: none; align-items: end; }
+  .sh h2, .sh p { grid-column: 1; max-width: 44em; }
+  .sh-chip { grid-column: 2; grid-row: 1 / span 2; align-self: end; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
+    border: 1px solid var(--border2); background: rgba(13,20,23,.55); font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; }
+  a.sh-chip:hover { border-color: var(--lotus); }
+  .sh-chip.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--jade); box-shadow: 0 0 0 4px rgba(63,201,162,.18); }
+  .sh-chip.ok { border-color: rgba(63,201,162,.4); color: #8fe6cc; }
+  @media (max-width: 760px) { .sh { grid-template-columns: minmax(0, 1fr); } .sh-chip { grid-column: 1; grid-row: auto; margin-top: 14px; justify-self: start; white-space: normal; } }
+
+  .card { border-color: rgba(190,220,228,.12); background: linear-gradient(180deg, rgba(20,31,36,.82), rgba(15,23,27,.82)); backdrop-filter: blur(4px); }
+  html[data-theme="vn"] .card { background: linear-gradient(180deg, rgba(36,26,28,.82), rgba(26,19,21,.82)); }
+  .card:not(.feature)::after { content: ""; position: absolute; left: 24px; right: 24px; top: -1px; height: 1px; background: linear-gradient(90deg, transparent, rgba(var(--netc), .55), transparent); pointer-events: none; }
   th { text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 600; color: var(--muted); }
 
   /* footer */
@@ -353,8 +407,8 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
   .wcan li { padding: 3px 0; }
   .wfoot { margin-top: auto; font-size: 12.5px; }
   .wflow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; font: 12px var(--mono); color: var(--muted); }
-  .wflow span { padding: 6px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); color: #cfd5dd; }
-  html[data-theme="vn"] .wflow span { color: var(--text); }
+  .wflow > span { padding: 7px 14px; border: 1px solid var(--border2); border-radius: 999px; background: var(--panel); color: #cfd5dd; }
+  html[data-theme="vn"] .wflow > span { color: var(--text); }
   .invoice { display: flex; gap: 8px; margin-top: 10px; }
   .invoice input { flex: 1; min-width: 0; font: 14px var(--sans); color: var(--text); background: rgba(0,0,0,.25); border: 1px solid var(--border2); border-radius: 10px; padding: 8px 10px; }
 
@@ -544,6 +598,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
 </style>
 </head>
 <body>
+<canvas id="net" aria-hidden="true"></canvas>
 <nav>
   <div class="wrap">
     <a class="brand" href="#"><img src="/assets/logo.png" alt="" />Lotus</a>
@@ -583,6 +638,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
       <div id="heroBadges"></div>
     </div>
     <div class="receipt-wrap">
+      <div class="halo" aria-hidden="true"></div>
       <article class="receipt" aria-label="Lotus receipt #6">
         <div class="r-head"><img src="/assets/logo.png" alt="" /><div><b>Lotus</b><span><span data-vi="Biên nhận #6">Receipt #6</span></span></div><time datetime="2026-11-13T04:44:35Z">13/11/2026 11:44</time></div>
         <p class="r-claim">“FOX chia cổ tức”</p>
@@ -609,10 +665,11 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
     </div>
   </div>
 </header>
+<div class="ticker" role="region" aria-label="Recent receipts"><div class="ticker-track" id="ticker"></div></div>
 
 <main class="wrap">
   <section id="how">
-    <div class="sh"><h2><span data-vi="Một câu hỏi có trả phí diễn ra thế nào">How a paid question works</span></h2><p><span class="t-default"><span data-vi="Agent không giữ khoá. Tiền chỉ rời hũ khi con người duyệt và mọi luật trên chuỗi đều đạt.">The agent holds no key. Money leaves the jar only when a human approves and every on-chain rule passes.</span></span><span class="t-vn">Sứ giả Văn Lang (agent) không giữ khoá. Tiền chỉ rời Hũ Âu Cơ khi <abbr class="hist" title="Hội nghị Diên Hồng: năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão; họ quyết đánh. Ẩn dụ: người phải duyệt trước khi chi.">Hội nghị Diên Hồng</abbr> duyệt và luật <abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt 1077). Tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> trên chuỗi đều đạt.</span></p></div>
+    <div class="sh"><h2><span data-vi="Một câu hỏi có trả phí diễn ra thế nào">How a paid question works</span></h2><p><span class="t-default"><span data-vi="Agent không giữ khoá. Tiền chỉ rời hũ khi con người duyệt và mọi luật trên chuỗi đều đạt.">The agent holds no key. Money leaves the jar only when a human approves and every on-chain rule passes.</span></span><span class="t-vn">Sứ giả Văn Lang (agent) không giữ khoá. Tiền chỉ rời Hũ Âu Cơ khi <abbr class="hist" title="Hội nghị Diên Hồng: năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão; họ quyết đánh. Ẩn dụ: người phải duyệt trước khi chi.">Hội nghị Diên Hồng</abbr> duyệt và luật <abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt 1077). Tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> trên chuỗi đều đạt.</span></p><span class="sh-chip"><span data-vi="Agent không giữ khoá nào">The agent holds no key</span></span></div>
     <ol class="steps">
       <li><h4><span data-vi="Hỏi">Ask</span></h4><p><span data-vi="Gõ một nhận định trên Telegram, hoặc gọi API.">Send a claim on Telegram, or call the API.</span></p></li>
       <li><h4><span data-vi="Báo giá 402">402 quote</span></h4><p><span data-vi="Lotus trả HTTP 402 kèm giá trần, gắn với đúng câu hỏi này.">Lotus answers HTTP 402 with a price ceiling tied to this exact question.</span></p></li>
@@ -641,7 +698,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
 </section>
 
   <section id="dashboard">
-    <div class="sh"><h2><span data-vi="Demo trực tiếp">Live demo</span></h2><p><span class="t-default"><span data-vi="Hũ và biên nhận được đọc trực tiếp từ Avalanche Fuji.">Jar and receipts are read live from Avalanche Fuji.</span></span><span class="t-vn">Hũ Âu Cơ và Sổ Trống đồng được đọc trực tiếp từ Avalanche Fuji.</span></p></div>
+    <div class="sh"><h2><span data-vi="Demo trực tiếp">Live demo</span></h2><p><span class="t-default"><span data-vi="Hũ và biên nhận được đọc trực tiếp từ Avalanche Fuji.">Jar and receipts are read live from Avalanche Fuji.</span></span><span class="t-vn">Hũ Âu Cơ và Sổ Trống đồng được đọc trực tiếp từ Avalanche Fuji.</span></p><span class="sh-chip live"><i></i><span data-vi="Đọc trực tiếp từ Fuji, cập nhật mỗi 4 giây">Live from Fuji, refreshes every 4 s</span></span></div>
     <div class="grid">
       <div>
         <div class="card" id="jarCard"><h3><span class="t-default"><span data-vi="Hũ bằng chứng">Evidence jar</span></span><span class="t-vn">Hũ Âu Cơ</span></h3><div class="empty"><span class="t-default"><span data-vi="Đang đọc hũ trên Fuji…">Reading the jar on Fuji…</span></span><span class="t-vn">Đang đọc Hũ Âu Cơ trên Fuji…</span></div></div>
@@ -675,13 +732,13 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
   </section>
 
   <section id="wallets">
-    <div class="sh"><h2><span data-vi="Ba ví tách biệt">Three separate wallets</span></h2><p><span data-vi="Mỗi ví một quyền, do hợp đồng ép chứ không do lời hứa của agent. Agent chỉ chạm được vào hũ chi tiêu, và chỉ trong hạn mức.">Each wallet has one power, enforced by a contract rather than promised by the agent. The agent can only touch the spending jar, and only within its caps.</span></p></div>
+    <div class="sh"><h2><span data-vi="Ba ví tách biệt">Three separate wallets</span></h2><p><span data-vi="Mỗi ví một quyền, do hợp đồng ép chứ không do lời hứa của agent. Agent chỉ chạm được vào hũ chi tiêu, và chỉ trong hạn mức.">Each wallet has one power, enforced by a contract rather than promised by the agent. The agent can only touch the spending jar, and only within its caps.</span></p><a class="sh-chip" href="https://testnet.snowtrace.io/tx/0xc7bdf9207efabbaaff3c0473b86328f6eac3a679f91046c00fdc98f5b40138b7" target="_blank" rel="noopener"><span data-vi="Đã chia tiền hoá đơn thật trên Fuji ↗">Invoice split tested on Fuji ↗</span></a></div>
     <div class="wallets3" id="walletCards"><div class="card"><div class="empty"></div></div></div>
     <div class="wflow"><span><span data-vi="Khách trả hoá đơn">Client pays an invoice</span></span><i>→</i><span><span data-vi="Ví hoá đơn (chỉ nhận)">Invoice wallet (receive-only)</span></span><i>→</i><span><span data-vi="chia theo tỷ lệ trên hợp đồng">split by the on-chain ratio</span></span><i>→</i><span><span data-vi="Ví chính">Main wallet</span></span><i>+</i><span><span data-vi="Hũ chi tiêu">Spending jar</span></span><i>→</i><span><span data-vi="agent chi trong hạn mức, chủ duyệt">agent spends within caps, owner approves</span></span></div>
   </section>
 
   <section id="rules">
-    <div class="sh"><h2><span data-vi="Quy tắc bằng tiếng Việt">Spending rules in plain language</span></h2><p><span class="t-default"><span data-vi="Viết quy tắc chi tiêu như nói chuyện. Lotus chuyển thành tham số hợp đồng, mô phỏng trước, rồi chủ hũ tự ký. Câu nào không hiểu thì báo ra, không đoán.">Write spending rules the way you would say them, in English or Vietnamese. Lotus turns them into contract parameters and simulates them first, then the owner signs. Anything it does not understand is reported, never guessed.</span></span><span class="t-vn"><abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt; tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> viết bằng lời: Lotus chuyển thành tham số Hũ Âu Cơ, mô phỏng trước, rồi chủ hũ tự ký. Câu nào không hiểu thì báo ra, không đoán.</span></p></div>
+    <div class="sh"><h2><span data-vi="Quy tắc bằng tiếng Việt">Spending rules in plain language</span></h2><p><span class="t-default"><span data-vi="Viết quy tắc chi tiêu như nói chuyện. Lotus chuyển thành tham số hợp đồng, mô phỏng trước, rồi chủ hũ tự ký. Câu nào không hiểu thì báo ra, không đoán.">Write spending rules the way you would say them, in English or Vietnamese. Lotus turns them into contract parameters and simulates them first, then the owner signs. Anything it does not understand is reported, never guessed.</span></span><span class="t-vn"><abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt; tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> viết bằng lời: Lotus chuyển thành tham số Hũ Âu Cơ, mô phỏng trước, rồi chủ hũ tự ký. Câu nào không hiểu thì báo ra, không đoán.</span></p><span class="sh-chip"><span data-vi="Mô phỏng được test với hợp đồng thật">Simulator tested against the real contract</span></span></div>
     <div class="rules-grid">
       <div class="card">
         <h3><span data-vi="Quy tắc của chủ hũ">Owner's rules</span></h3>
@@ -699,7 +756,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
 
 
   <section id="contracts">
-    <div class="sh"><h2><span data-vi="Hợp đồng trên Fuji">Contracts on Fuji</span></h2><p><span data-vi="Mã nguồn đã verify trên Snowtrace (Exact Match).">Source verified on Snowtrace (Exact Match).</span></p></div>
+    <div class="sh"><h2><span data-vi="Hợp đồng trên Fuji">Contracts on Fuji</span></h2><p><span data-vi="Mã nguồn đã verify trên Snowtrace (Exact Match).">Source verified on Snowtrace (Exact Match).</span></p><span class="sh-chip ok"><span data-vi="4/4 đã verify trên Snowtrace">4 of 4 verified on Snowtrace</span></span></div>
     <div class="card" style="overflow-x:auto"><table id="contractsTable"></table></div>
   </section>
 </main>
@@ -804,7 +861,7 @@ function applyStatic() {
   $("rulesStamp").textContent = "";
 }
 function rerender() {
-  applyStatic();
+  applyStatic(); drawNet(); tickerKey = ""; if (lastState) ticker(lastState);
   if (lastState) {
     if (desksLoaded) applyDeskNames(lastState);
     jar(lastState); wallets(lastState); pending(lastState); runs(lastState); ledger(lastState); redteam(lastState); contracts(lastState);
@@ -1028,7 +1085,7 @@ async function refresh() {
     }
     $("askCard").style.display = s.readOnly ? "none" : "";
     $("roNote").style.display = s.readOnly ? "" : "none";
-    lastState = s; badges(s); jar(s); if (!document.activeElement || document.activeElement.id !== "invAmt") wallets(s); pending(s); runs(s); ledger(s); redteam(s); contracts(s);
+    lastState = s; badges(s); ticker(s); jar(s); if (!document.activeElement || document.activeElement.id !== "invAmt") wallets(s); pending(s); runs(s); ledger(s); redteam(s); contracts(s);
   } catch (e) { console.error(e); }
 }
 async function approve(runId, approved) {
@@ -1121,7 +1178,34 @@ $("rulesEx").onclick = (e) => { const i = e.target.dataset.i; if (i === undefine
   links.forEach((a) => { const t = document.querySelector(a.getAttribute("href")); if (t) io.observe(t); });
 })();
 
+// Seed network behind the page: drawn once per size/theme, never animated.
+function drawNet() {
+  const c = $("net"); if (!c) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), w = innerWidth, h = innerHeight;
+  c.width = w * dpr; c.height = h * dpr; const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  const cs = getComputedStyle(document.body), col = cs.getPropertyValue("--netc").trim() || "240,108,155", col2 = cs.getPropertyValue("--netc2").trim() || "231,194,125";
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const n = Math.round((w * h) / 24000), pts = Array.from({ length: n }, () => ({ x: rnd() * w, y: rnd() * h, k: rnd() }));
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (d < 150) { g.strokeStyle = `rgba(${col},${0.2 * (1 - d / 150)})`; g.lineWidth = 0.7; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
+  }
+  for (const p of pts) { g.fillStyle = p.k > 0.86 ? `rgba(${col2},.55)` : `rgba(${col},${0.25 + p.k * 0.35})`; g.beginPath(); g.arc(p.x, p.y, p.k > 0.86 ? 1.8 : 1.1, 0, 7); g.fill(); }
+}
+let netTimer; addEventListener("resize", () => { clearTimeout(netTimer); netTimer = setTimeout(drawNet, 150); });
+// Ticker of real receipts from the ledger (rebuilt only when the ledger or language changes).
+let tickerKey = "";
+function ticker(s) {
+  const rec = (s.ledger && s.ledger.recent) || [];
+  const key = currentLang() + rec.map((r) => r.hash).join();
+  if (!rec.length || key === tickerKey) return; tickerKey = key;
+  const item = (r) => `<span class="tk"><i class="v-${r.verdict}"></i><b>#${r.index}</b> ${esc(r.desk)} <em class="v-${r.verdict}">${esc(r.verdict)}</em> ${r.score}/100${r.pricing && +r.pricing.refundDue > 0 ? ` · ${r.refundTx ? `<a href="${s.explorer}/tx/${r.refundTx}" target="_blank" rel="noopener">${L("refunded", "đã hoàn")} ${usd2(r.pricing.refundDue)} USDC</a>` : `${L("refund", "hoàn")} ${usd2(r.pricing.refundDue)} USDC`}` : ""}</span>`;
+  const one = rec.map(item).join("");
+  $("ticker").innerHTML = one + one;
+}
+
 applyStatic();
+drawNet();
 refresh(); setInterval(refresh, 4000);
 previewRulesUi(false);
 </script>
