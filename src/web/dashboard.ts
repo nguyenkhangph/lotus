@@ -109,10 +109,11 @@ export function dashboardRouter(d: DashboardDeps): Router {
   // Pure computation on public data (no key, no transaction), so the read-only demo allows it too.
   r.post("/api/rules/preview", express.json({ limit: "8kb" }), async (req, res) => {
     const text = String(req.body?.text ?? "").trim();
-    if (!text || text.length > 800) return res.status(400).json({ error: "Nhập 1–800 ký tự quy tắc." });
+    const lang = req.body?.lang === "en" ? "en" : "vi";
+    if (!text || text.length > 800) return res.status(400).json({ error: lang === "en" ? "Enter 1–800 characters of rules." : "Nhập 1–800 ký tự quy tắc." });
     if (!d.treasury) return res.status(503).json({ error: "treasury not configured" });
     await refreshJar();
-    res.json(previewRules(text, jarCache.v, d.treasury));
+    res.json(previewRules(text, jarCache.v, d.treasury, undefined, lang));
   });
 
   r.post("/api/check", express.json(), async (req, res) => {

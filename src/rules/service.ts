@@ -1,6 +1,6 @@
 import { getAddress } from "ethers";
 import type { JarStatus } from "../agent/jar";
-import { compare, fmtUsd, ownerCalls, parseRules, usd, type Policy } from "./policy";
+import { compare, fmtUsd, ownerCalls, parseRules, usd, type Lang, type Policy } from "./policy";
 
 export type PolicyView = { perTx: string; perDay: string; lifetime: string; delay: number; expiresAt: number; burstWindow: number; burstMax: number };
 
@@ -23,10 +23,10 @@ export function currentPolicy(status: JarStatus | null, now: number): { policy: 
   };
 }
 
-export function previewRules(text: string, status: JarStatus | null, treasury: string, now = Math.floor(Date.now() / 1000)) {
+export function previewRules(text: string, status: JarStatus | null, treasury: string, now = Math.floor(Date.now() / 1000), lang: Lang = "vi") {
   const T = getAddress(treasury);
   const { policy: current, live } = currentPolicy(status, now);
-  const parsed = parseRules(text, current, { now, treasury: T });
+  const parsed = parseRules(text, current, { now, treasury: T, lang });
   const payeeAllowed = (a: string) => (getAddress(a) === T ? status?.treasuryAllowed ?? true : false);
   const start = {
     now,
@@ -34,7 +34,7 @@ export function previewRules(text: string, status: JarStatus | null, treasury: s
     spentLifetime: status ? usd(status.spentLifetime) : 0n,
     spentToday: status ? usd(status.perDay) - usd(status.remainingToday) : 0n,
   };
-  const calls = ownerCalls(current, parsed.policy, payeeAllowed);
+  const calls = ownerCalls(current, parsed.policy, payeeAllowed, lang);
   const quoted = text.replace(/"/g, "'").replace(/\s+/g, " ").trim();
   return {
     live,
@@ -43,7 +43,7 @@ export function previewRules(text: string, status: JarStatus | null, treasury: s
     understood: parsed.understood,
     unknown: parsed.unknown,
     warnings: parsed.warnings,
-    scenarios: compare(current, parsed.policy, start, T, payeeAllowed),
+    scenarios: compare(current, parsed.policy, start, T, payeeAllowed, lang),
     calls,
     command: calls.length ? `npm run jar -- rules "${quoted}" --send` : null,
   };

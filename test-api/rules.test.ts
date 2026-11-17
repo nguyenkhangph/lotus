@@ -62,3 +62,38 @@ describe("Vietnamese spending rules", () => {
     expect((await request(app).post("/api/rules/preview").send({ text: "" })).status).to.equal(400);
   });
 });
+
+describe("English rules and English messages", () => {
+  const parseEn = (t: string) => parseRules(t, BASE, { now: NOW, treasury: T, lang: "en" });
+
+  it("understands the same rules written in English", () => {
+    const r = parseEn("Max 0.2 USDC per payment. No more than 3 USDC per day. 100 USDC in total. Only pay Lotus. Lock the jar if more than 5 requests in 1 minute. Expires in 30 days. Wait 2 minutes before paying.");
+    expect(r.unknown).to.deep.equal([]);
+    expect([r.policy.perTx, r.policy.perDay, r.policy.lifetime]).to.deep.equal([usd(0.2), usd(3), usd(100)]);
+    expect([r.policy.burstMax, r.policy.burstWindow, r.policy.delay]).to.deep.equal([5, 60, 120]);
+    expect(r.policy.expiresAt).to.equal(NOW + 30 * 86400);
+    expect(r.policy.payees[T]).to.equal(true);
+    expect(r.understood[0].text).to.equal("At most 0.2 USDC per payment");
+  });
+
+  it("explains what it cannot enforce, in English", () => {
+    const r = parseEn("At most 10 USDC per week. Max 3 requests a day. Be smart");
+    expect(r.unknown.map((u) => u.why)).to.deep.equal([
+      "The contract only has per-payment, per-day and lifetime caps; no weekly/monthly/yearly cap yet.",
+      'The contract does not count requests per day. Use "lock if more than N requests in X minutes", or a daily money cap.',
+      "Not understood, so not applied.",
+    ]);
+    expect(r.policy).to.deep.equal(BASE);
+  });
+
+  it("the preview API answers in the language asked for; a delay shows payments as queued", async () => {
+    const app = buildPublicApp({ FUJI_RPC_URL: "http://127.0.0.1:9", TREASURY_ADDRESS: T } as any);
+    const en = await request(app).post("/api/rules/preview").send({ text: "Mỗi lần tối đa 0,3 USDC", lang: "en" });
+    expect(en.body.understood[0].text).to.equal("At most 0.3 USDC per payment");
+    expect(en.body.scenarios[0].title).to.equal("Normal Lotus fee (0.45 USDC)");
+    const vi = await request(app).post("/api/rules/preview").send({ text: "Max 0.3 USDC per payment" });
+    expect(vi.body.understood[0].text).to.equal("Mỗi lần tối đa 0,3 USDC");
+    const q = await request(app).post("/api/rules/preview").send({ text: "Wait 2 minutes before paying", lang: "en" });
+    expect(q.body.scenarios[0].proposed.first).to.match(/^Queued/);
+  });
+});

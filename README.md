@@ -18,7 +18,7 @@ Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day
 
 ## Giao diện
 
-Demo có hai giao diện, chọn trên thanh điều hướng (**Giao diện: Mặc định | Việt Nam**). Lần mở đầu dùng **Mặc định** (đúng bản đang chạy trên Vercel). Trình duyệt nhớ lựa chọn (`localStorage`); có thể mở sẵn bản Việt Nam bằng `?theme=vn`.
+Demo mặc định bằng **tiếng Anh**. Nút **EN | VI** trên thanh điều hướng đổi sang tiếng Việt, có thể mở sẵn bằng `?lang=vi`. Có hai giao diện (**Theme: Default | Vietnam**). Giao diện Việt Nam luôn dùng tiếng Việt, mở sẵn bằng `?theme=vn`; bấm EN trong giao diện này sẽ trở về giao diện mặc định. Trình duyệt nhớ lựa chọn (`localStorage`). Mục Quy tắc hiểu quy tắc viết bằng cả tiếng Anh lẫn tiếng Việt, và trả lời bằng ngôn ngữ đang chọn.
 
 Bản **Việt Nam** dùng phong cách đêm sơn mài và các tên ẩn dụ lịch sử (chỉ chữ trên trang, không đổi tên hợp đồng, scheme, route hay id bàn):
 
