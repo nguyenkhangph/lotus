@@ -301,6 +301,18 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
   .wflow { margin-top: 16px; }
   .wflow span, .flow span { border-radius: 999px; font-family: var(--sans); font-size: 12.5px; }
 
+  /* ledger + red team: their own full-width row, equal columns, same height */
+  .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; margin-top: 20px; }
+  .split > .card, .split > .card + .card { margin-top: 0; display: flex; flex-direction: column; }
+  .split .scroll { max-height: 520px; }
+  @media (max-width: 900px) { .split { grid-template-columns: minmax(0, 1fr); } }
+  .scroll { scrollbar-width: thin; scrollbar-color: rgba(190,220,228,.22) transparent; }
+  .scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll::-webkit-scrollbar-track { background: transparent; }
+  .scroll::-webkit-scrollbar-thumb { background: rgba(190,220,228,.18); border-radius: 8px; }
+  .scroll::-webkit-scrollbar-thumb:hover { background: rgba(190,220,228,.3); }
+  .scroll table th { position: sticky; top: 0; background: #121c20; z-index: 1; }
+  #ledger td, #ledger th { white-space: nowrap; }
   th { text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 600; color: var(--muted); }
 
   /* footer */
@@ -421,6 +433,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
       linear-gradient(90deg, var(--bg) 16%, rgba(20,14,16,.82) 46%, rgba(20,14,16,.15) 72%, transparent 86%),
       linear-gradient(0deg, var(--bg) 0%, transparent 28%); }
   html[data-theme="vn"] .hero .eyebrow { background: none; border: 0; padding: 0; }
+  html[data-theme="vn"] .scroll table th { background: #1c1417; }
   html[data-theme="vn"] .eyebrow {
     color: var(--gold-bright);
     background: rgba(198, 163, 91, .12);
@@ -653,11 +666,11 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
 
       <div>
         <div class="card"><h3><span><span data-vi="Kết quả gần đây">Recent results</span></span><span id="feedSrc" style="text-transform:none;letter-spacing:0;font-weight:500"></span></h3><div id="runs"></div></div>
-        <div class="split">
-          <div class="card"><h3><span class="t-default"><span data-vi="Sổ biên nhận">Receipt ledger</span></span><span class="t-vn">Sổ Trống đồng</span></h3><div id="ledger"></div></div>
-          <div class="card"><h3>Red Team</h3><div id="redteam"></div></div>
-        </div>
       </div>
+    </div>
+    <div class="split">
+      <div class="card"><h3><span class="t-default"><span data-vi="Sổ biên nhận">Receipt ledger</span></span><span class="t-vn">Sổ Trống đồng</span></h3><div id="ledger"></div></div>
+      <div class="card"><h3>Red Team</h3><div id="redteam"></div></div>
     </div>
   </section>
 
