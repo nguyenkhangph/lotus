@@ -28,7 +28,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
 <meta name="twitter:image" content="https://lotus-azure-ten.vercel.app/og.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   :root {
     --bg: #0b0f14; --panel: rgba(255,255,255,.035); --panel2: rgba(255,255,255,.06);
@@ -183,6 +183,135 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
            padding: 10px 16px; border-radius: 12px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 50; }
   .toast.on { opacity: 1; }
 
+
+  /* ================= v3 · pond night + printed receipt ================= */
+  :root {
+    --bg: #0d1417; --panel: rgba(214, 236, 240, .035); --panel2: rgba(214, 236, 240, .07);
+    --border: rgba(190, 220, 228, .09); --border2: rgba(190, 220, 228, .16);
+    --text: #eef3f2; --muted: #93a3a6; --dim: #627275;
+    --lotus: #f06c9b; --coral: #f59a7a; --jade: #3fc9a2; --amber: #e7c27d; --gold: #e7c27d; --red: #ff7a7a;
+    --grad: linear-gradient(135deg, #f06c9b, #f59a7a);
+    --paper: #f2ece2; --paper-ink: #2a2622; --paper-dim: #857c71;
+    --sans: "Be Vietnam Pro", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  body {
+    font: 16px/1.6 var(--sans);
+    background-image:
+      radial-gradient(1100px 620px at 78% -8%, rgba(240, 108, 155, .09), transparent 62%),
+      radial-gradient(900px 600px at -12% 30%, rgba(63, 201, 162, .05), transparent 60%);
+  }
+  :focus-visible { outline: 2px solid var(--lotus); outline-offset: 3px; border-radius: 6px; }
+
+  nav { background: rgba(13, 20, 23, .78); }
+  .navlinks { gap: 26px; }
+  .navlinks a { padding: 6px 0; border-bottom: 2px solid transparent; }
+  .navlinks a.on { color: var(--text); border-bottom-color: var(--lotus); }
+
+  /* hero */
+  .hero .wrap { padding-top: 72px; padding-bottom: 88px; }
+  .hero::before { background-position: 72% center; opacity: .55; }
+  .hero::after { background: linear-gradient(90deg, var(--bg) 30%, rgba(13,20,23,.72) 55%, rgba(13,20,23,.35) 80%), linear-gradient(0deg, var(--bg) 0%, transparent 35%); }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 56px; align-items: center; }
+  @media (max-width: 1020px) { .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 44px; } }
+  .eyebrow { display: block; background: none; border: 0; padding: 0; font: 500 14px var(--sans); color: #f3b3c8; letter-spacing: 0; }
+  h1 { font-size: clamp(40px, 4.5vw, 64px); line-height: 1.04; letter-spacing: -.04em; font-weight: 800; margin: 14px 0 22px; max-width: none; }
+  .lead { font-size: 18.5px; line-height: 1.6; color: #c6d0d1; max-width: 34em; margin-bottom: 30px; }
+  .lead small { display: none; }
+  .btn { border-radius: 999px; padding: 12px 20px; font-weight: 600; }
+  .btn.primary { color: #2a0d18; box-shadow: 0 10px 34px rgba(240, 108, 155, .32); }
+  .btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+  .btn.ghost:hover { color: var(--text); background: var(--panel); }
+  .facts { margin: 30px 0 0; max-width: 34em; font-size: 15px; color: var(--muted); line-height: 1.7; }
+  .facts b { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+  #heroBadges { margin-top: 16px; }
+
+  /* the receipt: the one loud thing on the page */
+  .receipt-wrap { position: relative; display: flex; justify-content: center; padding-top: 14px; }
+  .receipt-wrap::before { content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: min(400px, 92%); height: 14px; border-radius: 8px;
+    background: linear-gradient(180deg, #1d2a30, #0f171a); box-shadow: inset 0 -2px 0 rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.06); z-index: 2; }
+  .receipt { position: relative; width: min(372px, 86%); margin-top: 6px; padding: 24px 24px 30px; background: var(--paper); color: var(--paper-ink);
+    font: 13px/1.5 var(--mono); transform: rotate(1.4deg); transform-origin: top center;
+    box-shadow: 0 30px 60px rgba(0,0,0,.45), 0 2px 0 rgba(0,0,0,.06);
+    -webkit-mask: radial-gradient(circle 6px at 9px 100%, transparent 98%, #000) -9px 0 / 18px 100% repeat-x;
+            mask: radial-gradient(circle 6px at 9px 100%, transparent 98%, #000) -9px 0 / 18px 100% repeat-x;
+    animation: print 1.5s cubic-bezier(.2,.7,.2,1) .25s both; }
+  @keyframes print { from { clip-path: inset(0 0 100% 0); translate: 0 -24px; } to { clip-path: inset(0 0 0 0); translate: 0 0; } }
+  @media (prefers-reduced-motion: reduce) { .receipt { animation: none; } }
+  .r-head { display: flex; align-items: center; gap: 10px; padding-bottom: 14px; border-bottom: 1px dashed #bdb3a6; }
+  .r-head img { width: 26px; }
+  .r-head b { display: block; font: 700 15px var(--sans); letter-spacing: -.01em; }
+  .r-head span { color: var(--paper-dim); font-size: 12px; }
+  .r-head time { margin-left: auto; color: var(--paper-dim); font-size: 11.5px; text-align: right; }
+  .r-claim { font: 700 21px/1.25 var(--sans); letter-spacing: -.02em; margin: 16px 0 2px; }
+  .r-sub { margin: 0; color: var(--paper-dim); font-size: 12px; }
+  .r-verdict { display: flex; align-items: center; justify-content: space-between; margin: 16px 0 10px; }
+  .r-stamp { font: 700 13px var(--mono); letter-spacing: .08em; color: #0f7a5c; border: 2px solid #0f7a5c; border-radius: 4px; padding: 3px 8px; transform: rotate(-4deg); opacity: .9; }
+  .r-score { font: 800 40px/1 var(--sans); letter-spacing: -.04em; }
+  .r-score small { font: 500 13px var(--mono); color: var(--paper-dim); margin-left: 2px; letter-spacing: 0; }
+  .r-lines { display: grid; grid-template-columns: 1fr auto; gap: 3px 12px; margin: 10px 0 0; padding: 0; }
+  .r-lines dt, .r-tx span, .r-sub, .r-head span { font-family: var(--sans); font-size: 12.5px; }
+  .r-lines dt { color: #5b544c; } .r-lines dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+  .r-money { border-top: 1px dashed #bdb3a6; padding-top: 10px; margin-top: 12px; }
+  .r-lines .tot { font-weight: 600; color: var(--paper-ink); padding-top: 4px; border-top: 1px solid #d3c9bc; margin-top: 3px; }
+  .r-tx { list-style: none; margin: 12px 0 0; padding: 10px 0 0; border-top: 1px dashed #bdb3a6; }
+  .r-tx li { display: flex; justify-content: space-between; gap: 10px; padding: 1px 0; }
+  .r-tx span { color: #5b544c; }
+  .r-tx a { color: #b8285c; } .r-tx a:hover { text-decoration: underline; }
+  .r-hash { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; color: var(--paper-dim); font-size: 11px; }
+  .r-bars { height: 34px; margin-top: 8px; display: flex; align-items: stretch; gap: 1px; }
+  .r-bars i { background: var(--paper-ink); }
+  .r-foot { margin: 10px 0 0; text-align: center; color: var(--paper-dim); font: 500 11px var(--sans); }
+
+  /* sections */
+  main section { padding: 96px 0 0; scroll-margin-top: 72px; }
+  .sh { margin-bottom: 30px; max-width: 46em; }
+  .sh h2 { font-size: clamp(28px, 3vw, 38px); letter-spacing: -.03em; line-height: 1.12; font-weight: 800; }
+  .sh p { font-size: 16px; margin-top: 10px; line-height: 1.6; }
+
+  /* cards: quieter, sentence-case headings */
+  .card { border-radius: 20px; background: linear-gradient(180deg, rgba(214,236,240,.045), rgba(214,236,240,.02)); }
+  .card h3 { font-size: 15px; font-weight: 700; letter-spacing: -.005em; text-transform: none; color: var(--text); margin-bottom: 16px; }
+  .card h3 #feedSrc { color: var(--muted); font-size: 12.5px; }
+  .grid { grid-template-columns: 400px minmax(0, 1fr); }
+  @media (max-width: 1020px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  /* how: a real sequence, so it is numbered */
+  .steps { list-style: none; counter-reset: st; margin: 0 0 28px; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; position: relative; }
+  .steps::before { content: ""; position: absolute; left: 22px; right: 22px; top: 21px; height: 2px; background: linear-gradient(90deg, var(--lotus), var(--gold) 60%, var(--jade)); opacity: .55; }
+  .steps li { counter-increment: st; position: relative; padding: 0 18px 0 0; }
+  .steps li::before { content: counter(st); position: relative; z-index: 1; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--lotus); color: var(--text); font: 700 16px var(--sans); margin-bottom: 16px; }
+  .steps li:nth-child(4)::before { border-color: var(--gold); } .steps li:nth-child(5)::before { border-color: var(--jade); }
+  .steps h4 { margin: 0 0 6px; font-size: 16.5px; letter-spacing: -.01em; }
+  .steps p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.55; }
+  @media (max-width: 900px) {
+    .steps { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .steps::before { left: 21px; right: auto; top: 22px; bottom: 22px; width: 2px; height: auto; background: linear-gradient(180deg, var(--lotus), var(--gold) 60%, var(--jade)); }
+    .steps li { padding: 0 0 0 64px; min-height: 44px; } .steps li::before { position: absolute; left: 0; top: 0; margin: 0; }
+  }
+  .features { gap: 16px; }
+  .feature { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 4px 16px; align-items: start; border-radius: 16px; padding: 18px; }
+  .feature img { width: 76px; height: 76px; margin: 0; grid-row: span 2; }
+  .feature h4 { font-size: 16px; margin: 4px 0 4px; }
+  .feature p { font-size: 13.5px; line-height: 1.55; }
+
+  /* wallets / rules */
+  .wallets3 > .card:nth-child(2) { border-color: rgba(240,108,155,.32); }
+  .wflow { margin-top: 16px; }
+  .wflow span, .flow span { border-radius: 999px; font-family: var(--sans); font-size: 12.5px; }
+
+  th { text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+
+  /* footer */
+  footer { margin-top: 110px; padding: 40px 0 56px; }
+  .foot-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 28px; align-items: flex-start; }
+  .foot-grid p { margin: 0 0 6px; max-width: 34em; }
+  .foot-brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; color: var(--text); }
+  .foot-brand img { width: 24px; }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; font-size: 14px; }
+  .foot-links a { color: var(--text); } .foot-links a:hover { color: var(--lotus); }
+
   /* ---- Theme toggle (both themes) ---- */
   .theme-switch { display: inline-flex; align-items: center; gap: 2px; margin-right: 10px; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
   .theme-switch-k { margin-right: 4px; }
@@ -291,6 +420,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
   html[data-theme="vn"] .hero::after { background:
       linear-gradient(90deg, var(--bg) 16%, rgba(20,14,16,.82) 46%, rgba(20,14,16,.15) 72%, transparent 86%),
       linear-gradient(0deg, var(--bg) 0%, transparent 28%); }
+  html[data-theme="vn"] .hero .eyebrow { background: none; border: 0; padding: 0; }
   html[data-theme="vn"] .eyebrow {
     color: var(--gold-bright);
     background: rgba(198, 163, 91, .12);
@@ -405,7 +535,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
   <div class="wrap">
     <a class="brand" href="#"><img src="/assets/logo.png" alt="" />Lotus</a>
     <div class="navlinks">
-      <a href="#dashboard">Dashboard</a><a href="#wallets"><span data-vi="Ba ví">Wallets</span></a><a href="#rules"><span data-vi="Quy tắc">Rules</span></a><a href="#how"><span data-vi="Cách hoạt động">How it works</span></a><a href="#contracts"><span data-vi="Hợp đồng">Contracts</span></a>
+      <a href="#how"><span data-vi="Cách hoạt động">How it works</span></a><a href="#dashboard"><span data-vi="Demo trực tiếp">Live demo</span></a><a href="#wallets"><span data-vi="Ba ví">Wallets</span></a><a href="#rules"><span data-vi="Quy tắc">Rules</span></a><a href="#contracts"><span data-vi="Hợp đồng">Contracts</span></a>
       <a href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
     <div class="navright">
@@ -426,28 +556,79 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
 </nav>
 
 <header class="hero">
-  <div class="wrap">
-    <span class="eyebrow">Avalanche Fuji · x402 · Team1 UniHack 2026</span>
-    <div id="heroBadges"></div>
-    <h1><span data-vi="Bằng chứng sạch&lt;br /&gt;&lt;span class=&quot;g&quot;&gt;giữa bùn tin đồn.&lt;/span&gt;">Clean evidence<br /><span class="g">in a muddy market.</span></span></h1>
-    <p class="lead"><span data-vi="Lotus chấm bằng chứng đằng sau tin thị trường, trả phí theo từng lần hỏi bằng test USDC. Không đủ nguồn độc lập thì trả lời &lt;b&gt;MISSING EVIDENCE&lt;/b&gt;, không bao giờ đoán.&lt;small&gt;Hũ chi tiêu có hạn mức · con người duyệt · biên nhận và hoàn tiền trên chuỗi. Không phải tư vấn đầu tư.&lt;/small&gt;">Lotus grades the evidence behind market claims, paid per question in test USDC. Without enough independent sources it answers <b>MISSING EVIDENCE</b>. It never guesses.<small>Policy-guarded spending jar · human approval · on-chain receipts and refunds. Not investment advice.</small></span></p>
-    <div class="cta">
-      <button class="btn primary" id="tryApi"><span data-vi="Thử API (HTTP 402)">Try the API (HTTP 402)</span></button>
-      <a class="btn" href="#contracts"><span data-vi="Hợp đồng đã verify">Verified contracts</span></a>
-      <a class="btn" href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener"><span data-vi="Mã nguồn ↗">Source code ↗</span></a>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow"><span data-vi="Xây trên Avalanche cho Team1 Vietnam UniHack 2026">Built on Avalanche for Team1 Vietnam UniHack 2026</span></p>
+      <h1><span data-vi="Bằng chứng sạch&lt;br /&gt;giữa bùn tin đồn.">Clean evidence<br />in a muddy market.</span></h1>
+      <p class="lead"><span data-vi="Lotus chấm bằng chứng đằng sau một tin thị trường, và AI agent trả phí cho từng câu hỏi. Không đủ nguồn độc lập thì Lotus nói thẳng là thiếu bằng chứng, không đoán. Agent không giữ chìa khoá tiền: hợp đồng giới hạn mức chi và bạn duyệt từng khoản.">Lotus grades the evidence behind a market claim, and AI agents pay for each question. Without enough independent sources it says so instead of guessing. The agent never holds the money: a contract caps what it can spend and you approve every payment.</span></p>
+      <div class="cta">
+        <button class="btn primary" id="tryApi"><span data-vi="Thử API (HTTP 402)">Try the API (HTTP 402)</span></button>
+        <a class="btn" href="#dashboard"><span data-vi="Xem demo trực tiếp">See the live demo</span></a>
+        <a class="btn ghost" href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener"><span data-vi="Mã nguồn ↗">Source code ↗</span></a>
+      </div>
+      <p class="facts"><span data-vi="Ngay lúc này trên Fuji: &lt;b id=&quot;stBal&quot;&gt;—&lt;/b&gt; test USDC trong hũ, &lt;b id=&quot;stReceipts&quot;&gt;—&lt;/b&gt; biên nhận nối hash, &lt;b id=&quot;stRed&quot;&gt;—&lt;/b&gt; kiểm tra tấn công đạt, và &lt;b&gt;4/4&lt;/b&gt; hợp đồng đã verify.">Right now on Fuji: <b id="stBal">—</b> test USDC in the jar, <b id="stReceipts">—</b> hash-chained receipts, <b id="stRed">—</b> attack checks passed, and <b>4 of 4</b> contracts verified.</span></p>
+      <div id="heroBadges"></div>
     </div>
-    <div class="stats">
-      <div class="stat"><b id="stBal">—</b><span><span class="t-default"><span data-vi="USDC trong hũ (Fuji)">USDC in the jar (Fuji)</span></span><span class="t-vn">USDC trong Hũ Âu Cơ (Fuji)</span></span></div>
-      <div class="stat"><b id="stReceipts">—</b><span><span class="t-default"><span data-vi="biên nhận băm nối tiếp">hash-chained receipts</span></span><span class="t-vn">Sổ Trống đồng · biên nhận băm nối tiếp</span></span></div>
-      <div class="stat"><b id="stRed">—</b><span><span data-vi="kiểm tra red team đạt">red-team checks passed</span></span></div>
-      <div class="stat"><b>4/4</b><span><span data-vi="hợp đồng verify (Exact Match)">contracts verified (Exact Match)</span></span></div>
+    <div class="receipt-wrap">
+      <article class="receipt" aria-label="Lotus receipt #6">
+        <div class="r-head"><img src="/assets/logo.png" alt="" /><div><b>Lotus</b><span><span data-vi="Biên nhận #6">Receipt #6</span></span></div><time datetime="2026-11-13T04:44:35Z">13/11/2026 11:44</time></div>
+        <p class="r-claim">“FOX chia cổ tức”</p>
+        <p class="r-sub"><span data-vi="vn_stocks · công bố thật trên HNX">vn_stocks · live HNX disclosure</span></p>
+        <div class="r-verdict"><span class="r-stamp">SUPPORTED</span><span class="r-score">45<small>/100</small></span></div>
+        <dl class="r-lines">
+          <dt><span data-vi="Nguồn độc lập">Independent sources</span></dt><dd>1</dd>
+          <dt><span data-vi="Buồng vang">Echo chamber</span></dt><dd>0.00</dd>
+        </dl>
+        <dl class="r-lines r-money">
+          <dt><span data-vi="Giá trần (upto)">Quoted ceiling (upto)</span></dt><dd>0.45</dd>
+          <dt><span data-vi="Đã dùng: phí cơ bản + 1 nguồn">Used: base + 1 source</span></dt><dd>0.10</dd>
+          <dt class="tot"><span data-vi="Hoàn về hũ">Refunded to the jar</span></dt><dd class="tot">0.35 USDC</dd>
+        </dl>
+        <ul class="r-tx">
+          <li><span><span data-vi="Thanh toán">Payment</span></span><a href="https://testnet.snowtrace.io/tx/0x4a9ecec68ab9b007a51e297c4a11794d723cd693305b9c250a4c8750db47f8be" target="_blank" rel="noopener">0x4a9e…f8be ↗</a></li>
+          <li><span><span data-vi="Neo biên nhận">Receipt anchor</span></span><a href="https://testnet.snowtrace.io/tx/0x9b3e11106c90ad0ea4647c6190c6413caff058270611d3d89d91a01534d84926" target="_blank" rel="noopener">0x9b3e…4926 ↗</a></li>
+          <li><span><span data-vi="Hoàn tiền">Refund</span></span><a href="https://testnet.snowtrace.io/tx/0xee563f8f3e0ae65faa3ef6362499e793e71c93bd4ac60d590f73ba83d8f510db" target="_blank" rel="noopener">0xee56…10db ↗</a></li>
+        </ul>
+        <div class="r-hash"><span>hash 0x2658…4eaf</span><span>prev 0x2da4…d00a</span></div>
+        <div class="r-bars" id="rBars" data-hash="0x2658343ae18a72b75b032f1bb72349a03609ee13cb147be5a79b84e6f2da4eaf" aria-hidden="true"></div>
+        <p class="r-foot"><span data-vi="Kiểm chứng được trên Avalanche Fuji. Không phải tư vấn đầu tư.">Verifiable on Avalanche Fuji. Not investment advice.</span></p>
+      </article>
     </div>
   </div>
 </header>
 
 <main class="wrap">
+  <section id="how">
+    <div class="sh"><h2><span data-vi="Một câu hỏi có trả phí diễn ra thế nào">How a paid question works</span></h2><p><span class="t-default"><span data-vi="Agent không giữ khoá. Tiền chỉ rời hũ khi con người duyệt và mọi luật trên chuỗi đều đạt.">The agent holds no key. Money leaves the jar only when a human approves and every on-chain rule passes.</span></span><span class="t-vn">Sứ giả Văn Lang (agent) không giữ khoá. Tiền chỉ rời Hũ Âu Cơ khi <abbr class="hist" title="Hội nghị Diên Hồng: năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão; họ quyết đánh. Ẩn dụ: người phải duyệt trước khi chi.">Hội nghị Diên Hồng</abbr> duyệt và luật <abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt 1077). Tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> trên chuỗi đều đạt.</span></p></div>
+    <ol class="steps">
+      <li><h4><span data-vi="Hỏi">Ask</span></h4><p><span data-vi="Gõ một nhận định trên Telegram, hoặc gọi API.">Send a claim on Telegram, or call the API.</span></p></li>
+      <li><h4><span data-vi="Báo giá 402">402 quote</span></h4><p><span data-vi="Lotus trả HTTP 402 kèm giá trần, gắn với đúng câu hỏi này.">Lotus answers HTTP 402 with a price ceiling tied to this exact question.</span></p></li>
+      <li><h4><span data-vi="Bạn duyệt">You approve</span></h4><p><span data-vi="Agent tự kiểm tra báo giá rồi hỏi bạn trên Telegram. Không bấm thì không trả.">The agent checks the quote, then asks you on Telegram. No tap, no payment.</span></p></li>
+      <li><h4><span data-vi="Hũ trả">The jar pays</span></h4><p><span data-vi="Hợp đồng chỉ trả trong hạn mức và chỉ cho người nhận trong whitelist.">The contract pays only within its caps and only to whitelisted payees.</span></p></li>
+      <li><h4><span data-vi="Biên nhận">Receipt</span></h4><p><span data-vi="Bạn nhận kết luận, nguồn, biên nhận trên chuỗi và tiền hoàn phần không dùng.">You get the verdict, sources, an on-chain receipt and a refund of what was not used.</span></p></li>
+    </ol>
+    <div class="features">
+      <div class="card feature"><img src="/assets/feature-approval.webp" alt="" /><h4><span class="t-default"><span data-vi="Con người duyệt từng khoản">A human approves every payment</span></span><span class="t-vn">Hội nghị Diên Hồng — con người duyệt từng khoản</span></h4><p><span class="t-default"><span data-vi="Agent nhận báo giá 402, kiểm tra trước (mạng, token, người nhận, hạn mức), rồi gửi phiếu duyệt lên Telegram. Không ai bấm trong 2 phút thì tự từ chối.">The agent gets a 402 quote, checks it first (network, token, payee, caps), then sends an approval card to Telegram. If nobody taps within 2 minutes, it is declined.</span></span><span class="t-vn">Sứ giả Văn Lang (agent) nhận báo giá 402, kiểm tra trước (mạng, token, người nhận, hạn mức), rồi gửi phiếu duyệt lên Telegram. Không ai bấm trong 2 phút thì tự từ chối.</span></p></div>
+      <div class="card feature"><img src="/assets/feature-limits.webp" alt="" /><h4><span class="t-default"><span data-vi="Hũ có hạn mức trên chuỗi">On-chain spending caps</span></span><span class="t-vn">Nam quốc sơn hà — hạn mức là ranh giới</span></h4><p><span class="t-default"><span data-vi="&lt;span class=&quot;mono&quot;&gt;LotusJar&lt;/span&gt; giới hạn chi theo lần, ngày và trọn đời, chỉ nhận token và người nhận trong whitelist, chữ ký EIP-712 dùng một lần. Có kill switch và tự khoá khi có lệnh dồn dập."><span class="mono">LotusJar</span> caps spending per payment, per day and over its lifetime, accepts only whitelisted tokens and payees, and takes one-time EIP-712 signatures. It has a kill switch and locks itself on a burst of requests.</span></span><span class="t-vn"><span class="mono">LotusJar</span> (Hũ Âu Cơ) giới hạn chi theo lần, ngày và trọn đời. Hạn mức là ranh giới (Nam quốc sơn hà). Kill switch gọi là <abbr class="hist" title="Cọc Bạch Đằng: trận 938 (Ngô Quyền thắng Nam Hán) và 1288 (Trần Hưng Đạo thắng Nguyên), dùng cọc đóng lòng sông để chặn thuyền.">Cọc Bạch Đằng</abbr>; người bảo vệ chỉ được khoá là <abbr class="hist" title="Thánh Gióng (Phù Đổng Thiên Vương): nhân vật truyền thuyết thời Hùng, đánh giặc Ân rồi bay về trời. Ẩn dụ: chỉ khoá, không được chi.">Thánh Gióng</abbr>.</span></p></div>
+      <div class="card feature"><img src="/assets/feature-receipts.webp" alt="" /><h4><span class="t-default"><span data-vi="Biên nhận không sửa được">Tamper-proof receipts</span></span><span class="t-vn">Sổ Trống đồng — biên nhận không sửa được</span></h4><p><span class="t-default"><span data-vi="Mỗi câu trả lời có một biên nhận băm nối tiếp, được neo lên &lt;span class=&quot;mono&quot;&gt;LotusReceipts&lt;/span&gt;. Phần phí &lt;span class=&quot;mono&quot;&gt;upto&lt;/span&gt; không dùng đến được hoàn về hũ ngay trên chuỗi.">Every answer gets a hash-chained receipt anchored on <span class="mono">LotusReceipts</span>. The unused part of the <span class="mono">upto</span> fee is refunded to the jar on-chain.</span></span><span class="t-vn">Mỗi câu trả lời có một biên nhận băm nối tiếp (<abbr class="hist" title="Sổ Trống đồng: ẩn dụ từ trống đồng văn hoá Đông Sơn (khoảng thế kỷ 7 TCN–thế kỷ 1/2 SCN). Dấu ấn không tẩy, không phải sổ kế toán cổ.">Sổ Trống đồng</abbr>), được neo lên <span class="mono">LotusReceipts</span>. Phần phí <span class="mono">upto</span> không dùng đến được hoàn về Hũ Âu Cơ ngay trên chuỗi.</span></p></div>
+    </div>
+
+  <aside class="notes vn-only" id="history-notes">
+    <h3>Chú thích lịch sử</h3>
+    <dl>
+      <div><dt>Hũ Âu Cơ.</dt><dd>Âu Cơ là mẹ trăm con trong truyền thuyết Lạc Long Quân–Âu Cơ (Lĩnh Nam chích quái). Ẩn dụ: mẹ giữ của cho con.</dd></div>
+      <div><dt>Nam quốc sơn hà.</dt><dd>Bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt năm 1077). “Hạn mức là ranh giới.” Tác quyền mang tính truyền thống.</dd></div>
+      <div><dt>Cọc Bạch Đằng.</dt><dd>Trận 938 (Ngô Quyền thắng Nam Hán) và 1288 (Trần Hưng Đạo thắng Nguyên): cọc đóng lòng sông để chặn thuyền. Ẩn dụ nút khoá hũ.</dd></div>
+      <div><dt>Hội nghị Diên Hồng.</dt><dd>Năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão họp ở điện Diên Hồng; họ quyết “đánh”. Ẩn dụ: người phải duyệt trước khi chi.</dd></div>
+      <div><dt>Sổ Trống đồng.</dt><dd>Trống đồng văn hoá Đông Sơn (khoảng thế kỷ 7 TCN–thế kỷ 1/2 SCN). Ẩn dụ dấu ấn không tẩy, không khẳng định trống đồng từng là sổ kế toán.</dd></div>
+      <div><dt>Thánh Gióng.</dt><dd>Nhân vật truyền thuyết thời Hùng (Phù Đổng Thiên Vương): đánh giặc Ân rồi bay về trời. Ẩn dụ người bảo vệ chỉ được khoá, không được chi.</dd></div>
+      <div><dt>Sứ giả Văn Lang.</dt><dd>Văn Lang là nhà nước đầu tiên trong sử liệu truyền thống (đời Hùng Vương). Sứ giả chỉ chuyển lệnh, không cầm khoá quỹ.</dd></div>
+    </dl>
+  </aside>
+</section>
+
   <section id="dashboard">
-    <div class="sh"><h2>Dashboard</h2><p><span class="t-default"><span data-vi="Hũ và biên nhận được đọc trực tiếp từ Avalanche Fuji.">Jar and receipts are read live from Avalanche Fuji.</span></span><span class="t-vn">Hũ Âu Cơ và Sổ Trống đồng được đọc trực tiếp từ Avalanche Fuji.</span></p></div>
+    <div class="sh"><h2><span data-vi="Demo trực tiếp">Live demo</span></h2><p><span class="t-default"><span data-vi="Hũ và biên nhận được đọc trực tiếp từ Avalanche Fuji.">Jar and receipts are read live from Avalanche Fuji.</span></span><span class="t-vn">Hũ Âu Cơ và Sổ Trống đồng được đọc trực tiếp từ Avalanche Fuji.</span></p></div>
     <div class="grid">
       <div>
         <div class="card" id="jarCard"><h3><span class="t-default"><span data-vi="Hũ bằng chứng">Evidence jar</span></span><span class="t-vn">Hũ Âu Cơ</span></h3><div class="empty"><span class="t-default"><span data-vi="Đang đọc hũ trên Fuji…">Reading the jar on Fuji…</span></span><span class="t-vn">Đang đọc Hũ Âu Cơ trên Fuji…</span></div></div>
@@ -501,28 +682,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
     </div>
   </section>
 
-  <section id="how">
-    <div class="sh"><h2><span data-vi="Cách hoạt động">How it works</span></h2><p><span class="t-default"><span data-vi="Agent không giữ khoá. Tiền chỉ rời hũ khi con người duyệt và mọi luật trên chuỗi đều đạt.">The agent holds no key. Money leaves the jar only when a human approves and every on-chain rule passes.</span></span><span class="t-vn">Sứ giả Văn Lang (agent) không giữ khoá. Tiền chỉ rời Hũ Âu Cơ khi <abbr class="hist" title="Hội nghị Diên Hồng: năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão; họ quyết đánh. Ẩn dụ: người phải duyệt trước khi chi.">Hội nghị Diên Hồng</abbr> duyệt và luật <abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt 1077). Tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> trên chuỗi đều đạt.</span></p></div>
-    <div class="features">
-      <div class="card feature"><img src="/assets/feature-approval.webp" alt="" /><h4><span class="t-default"><span data-vi="Con người duyệt từng khoản">A human approves every payment</span></span><span class="t-vn">Hội nghị Diên Hồng — con người duyệt từng khoản</span></h4><p><span class="t-default"><span data-vi="Agent nhận báo giá 402, kiểm tra trước (mạng, token, người nhận, hạn mức), rồi gửi phiếu duyệt lên Telegram. Không ai bấm trong 2 phút thì tự từ chối.">The agent gets a 402 quote, checks it first (network, token, payee, caps), then sends an approval card to Telegram. If nobody taps within 2 minutes, it is declined.</span></span><span class="t-vn">Sứ giả Văn Lang (agent) nhận báo giá 402, kiểm tra trước (mạng, token, người nhận, hạn mức), rồi gửi phiếu duyệt lên Telegram. Không ai bấm trong 2 phút thì tự từ chối.</span></p></div>
-      <div class="card feature"><img src="/assets/feature-limits.webp" alt="" /><h4><span class="t-default"><span data-vi="Hũ có hạn mức trên chuỗi">On-chain spending caps</span></span><span class="t-vn">Nam quốc sơn hà — hạn mức là ranh giới</span></h4><p><span class="t-default"><span data-vi="&lt;span class=&quot;mono&quot;&gt;LotusJar&lt;/span&gt; giới hạn chi theo lần, ngày và trọn đời, chỉ nhận token và người nhận trong whitelist, chữ ký EIP-712 dùng một lần. Có kill switch và tự khoá khi có lệnh dồn dập."><span class="mono">LotusJar</span> caps spending per payment, per day and over its lifetime, accepts only whitelisted tokens and payees, and takes one-time EIP-712 signatures. It has a kill switch and locks itself on a burst of requests.</span></span><span class="t-vn"><span class="mono">LotusJar</span> (Hũ Âu Cơ) giới hạn chi theo lần, ngày và trọn đời. Hạn mức là ranh giới (Nam quốc sơn hà). Kill switch gọi là <abbr class="hist" title="Cọc Bạch Đằng: trận 938 (Ngô Quyền thắng Nam Hán) và 1288 (Trần Hưng Đạo thắng Nguyên), dùng cọc đóng lòng sông để chặn thuyền.">Cọc Bạch Đằng</abbr>; người bảo vệ chỉ được khoá là <abbr class="hist" title="Thánh Gióng (Phù Đổng Thiên Vương): nhân vật truyền thuyết thời Hùng, đánh giặc Ân rồi bay về trời. Ẩn dụ: chỉ khoá, không được chi.">Thánh Gióng</abbr>.</span></p></div>
-      <div class="card feature"><img src="/assets/feature-receipts.webp" alt="" /><h4><span class="t-default"><span data-vi="Biên nhận không sửa được">Tamper-proof receipts</span></span><span class="t-vn">Sổ Trống đồng — biên nhận không sửa được</span></h4><p><span class="t-default"><span data-vi="Mỗi câu trả lời có một biên nhận băm nối tiếp, được neo lên &lt;span class=&quot;mono&quot;&gt;LotusReceipts&lt;/span&gt;. Phần phí &lt;span class=&quot;mono&quot;&gt;upto&lt;/span&gt; không dùng đến được hoàn về hũ ngay trên chuỗi.">Every answer gets a hash-chained receipt anchored on <span class="mono">LotusReceipts</span>. The unused part of the <span class="mono">upto</span> fee is refunded to the jar on-chain.</span></span><span class="t-vn">Mỗi câu trả lời có một biên nhận băm nối tiếp (<abbr class="hist" title="Sổ Trống đồng: ẩn dụ từ trống đồng văn hoá Đông Sơn (khoảng thế kỷ 7 TCN–thế kỷ 1/2 SCN). Dấu ấn không tẩy, không phải sổ kế toán cổ.">Sổ Trống đồng</abbr>), được neo lên <span class="mono">LotusReceipts</span>. Phần phí <span class="mono">upto</span> không dùng đến được hoàn về Hũ Âu Cơ ngay trên chuỗi.</span></p></div>
-    </div>
-    <div class="flow"><span>POST /v1/score</span><i>→</i><span>402 + requestHash</span><i>→</i><span>preflight</span><i>→</i><span><span data-vi="✅ duyệt trên Telegram">✅ approve on Telegram</span></span><i>→</i><span><span data-vi="LotusJar trả USDC">LotusJar pays USDC</span></span><i>→</i><span>X-PAYMENT</span><i>→</i><span><span data-vi="chấm bằng chứng">score the evidence</span></span><i>→</i><span><span data-vi="biên nhận + hoàn tiền">receipt + refund</span></span></div>
 
-  <aside class="notes vn-only" id="history-notes">
-    <h3>Chú thích lịch sử</h3>
-    <dl>
-      <div><dt>Hũ Âu Cơ.</dt><dd>Âu Cơ là mẹ trăm con trong truyền thuyết Lạc Long Quân–Âu Cơ (Lĩnh Nam chích quái). Ẩn dụ: mẹ giữ của cho con.</dd></div>
-      <div><dt>Nam quốc sơn hà.</dt><dd>Bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt năm 1077). “Hạn mức là ranh giới.” Tác quyền mang tính truyền thống.</dd></div>
-      <div><dt>Cọc Bạch Đằng.</dt><dd>Trận 938 (Ngô Quyền thắng Nam Hán) và 1288 (Trần Hưng Đạo thắng Nguyên): cọc đóng lòng sông để chặn thuyền. Ẩn dụ nút khoá hũ.</dd></div>
-      <div><dt>Hội nghị Diên Hồng.</dt><dd>Năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão họp ở điện Diên Hồng; họ quyết “đánh”. Ẩn dụ: người phải duyệt trước khi chi.</dd></div>
-      <div><dt>Sổ Trống đồng.</dt><dd>Trống đồng văn hoá Đông Sơn (khoảng thế kỷ 7 TCN–thế kỷ 1/2 SCN). Ẩn dụ dấu ấn không tẩy, không khẳng định trống đồng từng là sổ kế toán.</dd></div>
-      <div><dt>Thánh Gióng.</dt><dd>Nhân vật truyền thuyết thời Hùng (Phù Đổng Thiên Vương): đánh giặc Ân rồi bay về trời. Ẩn dụ người bảo vệ chỉ được khoá, không được chi.</dd></div>
-      <div><dt>Sứ giả Văn Lang.</dt><dd>Văn Lang là nhà nước đầu tiên trong sử liệu truyền thống (đời Hùng Vương). Sứ giả chỉ chuyển lệnh, không cầm khoá quỹ.</dd></div>
-    </dl>
-  </aside>
-</section>
 
 
   <section id="contracts">
@@ -550,9 +710,17 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
   </div>
 </div>
 <footer>
-  <div class="wrap">
-    <span>Lotus · <span class="t-default"><span data-vi="chỉ chạy testnet Avalanche Fuji">Avalanche Fuji testnet only</span></span><span class="t-vn">Hũ Âu Cơ · chỉ chạy testnet Avalanche Fuji</span> · <span data-vi="trên chuỗi chỉ lưu hash · không phải tư vấn đầu tư">only hashes on-chain · not investment advice</span></span>
-    <span><a class="link" href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener">GitHub</a> · MIT</span>
+  <div class="wrap foot-grid">
+    <div>
+      <p class="foot-brand"><img src="/assets/logo.png" alt="" />Lotus</p>
+      <p class="muted"><span class="t-default"><span data-vi="Chỉ chạy trên testnet Avalanche Fuji với test USDC. Trên chuỗi chỉ lưu hash. Không phải tư vấn đầu tư.">Runs on the Avalanche Fuji testnet with test USDC only. Only hashes go on-chain. Not investment advice.</span></span><span class="t-vn">Hũ Âu Cơ · chỉ chạy testnet Avalanche Fuji · trên chuỗi chỉ lưu hash · không phải tư vấn đầu tư</span></p>
+    </div>
+    <nav class="foot-links" aria-label="Links">
+      <a href="https://github.com/nguyenkhangph/lotus" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://testnet.snowtrace.io/address/0x805113113EC069205f59d72137c01244BfAA9619" target="_blank" rel="noopener"><span data-vi="Hũ trên Snowtrace">Jar on Snowtrace</span></a>
+      <a href="/catalog" target="_blank" rel="noopener">API catalog</a>
+      <span class="muted">MIT · Team1 Vietnam UniHack 2026</span>
+    </nav>
   </div>
 </footer>
 <div class="toast" id="toast"></div>
@@ -757,7 +925,7 @@ function runs(s) {
   const rec = s.ledger.recent || [];
   if (!rec.length) { $("feedSrc").textContent = ""; $("runs").innerHTML = `<div class="empty"><img src="/assets/empty.webp" alt="" />${L("No runs yet.", "Chưa có lượt nào.")}</div>`; return; }
   $("feedSrc").textContent = t(L("from the receipt ledger · real Fuji transactions", "từ sổ biên nhận · giao dịch thật trên Fuji"), "từ Sổ Trống đồng · giao dịch thật trên Fuji");
-  $("runs").innerHTML = rec.slice(0, 8).map((r) => {
+  $("runs").innerHTML = rec.slice(0, 5).map((r) => {
     const links = [];
     if (r.payment?.ref) links.push(tx(s, r.payment.ref, L("Payment", "Thanh toán")));
     if (r.pricing && +r.pricing.refundDue > 0) {
@@ -923,6 +1091,22 @@ async function previewRulesUi(user = true) {
 }
 $("rulesBtn").onclick = () => previewRulesUi(true);
 $("rulesEx").onclick = (e) => { const i = e.target.dataset.i; if (i === undefined) return; $("rulesText").value = RULE_EX[currentLang()][i]; previewRulesUi(); };
+
+// Receipt barcode drawn from the receipt hash (decorative; the real proof is the links above it).
+(function () {
+  const el = $("rBars"); if (!el) return;
+  const hex = (el.dataset.hash || "").slice(2);
+  el.innerHTML = [...hex].map((c, i) => `<i style="flex:${(parseInt(c, 16) % 4) + 1} 0 0;opacity:${i % 3 ? 1 : 0}"></i>`).join("");
+})();
+// Highlight the section in view in the nav.
+(function () {
+  const links = [...document.querySelectorAll('.navlinks a[href^="#"]')];
+  if (!("IntersectionObserver" in window) || !links.length) return;
+  const io = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) links.forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id));
+  }), { rootMargin: "-45% 0px -50% 0px" });
+  links.forEach((a) => { const t = document.querySelector(a.getAttribute("href")); if (t) io.observe(t); });
+})();
 
 applyStatic();
 refresh(); setInterval(refresh, 4000);
