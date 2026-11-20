@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
 <script>
 (function(){var d=document.documentElement;try{var sp=new URLSearchParams(location.search),q=sp.get("theme"),ql=sp.get("lang"),s=null,sl=null;try{s=localStorage.getItem("lotus-theme");sl=localStorage.getItem("lotus-lang")}catch(e){}
 var t=(q==="vn"||q==="default")?q:(s==="vn"||s==="default")?s:"default";
-var l=(ql==="vi"||ql==="en")?ql:(sl==="vi"||sl==="en")?sl:"en";
+var l=(ql==="vi"||ql==="en")?ql:(sl==="vi"||sl==="en")?sl:"vi";
 if(ql==="en"&&q!=="vn")t="default";if(t==="vn")l="vi";
 d.setAttribute("data-theme",t);d.setAttribute("data-lang",l);d.setAttribute("lang",l);
-try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)localStorage.setItem("lotus-lang",l)}catch(e){}}catch(e){d.setAttribute("data-theme","default");d.setAttribute("data-lang","en")}})();
+try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)localStorage.setItem("lotus-lang",l)}catch(e){}}catch(e){d.setAttribute("data-theme","default");d.setAttribute("data-lang","vi")}})();
 </script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lotus — evidence scores for market claims</title>
-<meta name="description" content="Lotus grades the evidence behind market claims, paid per call over x402 with test USDC on Avalanche Fuji. Policy-guarded jar, human approval, on-chain receipts. Not investment advice." />
+<title>Lotus — chấm bằng chứng tin thị trường</title>
+<meta name="description" content="Lotus chấm điểm bằng chứng cho các nhận định thị trường, trả phí theo từng câu hỏi qua x402 bằng test USDC trên Avalanche Fuji. Hũ chi tiêu có hạn mức, chủ hũ duyệt, biên nhận on-chain. Không phải tư vấn đầu tư." />
 <meta name="theme-color" content="#0B0F14" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -20,8 +20,8 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Lotus — evidence scores for market claims" />
-<meta property="og:description" content="Paid per call over x402 on Avalanche Fuji. Policy-guarded USDC jar, human approval via Telegram, on-chain receipts and refunds." />
+<meta property="og:title" content="Lotus — chấm bằng chứng tin thị trường" />
+<meta property="og:description" content="Trả phí theo câu hỏi qua x402 trên Avalanche Fuji. Hũ USDC có hạn mức, duyệt qua Telegram, biên nhận và hoàn tiền on-chain." />
 <meta property="og:image" content="https://lotus-azure-ten.vercel.app/og.png" />
 <meta property="og:url" content="https://lotus-azure-ten.vercel.app/" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -608,9 +608,9 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
     </div>
     <div class="navright">
       <div class="theme-switch lang-switch" role="group" aria-label="Language">
-        <button type="button" id="langEn" aria-pressed="true">EN</button>
+        <button type="button" id="langEn" aria-pressed="false">EN</button>
         <span class="theme-switch-sep" aria-hidden="true">|</span>
-        <button type="button" id="langVi" aria-pressed="false">VI</button>
+        <button type="button" id="langVi" aria-pressed="true">VI</button>
       </div>
       <div class="theme-switch" role="group" aria-label="Theme">
         <span class="theme-switch-k"><span data-vi="Giao diện">Theme</span></span>
@@ -669,7 +669,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
 
 <main class="wrap">
   <section id="how">
-    <div class="sh"><h2><span data-vi="Một câu hỏi có trả phí diễn ra thế nào">How a paid question works</span></h2><p><span class="t-default"><span data-vi="Agent không giữ khoá. Tiền chỉ rời hũ khi con người duyệt và mọi luật trên chuỗi đều đạt.">The agent holds no key. Money leaves the jar only when a human approves and every on-chain rule passes.</span></span><span class="t-vn">Sứ giả Văn Lang (agent) không giữ khoá. Tiền chỉ rời Hũ Âu Cơ khi <abbr class="hist" title="Hội nghị Diên Hồng: năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão; họ quyết đánh. Ẩn dụ: người phải duyệt trước khi chi.">Hội nghị Diên Hồng</abbr> duyệt và luật <abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt 1077). Tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> trên chuỗi đều đạt.</span></p><span class="sh-chip"><span data-vi="Agent không giữ khoá nào">The agent holds no key</span></span></div>
+    <div class="sh"><h2><span data-vi="Một câu hỏi có trả phí diễn ra thế nào">How a paid question works</span></h2><p><span class="t-default"><span data-vi="Agent không giữ khoá nào chuyển được tiền. Tiền chỉ rời hũ khi con người duyệt và mọi luật trên chuỗi đều đạt.">The agent holds no key that can move money. Money leaves the jar only when a human approves and every on-chain rule passes.</span></span><span class="t-vn">Sứ giả Văn Lang (agent) không giữ khoá chuyển tiền. Tiền chỉ rời Hũ Âu Cơ khi <abbr class="hist" title="Hội nghị Diên Hồng: năm 1284 (đời vua Trần Nhân Tông), Thượng hoàng Trần Thánh Tông triệu bô lão; họ quyết đánh. Ẩn dụ: người phải duyệt trước khi chi.">Hội nghị Diên Hồng</abbr> duyệt và luật <abbr class="hist" title="Nam quốc sơn hà: bài thơ được truyền là của Lý Thường Kiệt, đọc khi kháng Tống (truyền thống gắn trận Như Nguyệt 1077). Tác quyền mang tính truyền thống.">Nam quốc sơn hà</abbr> trên chuỗi đều đạt.</span></p><span class="sh-chip"><span data-vi="Agent không giữ khoá chuyển tiền">The agent cannot move money</span></span></div>
     <ol class="steps">
       <li><h4><span data-vi="Hỏi">Ask</span></h4><p><span data-vi="Gõ một nhận định trên Telegram, hoặc gọi API.">Send a claim on Telegram, or call the API.</span></p></li>
       <li><h4><span data-vi="Báo giá 402">402 quote</span></h4><p><span data-vi="Lotus trả HTTP 402 kèm giá trần, gắn với đúng câu hỏi này.">Lotus answers HTTP 402 with a price ceiling tied to this exact question.</span></p></li>
@@ -746,7 +746,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
         <button class="btn primary" style="margin-top:12px;width:100%;justify-content:center" id="rulesBtn"><span data-vi="Xem trước &amp;amp; mô phỏng">Preview &amp; simulate</span></button>
         <p class="muted" id="rulesStamp" style="font-size:12px;margin:8px 0 0;text-align:center"></p>
         <div class="chips" id="rulesEx"></div>
-        <p class="note-key"><span data-vi="Không gửi giao dịch nào. Thay đổi chỉ có hiệu lực khi chủ hũ ký &lt;span class=&quot;mono&quot;&gt;setCaps&lt;/span&gt; / &lt;span class=&quot;mono&quot;&gt;setTiming&lt;/span&gt; / &lt;span class=&quot;mono&quot;&gt;setPayTo&lt;/span&gt; bằng ví của mình. Agent và bot không giữ khoá này.">No transaction is sent. Changes only take effect when the owner signs <span class="mono">setCaps</span> / <span class="mono">setTiming</span> / <span class="mono">setPayTo</span> with their own wallet. The agent and the bot hold no such key.</span></p>
+        <p class="note-key"><span data-vi="Không gửi giao dịch nào. Thay đổi chỉ có hiệu lực khi chủ hũ ký &lt;span class=&quot;mono&quot;&gt;setCaps&lt;/span&gt; / &lt;span class=&quot;mono&quot;&gt;setTiming&lt;/span&gt; / &lt;span class=&quot;mono&quot;&gt;setPayTo&lt;/span&gt; bằng ví của mình. Code của agent và bot không gọi các lệnh này. Riêng bản demo, khoá chủ đang chạy trên cùng máy chủ với bot (ghi rõ trong README).">No transaction is sent. Changes only take effect when the owner signs <span class="mono">setCaps</span> / <span class="mono">setTiming</span> / <span class="mono">setPayTo</span> with their own wallet. The agent and bot code never call these. In this demo only, the owner key runs on the same server as the bot (disclosed in the README).</span></p>
       </div>
       <div id="rulesOut"><div class="card"><div class="empty"><span data-vi="Bấm “Xem trước &amp;amp; mô phỏng” để xem hũ sẽ làm gì với các khoản chi giả lập.">Click “Preview &amp; simulate” to see what the jar would do with simulated payments.</span></div></div></div>
     </div>
@@ -776,7 +776,7 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
     <p class="caveat">Đây là phép liên tưởng văn hoá trên giao diện, không phải phả hệ lịch sử của sản phẩm.</p>
   </div>
   <div class="vision vn-only">
-    <p><b>Tầm nhìn — Quỹ Lạc Hồng</b> · kênh tiết kiệm / lợi suất (hướng tới trái phiếu token hoá). <i>Chưa có trên demo này, không phải tính năng đang chạy.</i> “Lạc Hồng” là tên văn học chỉ dòng dõi Lạc Long Quân và Âu Cơ trong truyền thuyết.</p>
+    <p><b>Tầm nhìn — Quỹ Lạc Hồng</b> · một ngăn tiết kiệm tách khỏi hũ chi tiêu. Lotus không trả lãi, không hứa lợi suất và không đầu tư hộ. <i>Chưa có trên demo này, không phải tính năng đang chạy.</i> “Lạc Hồng” là tên văn học chỉ dòng dõi Lạc Long Quân và Âu Cơ trong truyền thuyết.</p>
   </div>
 </div>
 <footer>

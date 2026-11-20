@@ -1,7 +1,7 @@
 import { Contract, Wallet, encodeBytes32String } from "ethers";
 import { loadConfig } from "./config";
 import { createApp } from "./app";
-import { DeskRouter, FixtureProvider, HnxRssProvider } from "./evidence/providers";
+import { DeskRouter, FixtureProvider, VnExchangeProvider } from "./evidence/providers";
 import { Ledger } from "./ledger";
 import { EthersChain } from "./x402/chain";
 import { ApprovalHub } from "./agent/hub";
@@ -19,7 +19,7 @@ const explorer = env.EXPLORER_URL ?? "https://testnet.snowtrace.io";
 
 const chain = new EthersChain(cfg, env.FACILITATOR_PRIVATE_KEY, { facilitatorUrl: env.X402_FACILITATOR_URL || undefined });
 const provider = chain.provider;
-const evidence = new DeskRouter({ vn_stocks: new HnxRssProvider() }, new FixtureProvider());
+const evidence = new DeskRouter({ vn_stocks: new VnExchangeProvider() }, new FixtureProvider());
 const ledger = new Ledger(cfg.ledgerPath);
 const hub = new ApprovalHub(Number(env.APPROVAL_TIMEOUT_MS ?? 120_000));
 

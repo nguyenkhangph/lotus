@@ -147,7 +147,10 @@ export function scoreClaim(claim: Claim, desk: Desk, items: EvidenceItem[]): Sco
 
     const ageHours = (asOf.getTime() - new Date(it.publishedAt).getTime()) / 3600000;
     const oldYear = (text.match(/\b(19|20)\d{2}\b/g) ?? []).map(Number);
-    const recycled = oldYear.length > 0 && Math.max(...oldYear) < asOf.getUTCFullYear() && it.stance !== "neutral";
+    // A fresh post quoting an old year is recycled news (RT-08). An exchange disclosure feed dates its own items,
+    // and "cổ tức năm 2025" paid in 2026 is current news, so the year heuristic is not applied to it.
+    const officialFeed = it.platform === "rss" && source?.type === "primary";
+    const recycled = !officialFeed && oldYear.length > 0 && Math.max(...oldYear) < asOf.getUTCFullYear() && it.stance !== "neutral";
     if (ageHours > desk.staleAfterHours || recycled) flags.push("STALE");
 
     if (it.platform === "image" || (!it.url && it.imageHash && !it.handle)) flags.push("SCREENSHOT_ONLY");
@@ -160,22 +163,33 @@ export function scoreClaim(claim: Claim, desk: Desk, items: EvidenceItem[]): Sco
   if (findings.some((f) => f.flags.includes("PROMPT_INJECTION"))) rules.push("evidence containing instructions is tainted and ignored");
 
   // 3) Independence clustering across ALL non-tainted items (to measure the echo chamber).
+  // `clusters` decides what counts as ONE source (same org → one unit). `echoes` measures copying: distinct
+  // documents from one exchange's own disclosure feed (e.g. a record-date notice and an issuance notice)
+  // are one source but not copies of each other, so they do not raise the echo index.
   const clusters = new Clusters();
+  const echoes = new Clusters();
   const live = items.filter((_, i) => !findings[i].flags.includes("PROMPT_INJECTION"));
+  const officialFeed = (it: EvidenceItem, f: ItemFinding) => it.platform === "rss" && f.type === "primary";
   for (let i = 0; i < live.length; i++) {
     const a = live[i];
     const fa = findings[items.indexOf(a)];
     clusters.find(a.id);
-    if (a.repostOf) clusters.union(a.repostOf, a.id);
+    echoes.find(a.id);
+    if (a.repostOf) { clusters.union(a.repostOf, a.id); echoes.union(a.repostOf, a.id); }
     for (let j = 0; j < i; j++) {
       const b = live[j];
       const fb = findings[items.indexOf(b)];
-      if (fa.org && fa.org === fb.org) clusters.union(b.id, a.id);
-      else if (a.imageHash && a.imageHash === b.imageHash) clusters.union(b.id, a.id);
-      else if (similarity(a.text, b.text) >= DUP_SIMILARITY) clusters.union(b.id, a.id);
+      const copy = (a.imageHash && a.imageHash === b.imageHash) || similarity(a.text, b.text) >= DUP_SIMILARITY;
+      if (fa.org && fa.org === fb.org) {
+        clusters.union(b.id, a.id);
+        if (copy || !(officialFeed(a, fa) && officialFeed(b, fb))) echoes.union(b.id, a.id);
+      } else if (copy) {
+        clusters.union(b.id, a.id);
+        echoes.union(b.id, a.id);
+      }
     }
   }
-  const roots = new Set(live.map((x) => clusters.find(x.id)));
+  const roots = new Set(live.map((x) => echoes.find(x.id)));
   const echoIndex = live.length ? Number((1 - roots.size / live.length).toFixed(3)) : 0;
   for (const f of findings) {
     f.unit = clusters.find(f.itemId);
@@ -184,8 +198,9 @@ export function scoreClaim(claim: Claim, desk: Desk, items: EvidenceItem[]): Sco
   const seenUnits = new Set<string>();
   for (const f of findings) {
     if (!f.counted) continue;
-    if (seenUnits.has(f.unit!)) f.flags.push("ECHO_DUPLICATE");
-    seenUnits.add(f.unit!);
+    const e = echoes.find(f.itemId);
+    if (seenUnits.has(e)) f.flags.push("ECHO_DUPLICATE");
+    seenUnits.add(e);
   }
   if (echoIndex >= 0.5) reason.add("ECHO_DUPLICATE");
   const unofficialBurst = findings.filter((f) => !f.counted).length;

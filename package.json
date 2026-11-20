@@ -15,7 +15,8 @@
     "deploy:inbox": "hardhat run scripts/deploy-inbox.ts --network fuji",
     "verify:fuji": "hardhat run scripts/verify.ts --network fuji",
     "jar": "ts-node --transpile-only scripts/jar.ts",
-    "hnx": "node --use-system-ca -r ts-node/register/transpile-only scripts/hnx.ts"
+    "hnx": "node --use-system-ca -r ts-node/register/transpile-only scripts/hnx.ts",
+    "hose": "node --use-system-ca -r ts-node/register/transpile-only scripts/hose.ts"
   },
   "keywords": [],
   "author": "",

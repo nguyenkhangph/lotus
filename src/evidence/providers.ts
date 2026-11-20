@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import type { Claim, Desk, EvidenceItem } from "../engine/types";
+import { foldDiacritics } from "../engine/patterns";
 
 export interface EvidenceProvider {
   fetch(claim: Claim, desk: Desk): Promise<EvidenceItem[]>;
@@ -262,6 +263,91 @@ export class HnxRssProvider implements EvidenceProvider {
     const items = parseRss(await this.client.get(url));
     this.cache.set(url, { at: Date.now(), items });
     return items;
+  }
+}
+
+type HoseNews = { id: number; title: string; postedDate: number; summary?: string };
+
+/** "GDA: Thông báo về ngày ĐKCC…" → "gda-thong-bao-ve-ngay-dkcc" (the slug hsx.vn uses in its article URLs). */
+export function hoseSlug(title: string): string {
+  return foldDiacritics(title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Live desk: HOSE "Tin tổ chức niêm yết" (listed-company disclosures), the JSON API behind hsx.vn.
+ * HOSE titles start with the ticker ("GDA: Thông báo…"), so a disclosure counts only when its title
+ * starts with exactly the claim's ticker. postedDate is Vietnam local time written as epoch seconds.
+ */
+export class HoseNewsProvider implements EvidenceProvider {
+  static API = "https://api.hsx.vn/n/api/v1/1/news/cate";
+  static CATEGORY = "tin-tuc/tin-to-chuc-niem-yet";
+  private cache = new Map<string, { at: number; items: HoseNews[] }>();
+
+  constructor(
+    private client: { get(url: string): Promise<string> } = new CookieClient(),
+    private ttlMs = 5 * 60_000,
+    private pages = 3,
+    private now = () => Date.now(),
+  ) {}
+
+  async fetch(claim: Claim, desk: Desk): Promise<EvidenceItem[]> {
+    const tickers = [...new Set(tickerTokens(claim.text))];
+    if (!tickers.length) return [];
+    const lc = claim.text.toLowerCase();
+    const events = EVENT_WORDS.filter((w) => lc.includes(w));
+    let all: HoseNews[] = [];
+    try {
+      all = await this.list(desk.staleAfterHours ?? 120);
+    } catch {
+      return []; // a dead source yields no evidence, never invented evidence
+    }
+    const out: EvidenceItem[] = [];
+    for (const it of all) {
+      const head = /^([A-Z0-9]{3,8}):/.exec(it.title.trim());
+      if (!head || !tickers.includes(head[1])) continue;
+      const shared = events.filter((w) => it.title.toLowerCase().includes(w));
+      out.push({
+        id: `hose:${it.id}`,
+        platform: "rss",
+        url: `https://www.hsx.vn/vi/tin-tuc/${hoseSlug(it.title)}/${it.id}`,
+        publishedAt: new Date(it.postedDate * 1000 - 7 * 3_600_000).toISOString(),
+        text: `${it.title.trim()} — ${htmlToText(it.summary ?? "")}`.trim(),
+        stance: shared.length ? "supports" : "neutral",
+      });
+    }
+    return out.slice(0, 20);
+  }
+
+  private async list(hours: number): Promise<HoseNews[]> {
+    const end = new Date(this.now() + 7 * 3_600_000);
+    const start = new Date(end.getTime() - Math.max(hours, 24) * 3_600_000);
+    const d = (x: Date) => x.toISOString().slice(0, 10);
+    const key = `${d(start)}_${d(end)}`;
+    const c = this.cache.get(key);
+    if (c && this.now() - c.at < this.ttlMs) return c.items;
+    const items: HoseNews[] = [];
+    for (let page = 1; page <= this.pages; page++) {
+      const url = `${HoseNewsProvider.API}?pageIndex=${page}&pageSize=200&startDate=${d(start)}&endDate=${d(end)}&aliasCate=${encodeURIComponent(HoseNewsProvider.CATEGORY)}`;
+      const body = JSON.parse(await this.client.get(url));
+      const list: HoseNews[] = body?.data?.list ?? [];
+      items.push(...list);
+      if (list.length < 200 || page >= (body?.data?.paging?.totalPages ?? 1)) break;
+    }
+    this.cache.set(key, { at: this.now(), items });
+    return items;
+  }
+}
+
+/**
+ * Vietnamese stocks: a ticker is listed on exactly one venue. HOSE tickers disclose on hsx.vn; HNX and
+ * UPCoM tickers (FOX is on UPCoM) disclose on hnx.vn. Both are queried and only the venue that lists the
+ * ticker returns items, so the two exchanges never stack on the same claim.
+ */
+export class VnExchangeProvider implements EvidenceProvider {
+  constructor(private venues: EvidenceProvider[] = [new HnxRssProvider(), new HoseNewsProvider()]) {}
+  async fetch(claim: Claim, desk: Desk): Promise<EvidenceItem[]> {
+    const parts = await Promise.all(this.venues.map((v) => v.fetch(claim, desk).catch(() => [] as EvidenceItem[])));
+    return parts.flat().slice(0, 20);
   }
 }
 

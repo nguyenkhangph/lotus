@@ -7,18 +7,30 @@ Khi không kiểm chứng được, Lotus trả `MISSING EVIDENCE`. Từ chối 
 
 Bài dự thi **Team1 Vietnam UniHack 2026** (Avalanche). Hạn nộp: 21/11/2026, 23:59 giờ Việt Nam. Giấy phép: [MIT](LICENSE).
 
-**Demo công khai (chỉ đọc):** https://lotus-azure-ten.vercel.app · thử API: `POST https://lotus-azure-ten.vercel.app/v1/score` → HTTP 402 kèm điều khoản x402.
+**Demo công khai (chỉ đọc):** https://lotus-azure-ten.vercel.app
+
+**Video demo:** ĐIỀN_LINK_VIDEO · **Slide pitch:** ĐIỀN_LINK_SLIDE
+
+Thử API (trả về HTTP 402 kèm điều khoản x402):
+
+```bash
+curl -i -X POST https://lotus-azure-ten.vercel.app/v1/score \
+  -H "content-type: application/json" \
+  -d '{"claim":"FOX chia co tuc","desk":"vn_stocks"}'
+```
+
+> ⚠️ **Đừng trả tiền vào bản demo này.** Đây là testnet và bản công khai chỉ để xem. Báo giá 402 có kèm scheme `exact`, nhưng scheme này chưa từng được chạy thật trên Fuji. Mọi giao dịch thật trong README đều đi qua scheme `lotus-jar`.
 
 ### In English
 
 Lotus is a pay-per-call **evidence-scoring API for market claims** ("the Fed cut rates", "NATO invoked Article 5", "FOX pays a cash dividend"), paid with test USDC over an **x402-style flow on Avalanche Fuji**. It counts *independent* sources, measures the echo chamber, flags stale, impersonated, injected or shill content, and answers `MISSING_EVIDENCE` rather than guess. It never gives buy/sell calls or price targets, and refuses those questions for free before quoting.
 
-Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day/lifetime caps, token and payee allow-lists by address, one-time EIP-712 approvals signed by the human (via Telegram), a guardian kill switch, and burst auto-lock. The agent holds no key that can move funds. The unused part of each `upto` payment is refunded on-chain, and every answer's receipt hash is chained and anchored on `LotusReceipts`. Invoice money lands in `LotusInbox`, which can only pay out by the owner's split (main wallet / spending jar). All four contracts are verified on Snowtrace, and every flow below has real Fuji transactions. Live read-only demo: https://lotus-azure-ten.vercel.app The Vietnamese stock desk reads live HNX disclosures. The other four desks run on clearly labelled synthetic fixtures.
+Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day/lifetime caps, token and payee allow-lists by address, one-time EIP-712 spend approvals, signed by the Telegram bot's approval key only after the owner taps ✅, a guardian kill switch, and burst auto-lock. The agent holds no key that can move funds. The unused part of each `upto` payment is refunded on-chain, and every answer's receipt hash is chained and anchored on `LotusReceipts`. Invoice money lands in `LotusInbox`, which can only pay out by the owner's split (main wallet / spending jar). All four contracts are verified on Snowtrace, and every flow below has real Fuji transactions, except the `exact` (EIP-3009) scheme, which is implemented and tested but has not been run on Fuji. **Demo caveat:** in this demo the jar owner's wallet also signs the receipt anchors, so the owner key sits on the same server as the bot (see "Khoá trong bản demo"). Live read-only demo: https://lotus-azure-ten.vercel.app The Vietnamese stock desk reads live exchange disclosures: HNX for HNX/UPCoM tickers and HOSE for HOSE tickers (each ticker is listed on one venue only, so the two never stack). The other four desks run on clearly labelled synthetic fixtures.
 
 
 ## Giao diện
 
-Demo mặc định bằng **tiếng Anh**. Nút **EN | VI** trên thanh điều hướng đổi sang tiếng Việt, có thể mở sẵn bằng `?lang=vi`. Có hai giao diện (**Theme: Default | Vietnam**). Giao diện Việt Nam luôn dùng tiếng Việt, mở sẵn bằng `?theme=vn`; bấm EN trong giao diện này sẽ trở về giao diện mặc định. Trình duyệt nhớ lựa chọn (`localStorage`). Mục Quy tắc hiểu quy tắc viết bằng cả tiếng Anh lẫn tiếng Việt, và trả lời bằng ngôn ngữ đang chọn.
+Demo mặc định bằng **tiếng Việt**. Nút **EN | VI** trên thanh điều hướng đổi sang tiếng Anh, có thể mở sẵn bằng `?lang=en`. Có hai giao diện (**Theme: Default | Vietnam**). Giao diện Việt Nam luôn dùng tiếng Việt, mở sẵn bằng `?theme=vn`; bấm EN trong giao diện này sẽ trở về giao diện mặc định. Trình duyệt nhớ lựa chọn (`localStorage`). Mục Quy tắc hiểu quy tắc viết bằng cả tiếng Anh lẫn tiếng Việt, và trả lời bằng ngôn ngữ đang chọn.
 
 Bản **Việt Nam** dùng phong cách đêm sơn mài và các tên ẩn dụ lịch sử (chỉ chữ trên trang, không đổi tên hợp đồng, scheme, route hay id bàn):
 
@@ -32,13 +44,13 @@ Bản **Việt Nam** dùng phong cách đêm sơn mài và các tên ẩn dụ l
 | Bảo vệ (guardian) | Thánh Gióng | Nhân vật truyền thuyết thời Hùng; chỉ khoá, không được chi |
 | Agent | Sứ giả Văn Lang | Văn Lang trong sử liệu truyền thống; sứ giả không cầm khoá quỹ |
 
-**Quỹ Lạc Hồng** chỉ hiện trên bản Việt Nam, ghi rõ là tầm nhìn (tiết kiệm / lợi suất), *chưa chạy*. Dải “Từ Văn Lang đến Lotus” là phép liên tưởng văn hoá, không phải phả hệ của sản phẩm.
+**Quỹ Lạc Hồng** chỉ hiện trên bản Việt Nam, ghi rõ là tầm nhìn: một ngăn tiết kiệm tách khỏi hũ chi tiêu, *chưa chạy*. Lotus không trả lãi, không hứa lợi suất và không đầu tư hộ. Dải “Từ Văn Lang đến Lotus” là phép liên tưởng văn hoá, không phải phả hệ của sản phẩm.
 
 ## Ba ví tách biệt
 
 | Ví | Hợp đồng | Agent làm được gì | Ai đổi được quy tắc |
 |---|---|---|---|
-| **Ví chính** (tiết kiệm) | ví của chủ (EOA) | Không gì cả: không có khoá, không được cấp quyền | Chủ |
+| **Ví chính** (tiết kiệm) | ví của chủ (EOA) | Không gì cả: code agent không dùng khoá này và không được cấp quyền. *Bản demo:* khoá này đang nằm trên máy chủ (xem "Khoá trong bản demo") | Chủ |
 | **Hũ chi tiêu** | `LotusJar` | Xin chi trong hạn mức, chủ duyệt từng khoản | Chủ (`setCaps`, `setTiming`, `setPayTo`) |
 | **Ví hoá đơn** (chỉ nhận) | `LotusInbox` | Không chuyển được cho ai. Ai cũng gọi được `sweep`, nhưng hợp đồng tự chia theo tỷ lệ chủ đặt | Chủ (`setSplit`) |
 
@@ -58,7 +70,7 @@ Chủ hũ viết quy tắc như nói chuyện, có dấu hay không dấu đều
 
 1. **Dịch sang tham số hợp đồng** (`perTx`, `perDay`, `lifetime`, `delay`, `expiresAt`, `burstWindow/burstMax`, whitelist người nhận). Bộ đọc là luật cố định, không dùng mô hình ngôn ngữ. Câu nào không hiểu, hoặc hợp đồng chưa hỗ trợ (ví dụ hạn mức theo tuần), thì báo ra và **không áp dụng**, không đoán.
 2. **Mô phỏng trước khi chi** 6 kịch bản: trả phí bình thường, agent bị dụ trả quá mức, chuyển cho ví lạ, prompt injection gửi lệnh dồn dập, gọi liên tục cả buổi, và chi sau khi hết hạn. Kết quả theo quy tắc hiện tại và quy tắc mới được đặt cạnh nhau. Test `test/rules-sim.test.ts` chạy cùng các kịch bản này trên `LotusJar` thật và yêu cầu kết quả từng khoản trùng với bộ mô phỏng.
-3. **Chủ hũ tự ký** đúng các lệnh `setCaps` / `setTiming` / `setPayTo` có thay đổi. Agent và bot không giữ khoá chủ.
+3. **Chủ hũ ký** đúng các lệnh `setCaps` / `setTiming` / `setPayTo` có thay đổi, bằng `npm run jar -- rules … --send` (khoá chủ). Code của agent và bot không gọi các lệnh này. *Bản demo:* khoá chủ đang nằm trên cùng máy chủ với bot, xem "Khoá trong bản demo".
 
 Dùng ở đâu: mục **Quy tắc** trên trang demo (cả bản công khai), lệnh `/rules …` trên Telegram, hoặc dòng lệnh:
 
@@ -75,11 +87,11 @@ npm run jar -- rules "Mỗi ngày không quá 3 USDC. Quá 5 lệnh trong 1 phú
 Người dùng ─► Agent (không giữ khoá) ─► POST /v1/score ─► 402 + báo giá gắn requestHash
                                    │
                                    ├─► Preflight phía người mua: pay / review / do_not_pay
-                                   ├─► Phiếu duyệt (terminal → Telegram) ─► người dùng ký Spend (EIP-712)
+                                   ├─► Phiếu duyệt (terminal → Telegram) ─► chủ hũ bấm ✅ ─► bot ký Spend (EIP-712) bằng khoá duyệt
                                    ├─► LotusJar (policy contract) kiểm tra cap / whitelist / nonce / hạn / khoá ─► trả USDC
                                    └─► Gửi lại kèm X-PAYMENT (tx hash) ─► API xác minh log on-chain
                                                                           │
-              Nguồn (HNX RSS sống + fixture khai báo) ─► Bộ quy tắc ─► kết luận + điểm + chỉ số buồng vang
+              Nguồn (công bố HNX + HOSE sống + fixture khai báo) ─► Bộ quy tắc ─► kết luận + điểm + chỉ số buồng vang
                                                                           │
                                          Biên nhận băm nối tiếp (JSONL) ─► neo hash lên LotusReceipts (Fuji)
 ```
@@ -93,7 +105,7 @@ Người dùng ─► Agent (không giữ khoá) ─► POST /v1/score ─► 40
 | Bộ quy tắc: đếm nguồn độc lập, buồng vang, tin cũ, mạo danh, tài khoản mới / tương tác ảo, prompt injection, "kèo" tiếng Việt, mâu thuẫn số liệu và đơn vị, quy kết cho cơ quan chính thức phải có nguồn sơ cấp | `src/engine/` | ✅ |
 | Preflight người mua: chặn báo giá sai mạng, sai token, sai `payTo`, sai yêu cầu, vượt cap ngày, cap mỗi lần, cap trọn đời của hũ, **trước khi ký** | `src/buyer/preflight.ts` | ✅ |
 | Chặn lệch giá giữa hai oracle (cho hũ lệnh tuỳ chọn) | `src/buyer/oracle.ts` | ⚠️ chỉ có unit test, chưa chạy với oracle sống trên Fuji |
-| Bàn sống chứng khoán VN (RSS công bố HNX, giữ cookie phiên, lấy mã từ nội dung công bố) + fixture SYNTHETIC cho 4 bàn còn lại | `src/evidence/`, `data/fixtures/` | ✅ chạy thật với HNX ngày 13/11/2026 |
+| Bàn sống chứng khoán VN: công bố HNX (RSS, gồm UPCoM) và HOSE (API tin tổ chức niêm yết của hsx.vn), tự chọn theo sàn niêm yết của mã + fixture SYNTHETIC cho 4 bàn còn lại | `src/evidence/`, `data/fixtures/` | ✅ HNX chạy thật ngày 13/11/2026 · HOSE thêm ngày 20/11/2026, test bằng dữ liệu thật lấy từ api.hsx.vn |
 | Red Team 22 kịch bản (28 kiểm tra) | `redteam/` | ✅ 28/28 |
 | Bot Telegram: phiếu duyệt có nút ✅/❌, `/check`, `/status`, `/lock` (khoá bằng khoá guardian), chỉ nhận lệnh từ chủ hũ, quá giờ không duyệt thì tự từ chối | `src/telegram/bot.ts` | ✅ |
 | Dashboard: hũ on-chain, khoản chờ duyệt, kết quả kèm link nguồn, sổ biên nhận, red team. Chế độ **demo công khai chỉ đọc** (`PUBLIC_DEMO=1`, hoặc bản Vercel `api/index.ts` không nạp key nào) | `src/web/`, `src/public.ts`, [`docs/DEPLOY.md`](docs/DEPLOY.md) | ✅ |
@@ -105,7 +117,7 @@ Người dùng ─► Agent (không giữ khoá) ─► POST /v1/score ─► 40
 
 ## Đang chạy trên Avalanche Fuji
 
-Ba hợp đồng đều **đã verify mã nguồn (Exact Match)** trên Snowtrace:
+Bốn hợp đồng đều **đã verify mã nguồn (Exact Match)** trên Snowtrace:
 
 | Hợp đồng | Địa chỉ |
 |---|---|
@@ -139,6 +151,44 @@ Kill switch: giao dịch `Lock` gửi từ ví guardian (lệnh `/lock` trên Te
 | Hash biên nhận, hash gói bằng chứng, chuỗi nối tiếp | ✅ | `receiptHash`, `evidencePackHash`, `prevHash` trong cùng event; `head()` của hợp đồng |
 | Điểm số (vd. 45/100), mã lý do, nội dung nhận định | ❌ chỉ lưu off-chain | Lấy biên nhận ở `GET /receipts`, băm lại (`sha256` của JSON chuẩn hoá) rồi so với `receiptHash` đã neo. Sửa một trường là hash lệch (có test) |
 
+### Khoá trong bản demo
+
+Ghi rõ để giám khảo đối chiếu được trên Snowtrace:
+
+| Vai trò | Địa chỉ | Khoá đang ở đâu trong bản demo |
+|---|---|---|
+| Chủ hũ (owner), cũng là ví deploy | `0xEe00…c4A7` | Trên máy chạy `npm run dev`. Ví này **cũng ký cả 9 giao dịch neo biên nhận**, vì `FACILITATOR_PRIVATE_KEY` đang dùng chung khoá với ví chủ |
+| Khoá duyệt (approver) | `0xDaa5…` | Trong bot Telegram, chỉ ký sau khi chủ hũ bấm ✅ |
+| Agent | ví agent | Chỉ chuyển tiếp lệnh đã ký và trả gas, không chuyển được tiền một mình |
+| Guardian | ví guardian | Chỉ khoá được hũ |
+
+Nghĩa là: **hợp đồng** tách quyền đúng như thiết kế (agent và bot không thể đổi hạn mức hay mở khoá hũ), nhưng **bản demo** chạy cả khoá chủ trên cùng máy với bot cho tiện. Bản thật phải tách:
+
+1. Dùng một ví riêng, không phải ví chủ, cho `FACILITATOR_PRIVATE_KEY` (ví neo biên nhận).
+2. `LotusReceipts` cố định người neo khi deploy (`operator` là `immutable`), nên đổi ví neo cần deploy lại `LotusReceipts` với ví mới.
+3. Khoá chủ chỉ dùng ở máy của chủ, cho `rules --send`, `unlock` và deploy, không đặt trên máy chủ.
+
+## Vì sao cần on-chain
+
+- **Tiền phải bị giới hạn bằng code, không bằng lời hứa.** Hạn mức, danh sách người nhận và khoá khẩn cấp nằm trong `LotusJar`. Agent bị prompt injection cũng không vượt được, vì giao dịch sai sẽ bị revert (red team 28/28).
+- **Biên nhận không sửa lén được.** Hash biên nhận được neo nối chuỗi trên `LotusReceipts`. Ai cũng tự băm lại và so được, không cần tin Lotus.
+- **Agent trả tiền cho agent.** Một AI agent không có tài khoản ngân hàng, nhưng có thể nhận báo giá 402 và trả từng khoản nhỏ bằng stablecoin, ngay trong một lần gọi API.
+
+## Vì sao chọn Avalanche
+
+- **Phí thấp và xác nhận nhanh** trên C-Chain, đủ cho khoản trả vài cent mỗi câu hỏi, rồi hoàn lại phần thừa ngay sau đó.
+- **Tương thích EVM:** Solidity, EIP-712, EIP-3009 và công cụ quen thuộc (Hardhat, ethers), verify mã nguồn trên Snowtrace.
+- **USDC của Circle có trên Fuji** (`0x5425…Bc65`), cùng faucet của Circle và Team1, nên demo dùng đúng loại tài sản sẽ dùng khi chạy thật.
+- **Hướng mở rộng:** có thể tách thành một Avalanche L1 riêng cho các bàn bằng chứng, với phí và quy tắc phù hợp, nếu khối lượng lớn.
+
+## Tiền đến từ đâu
+
+- **Doanh thu:** phí theo từng câu hỏi. Báo giá `upto` gồm phí cơ bản 0,05 USDC cộng 0,05 USDC cho mỗi nguồn độc lập được giao, trần 0,45 USDC. Lotus giữ phần thực dùng và hoàn phần thừa on-chain.
+- **Ai trả:** các AI agent và ứng dụng đọc tin thị trường (trợ lý đầu tư cá nhân, bộ phận phân tích dữ liệu của doanh nghiệp, sàn và công ty dữ liệu) trả trước khi hành động theo một tin.
+- **Kết luận thiếu bằng chứng vẫn tính phí cơ bản 0,05 USDC** (công kiểm tra), phần còn lại được hoàn. Câu hỏi mua/bán bị từ chối miễn phí, trước khi báo giá.
+- **Chi phí chính:** gas trên Avalanche và chi phí truy cập nguồn dữ liệu (các nguồn công bố chính thức như HNX là miễn phí).
+- Hiện chỉ chạy testnet. Khi chạy thật với khách hàng tại Việt Nam, thanh toán và doanh thu phải tuân theo quy định ở mục "Pháp lý tại Việt Nam" (ví dụ thu phí bằng VND qua kênh hợp pháp).
+
 ## Chạy thử
 
 ```bash
@@ -157,7 +207,11 @@ Hardhat biên dịch bằng `solc` lấy từ npm (`node_modules/solc`), nên ch
 ### Deploy lên Fuji
 
 1. Lấy test AVAX và test USDC: https://faucet.circle.com, https://team1vn.xyz/faucet.html
-2. `cp .env.example .env`, rồi điền `DEPLOYER_PRIVATE_KEY`, `TREASURY_ADDRESS`, `APPROVER_ADDRESS`, `GUARDIAN_ADDRESS`
+2. `cp .env.example .env`, rồi điền:
+   - `DEPLOYER_PRIVATE_KEY` (ví chủ hũ, chỉ dùng để deploy và đổi quy tắc), `TREASURY_ADDRESS`, `APPROVER_ADDRESS`, `GUARDIAN_ADDRESS`
+   - `AGENT_PRIVATE_KEY` (ví agent, chỉ trả gas), `APPROVER_PRIVATE_KEY` (khoá duyệt của bot), `FACILITATOR_PRIVATE_KEY` (ví neo biên nhận, nên là **ví riêng**, không dùng chung với ví chủ)
+   - Tuỳ chọn: `TREASURY_PRIVATE_KEY` (hoàn tiền), `GUARDIAN_PRIVATE_KEY` (`/lock`)
+   - Mỗi ví cần khoảng 0,05 test AVAX để trả gas
 3. `npm run deploy:fuji`, rồi chép địa chỉ in ra vào `.env`
 4. Gửi test USDC vào `JAR_ADDRESS`
 5. `npm run dev`, sau đó ở terminal khác chạy `npm run demo:agent -- "US CPI rose last month" macro_whitehouse`
@@ -180,6 +234,7 @@ Muốn dùng `/lock`, điền thêm `GUARDIAN_PRIVATE_KEY` (ví GUARDIAN cần k
 - **Không giá mục tiêu, không khuyến nghị mua/bán, không dự báo.** Câu hỏi kiểu "có nên mua…" nhận `REFUSE`.
 - **Giá `upto`:** `base + perSource × số nguồn độc lập đã giao`, có trần. Phần chênh (`refundDue`) được TREASURY chuyển lại về hũ on-chain ngay sau khi trả lời (khi đã cấu hình `TREASURY_PRIVATE_KEY`).
 - **Từ chối không tính tiền.** Câu "có nên mua…", giá mục tiêu hay "kèo" bị từ chối trước khi báo giá 402.
+- **Thiếu bằng chứng vẫn tính phí cơ bản.** `MISSING_EVIDENCE` giữ 0,05 USDC phí cơ bản và hoàn phần còn lại (ví dụ ca NATO: trả 0,45, hoàn 0,40). Không có chuyện "hoàn toàn bộ khi thất bại".
 - **Người duyệt cuối cùng là con người.** Phiếu duyệt không ai trả lời sẽ tự bị từ chối, và chỉ chủ hũ mới mở lại được hũ đã khoá.
 
 ## Giới hạn
@@ -187,27 +242,52 @@ Muốn dùng `/lock`, điền thêm `GUARDIAN_PRIVATE_KEY` (ví GUARDIAN cần k
 - **Không phải tư vấn tài chính hay đầu tư.** Lotus chấm *nhận định*, không chấm con người, và không đưa giá mục tiêu.
 - **Chỉ chạy testnet (Avalanche Fuji, test USDC).** Tài sản mã hoá không phải phương tiện thanh toán hợp pháp tại Việt Nam. Lotus không nhận tiền gửi và không hứa lợi nhuận.
 - **Trên chuỗi chỉ lưu hash**, không lưu tên, nội dung nhận định hay nội dung nguồn.
-- **Một bàn sống** (chứng khoán VN qua RSS công bố của HNX). Bốn bàn còn lại dùng **fixture được ghi rõ là dữ liệu mẫu** (`deskLive: false`, mỗi mục có `synthetic: true`).
-- Bàn sống đọc RSS công bố của HNX (gồm cả sàn UPCoM), rồi mở trang công bố để lấy mã cổ phiếu được nhắc trong nội dung tin (dạng *"cổ phiếu XXX"*). Văn bản doanh nghiệp tự nộp không ghi mã thì bị bỏ qua. Mã niêm yết trên HOSE (như HPG) chưa có trong bàn này nên luôn ra `MISSING EVIDENCE`. Lotus không bao giờ đoán.
+- **Một bàn sống** (chứng khoán VN qua công bố chính thức của HNX và HOSE). Bốn bàn còn lại dùng **fixture được ghi rõ là dữ liệu mẫu** (`deskLive: false`, mỗi mục có `synthetic: true`).
+- Bàn sống đọc RSS công bố của HNX (gồm cả sàn UPCoM), rồi mở trang công bố để lấy mã cổ phiếu được nhắc trong nội dung tin (dạng *"cổ phiếu XXX"*). Văn bản doanh nghiệp tự nộp không ghi mã thì bị bỏ qua. Mã niêm yết trên HOSE (như GDA, HPG) lấy từ API tin tổ chức niêm yết của hsx.vn; tin chỉ được tính khi tiêu đề bắt đầu đúng bằng mã đó (`GDA: …`), trong cửa sổ 120 giờ. Kiểm tra từ máy của bạn: `npm run hose -- GDA "cổ tức"`. Lotus không bao giờ đoán.
+- **Vì sao không cộng HNX + HOSE + UBCKNN:** mỗi mã chỉ niêm yết ở một sàn, nên HNX và HOSE không bao giờ cùng ủng hộ một mã. Cổng công bố thông tin của UBCKNN hiển thị lại chính các văn bản doanh nghiệp đã nộp qua hệ thống một đầu mối, nên theo quy tắc độc lập của Lotus đó là bản sao (gộp thành một nguồn), không phải nguồn thứ hai. Nguồn chính thức độc lập thật sự cho sự kiện quyền là thông báo ngày đăng ký cuối cùng của VSDC: đây là bước tiếp theo trong lộ trình.
 - Danh sách nguồn là ứng viên đã xác minh *tồn tại* ngày 12/11/2026, không phải cam kết độ tin cậy.
 - Chưa kiểm chứng feed oracle nào đang chạy trên Fuji. Bộ chặn lệch giá (`src/buyer/oracle.ts`) chỉ dùng cho hũ lệnh tuỳ chọn, và đó không phải tín hiệu giao dịch.
-- Nhóm không phải luật sư và chưa kiểm chứng văn bản pháp luật hiện hành. Các câu hỏi về phạm vi pháp lý và điều kiện dự thi đã gửi ban tổ chức qua nhóm Builders Telegram và **đang chờ trả lời**. Mục này sẽ được cập nhật khi có câu trả lời.
+- Phần pháp lý tại Việt Nam: xem mục riêng bên dưới.
 - Thanh toán qua scheme `exact` và qua facilitator x402 bên ngoài **chưa được chạy thật** (xem bảng thành phần ở trên).
 - Demo công khai chạy ở chế độ chỉ đọc: người xem không thấy các khoản chờ duyệt và không duyệt chi được.
+
+## Pháp lý tại Việt Nam
+
+Nhóm không phải luật sư. Dưới đây là các quy định nhóm đã đối chiếu (cập nhật 19/11/2026) và cách Lotus được thiết kế để nằm ngoài phạm vi cần cấp phép.
+
+| Vấn đề | Quy định | Lotus làm gì |
+|---|---|---|
+| **Tư vấn đầu tư chứng khoán có thu phí** | Tư vấn đầu tư chứng khoán là nghiệp vụ kinh doanh của công ty chứng khoán, phải được Uỷ ban Chứng khoán Nhà nước cấp phép (Điều 72, Luật Chứng khoán 54/2019/QH14) | Lotus **không tư vấn**: chỉ chấm bằng chứng cho một nhận định đã có, không khuyến nghị mua/bán, không giá mục tiêu, không dự báo. Câu hỏi kiểu "có nên mua" bị từ chối miễn phí (`REFUSE`). Mọi kết quả kèm câu miễn trừ. Nếu thương mại hoá dịch vụ có yếu tố tư vấn, cần hợp tác với công ty chứng khoán có giấy phép |
+| **Tài sản mã hoá** | Luật Công nghiệp công nghệ số (hiệu lực 01/01/2026) công nhận tài sản số là tài sản. Nghị quyết 05/2025/NQ-CP thí điểm thị trường tài sản mã hoá trong 5 năm, giao dịch qua tổ chức được cấp phép. Nghị định 284/2026/NĐ-CP quy định xử phạt vi phạm hành chính về tài sản mã hoá | Lotus không phát hành token, không mua bán hay giữ hộ tài sản mã hoá cho người khác, không làm sàn |
+| **Phương tiện thanh toán** | Tài sản mã hoá và stablecoin không phải phương tiện thanh toán hợp pháp tại Việt Nam | Chỉ chạy testnet với test USDC không có giá trị. Bản thật cho khách tại Việt Nam sẽ thu phí bằng VND qua kênh hợp pháp, phần on-chain chỉ dùng cho khách và agent ở nước ngoài, hoặc trong khuôn khổ được phép |
+| **Lương nhân sự** | Tiền lương trả cho người lao động Việt Nam phải bằng VND; chỉ người lao động nước ngoài tại Việt Nam mới có thể nhận bằng ngoại tệ (khoản 2 Điều 95, Bộ luật Lao động 2019) | Lương đội ngũ trả bằng VND qua ngân hàng, không trả bằng USDC hay token |
+| **Dữ liệu cá nhân** | Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân | Trên chuỗi chỉ lưu hash, không lưu tên, nội dung nhận định hay thông tin người dùng |
+
+Nguồn: [Luật Chứng khoán 2019, Điều 72](https://lsvn.vn/dieu-kien-duoc-cap-phep-va-hoat-dong-cua-cong-ty-chung-khoan1616341455-a101930.html) · [Bộ luật Lao động 2019, Điều 95](https://pbgdpl.moj.gov.vn/qt/tintuc/Lists/ToGap/Attachments/345/To%20gap%2010%20-%20tIEN%20LUONG.pdf) · [Luật Công nghiệp công nghệ số](https://www.sggp.org.vn/thi-truong-tai-san-so-chay-nuoc-rut-post833070.html) · [Nghị quyết 05/2025/NQ-CP](https://luatvietnam.vn/tin-van-ban-moi/tai-toan-van-nghi-quyet-05-2025-nq-cp-ve-trien-khai-thi-diem-thi-truong-tai-san-ma-hoa-186-103979-article.html) · [Nghị định 284/2026/NĐ-CP](https://luatvietnam.vn/bai-viet-lien-quan/nghi-quyet-05-2025-nq-cp-410830.html)
+
+## Đội
+
+Tên dự án thống nhất là **Lotus** (repo, web, form và slide).
+
+| Thành viên | Vai trò |
+|---|---|
+| Phạm Nguyễn Khang | ĐIỀN_VAI_TRÒ |
+| ĐIỀN_TÊN | ĐIỀN_VAI_TRÒ |
 
 ## Cấu trúc
 
 ```
-contracts/      LotusJar, LotusJarFactory, LotusReceipts (+ MockToken cho test)
+contracts/      LotusJar, LotusJarFactory, LotusReceipts, LotusInbox (+ MockToken cho test)
 src/engine/     desks (allowlist 5 bàn), patterns, score (bộ quy tắc)
 src/x402/       quote + verify (exact / lotus-jar), kết nối Fuji, chain giả cho test
-src/agent/      runner (luồng của agent mua bằng chứng), hub (hàng chờ duyệt), jar (đọc/khoá/hoàn tiền)
+src/agent/      runner (luồng của agent mua bằng chứng), hub (hàng chờ duyệt), jar (đọc/khoá/hoàn tiền), refunds (hoàn bù), wallets (ba ví, sweep)
+src/rules/      đọc quy tắc chi tiêu tiếng Việt/Anh, mô phỏng, tạo lệnh cho chủ hũ
 src/telegram/   bot Telegram (Bot API qua fetch, không thêm thư viện)
 src/web/        dashboard (một file HTML)
 src/buyer/      preflight, chặn lệch oracle
 src/evidence/   FixtureProvider, HnxRssProvider
 src/ledger.ts   sổ biên nhận băm nối tiếp
 redteam/        22 kịch bản + runner
-scripts/        deploy + verify Fuji, client demo cho agent, quản trị hũ, duyệt công bố HNX
+scripts/        deploy + verify Fuji, client demo cho agent, quản trị hũ, duyệt công bố HNX (`npm run hnx`) và HOSE (`npm run hose`)
 docs/           DEPLOY.md (đưa demo lên public)
 ```

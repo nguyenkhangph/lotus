@@ -10,7 +10,7 @@ import path from "path";
 import { JsonRpcProvider } from "ethers";
 import { createApp } from "./app";
 import { loadConfig } from "./config";
-import { DeskRouter, FixtureProvider, HnxRssProvider } from "./evidence/providers";
+import { DeskRouter, FixtureProvider, VnExchangeProvider } from "./evidence/providers";
 import { Ledger } from "./ledger";
 import { ApprovalHub } from "./agent/hub";
 import { readWallets } from "./agent/wallets";
@@ -52,7 +52,7 @@ export function buildPublicApp(env: NodeJS.ProcessEnv = process.env) {
     cfg,
     chain,
     ledger,
-    evidence: new DeskRouter({ vn_stocks: new HnxRssProvider() }, new FixtureProvider()),
+    evidence: new DeskRouter({ vn_stocks: new VnExchangeProvider() }, new FixtureProvider()),
   });
   const jarAddr = env.JAR_ADDRESS ?? "0x805113113EC069205f59d72137c01244BfAA9619";
   app.use(
