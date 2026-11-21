@@ -19,7 +19,7 @@
     "hose": "node --use-system-ca -r ts-node/register/transpile-only scripts/hose.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Đội Lotus — Đinh Thị Lan Anh, Nguyễn Minh Huy (Trường Đại học Sài Gòn)",
   "license": "MIT",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",

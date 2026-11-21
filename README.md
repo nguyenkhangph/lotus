@@ -1,7 +1,7 @@
 # Lotus 🪷
 
 **Lotus chấm bằng chứng đằng sau các nhận định thị trường**, trả phí theo kiểu x402 bằng test USDC trên **Avalanche Fuji**.
-Khi không kiểm chứng được, Lotus trả `MISSING EVIDENCE`. Từ chối trả lời là một kết quả hợp lệ.
+Không đủ bằng chứng thì Lotus trả `MISSING EVIDENCE` thay vì đoán; câu hỏi mua/bán bị từ chối miễn phí.
 
 > Hoa sen mọc từ bùn mà không nhuốm bùn. Lotus lọc bằng chứng sạch giữa bùn tin đồn, "kèo" và tin giả.
 
@@ -9,7 +9,7 @@ Bài dự thi **Team1 Vietnam UniHack 2026** (Avalanche). Hạn nộp: 21/11/202
 
 **Demo công khai (chỉ đọc):** https://lotus-azure-ten.vercel.app
 
-**Video demo:** ĐIỀN_LINK_VIDEO · **Slide pitch:** ĐIỀN_LINK_SLIDE
+**Video demo (2:56, tiếng Việt):** https://drive.google.com/file/d/1eJMHXSc6XAv1XTA0VYitlEfWQ4PpnYid/view?usp=sharing · **Slide pitch:** https://docs.google.com/presentation/d/1FqwX6q6E2lgV85YN72tTxSpjguBbg3sxzPc_0wwBlOY/view?usp=sharing
 
 Thử API (trả về HTTP 402 kèm điều khoản x402):
 
@@ -117,7 +117,7 @@ Người dùng ─► Agent (không giữ khoá) ─► POST /v1/score ─► 40
 
 ## Đang chạy trên Avalanche Fuji
 
-Bốn hợp đồng đều **đã verify mã nguồn (Exact Match)** trên Snowtrace:
+Cả bốn hợp đồng đã verify mã nguồn (Exact Match) trên Snowtrace:
 
 | Hợp đồng | Địa chỉ |
 |---|---|
@@ -263,7 +263,7 @@ Nhóm không phải luật sư. Dưới đây là các quy định nhóm đã đ
 | **Lương nhân sự** | Tiền lương trả cho người lao động Việt Nam phải bằng VND; chỉ người lao động nước ngoài tại Việt Nam mới có thể nhận bằng ngoại tệ (khoản 2 Điều 95, Bộ luật Lao động 2019) | Lương đội ngũ trả bằng VND qua ngân hàng, không trả bằng USDC hay token |
 | **Dữ liệu cá nhân** | Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân | Trên chuỗi chỉ lưu hash, không lưu tên, nội dung nhận định hay thông tin người dùng |
 
-Nguồn: [Luật Chứng khoán 2019, Điều 72](https://lsvn.vn/dieu-kien-duoc-cap-phep-va-hoat-dong-cua-cong-ty-chung-khoan1616341455-a101930.html) · [Bộ luật Lao động 2019, Điều 95](https://pbgdpl.moj.gov.vn/qt/tintuc/Lists/ToGap/Attachments/345/To%20gap%2010%20-%20tIEN%20LUONG.pdf) · [Luật Công nghiệp công nghệ số](https://www.sggp.org.vn/thi-truong-tai-san-so-chay-nuoc-rut-post833070.html) · [Nghị quyết 05/2025/NQ-CP](https://luatvietnam.vn/tin-van-ban-moi/tai-toan-van-nghi-quyet-05-2025-nq-cp-ve-trien-khai-thi-diem-thi-truong-tai-san-ma-hoa-186-103979-article.html) · [Nghị định 284/2026/NĐ-CP](https://luatvietnam.vn/bai-viet-lien-quan/nghi-quyet-05-2025-nq-cp-410830.html)
+Nguồn: [Luật Chứng khoán 2019, Điều 72](https://lsvn.vn/dieu-kien-duoc-cap-phep-va-hoat-dong-cua-cong-ty-chung-khoan1616341455-a101930.html) · [Bộ luật Lao động 2019, Điều 95](https://vanban.org/van-ban/bo-luat-lao-dong-2019-45-2019-qh14/dieu-95) · [Luật Công nghiệp công nghệ số](https://www.sggp.org.vn/thi-truong-tai-san-so-chay-nuoc-rut-post833070.html) · [Nghị quyết 05/2025/NQ-CP](https://luatvietnam.vn/tin-van-ban-moi/tai-toan-van-nghi-quyet-05-2025-nq-cp-ve-trien-khai-thi-diem-thi-truong-tai-san-ma-hoa-186-103979-article.html) · [Nghị định 284/2026/NĐ-CP](https://luatvietnam.vn/bai-viet-lien-quan/nghi-quyet-05-2025-nq-cp-410830.html)
 
 ## Đội
 
@@ -289,7 +289,7 @@ src/rules/      đọc quy tắc chi tiêu tiếng Việt/Anh, mô phỏng, tạ
 src/telegram/   bot Telegram (Bot API qua fetch, không thêm thư viện)
 src/web/        dashboard (một file HTML)
 src/buyer/      preflight, chặn lệch oracle
-src/evidence/   FixtureProvider, HnxRssProvider
+src/evidence/   FixtureProvider, HnxRssProvider (HNX/UPCoM), HoseNewsProvider (HOSE), VnExchangeProvider (chọn sàn theo mã)
 src/ledger.ts   sổ biên nhận băm nối tiếp
 redteam/        22 kịch bản + runner
 scripts/        deploy + verify Fuji, client demo cho agent, quản trị hũ, duyệt công bố HNX (`npm run hnx`) và HOSE (`npm run hose`)
