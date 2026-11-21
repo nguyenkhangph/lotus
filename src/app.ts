@@ -53,7 +53,7 @@ export function createApp(d: AppDeps) {
           network: d.cfg.network,
           chainId: d.cfg.chainId,
           payTo: d.cfg.treasury,
-          schemes: ["exact", ...(d.cfg.jarFactory ? ["lotus-jar"] : [])],
+          schemes: [...(d.cfg.jarFactory ? ["lotus-jar"] : []), "exact"],
         },
       ],
       desks: Object.values(DESKS).map((x) => ({ id: x.id, name: x.name, live: x.live, sources: x.sources.length })),

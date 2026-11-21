@@ -3,11 +3,10 @@
 <head>
 <script>
 (function(){var d=document.documentElement;try{var sp=new URLSearchParams(location.search),q=sp.get("theme"),ql=sp.get("lang"),s=null,sl=null;try{s=localStorage.getItem("lotus-theme");sl=localStorage.getItem("lotus-lang")}catch(e){}
-var t=(q==="vn"||q==="default")?q:(s==="vn"||s==="default")?s:"default";
+var t="default";try{localStorage.removeItem("lotus-theme")}catch(e){}
 var l=(ql==="vi"||ql==="en")?ql:(sl==="vi"||sl==="en")?sl:"vi";
-if(ql==="en"&&q!=="vn")t="default";if(t==="vn")l="vi";
 d.setAttribute("data-theme",t);d.setAttribute("data-lang",l);d.setAttribute("lang",l);
-try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)localStorage.setItem("lotus-lang",l)}catch(e){}}catch(e){d.setAttribute("data-theme","default");d.setAttribute("data-lang","vi")}})();
+try{if(ql)localStorage.setItem("lotus-lang",l)}catch(e){}}catch(e){d.setAttribute("data-theme","default");d.setAttribute("data-lang","vi")}})();
 </script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -612,12 +611,6 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
         <span class="theme-switch-sep" aria-hidden="true">|</span>
         <button type="button" id="langVi" aria-pressed="true">VI</button>
       </div>
-      <div class="theme-switch" role="group" aria-label="Theme">
-        <span class="theme-switch-k"><span data-vi="Giao diện">Theme</span></span>
-        <button type="button" id="themeDefault" data-theme-set="default" aria-pressed="true"><span data-vi="Mặc định">Default</span></button>
-        <span class="theme-switch-sep" aria-hidden="true">|</span>
-        <button type="button" id="themeVn" data-theme-set="vn" aria-pressed="false"><span data-vi="Việt Nam">Vietnam</span></button>
-      </div>
       <div id="badges"></div>
     </div>
   </div>
@@ -702,6 +695,13 @@ try{if(q==="vn"||q==="default")localStorage.setItem("lotus-theme",t);if(ql)local
     <div class="grid">
       <div>
         <div class="card" id="jarCard"><h3><span class="t-default"><span data-vi="Hũ bằng chứng">Evidence jar</span></span><span class="t-vn">Hũ Âu Cơ</span></h3><div class="empty"><span class="t-default"><span data-vi="Đang đọc hũ trên Fuji…">Reading the jar on Fuji…</span></span><span class="t-vn">Đang đọc Hũ Âu Cơ trên Fuji…</span></div></div>
+
+        <div class="card" id="demoCard" style="display:none">
+          <h3><span data-vi="Giám khảo chấm thử (miễn phí)">Try it as a judge (free)</span></h3>
+          <p class="muted" style="margin:0 0 10px;font-size:14px"><span data-vi="Bấm một nhận định mẫu để xem Lotus chấm. Không trả tiền, không ghi biên nhận, không gửi gì lên chuỗi. Luồng có trả phí vẫn là API 402 bên dưới.">Tap a sample claim to see Lotus score it. No payment, no receipt, nothing is sent on-chain. The paid flow is still the 402 API below.</span></p>
+          <div class="chips" id="demoSamples"></div>
+          <div id="demoResult" class="empty" style="text-align:left"></div>
+        </div>
 
         <div class="card" id="roNote" style="display:none">
           <h3><span data-vi="Demo công khai">Public demo</span></h3>
@@ -1085,6 +1085,8 @@ async function refresh() {
     }
     $("askCard").style.display = s.readOnly ? "none" : "";
     $("roNote").style.display = s.readOnly ? "" : "none";
+    $("demoCard").style.display = s.demoMode ? "" : "none";
+    if (s.demoMode) loadDemoSamples();
     lastState = s; badges(s); ticker(s); jar(s); if (!document.activeElement || document.activeElement.id !== "invAmt") wallets(s); pending(s); runs(s); ledger(s); redteam(s); contracts(s);
   } catch (e) { console.error(e); }
 }
@@ -1099,14 +1101,41 @@ $("ask").onclick = async () => {
   if (!r.ok) toast((await r.json()).error);
   $("ask").disabled = false; refresh();
 };
+// ---- judge demo (DEMO_MODE=1): fixed sample claims, free, nothing on-chain
+let demoSamples = null;
+async function loadDemoSamples() {
+  if (demoSamples) return;
+  try {
+    const j = await (await fetch("/api/demo/samples")).json();
+    demoSamples = j.samples || [];
+    $("demoSamples").innerHTML = demoSamples.map((x) => `<button class="chipbtn" data-id="${esc(x.id)}" title="${esc(L(x.note.en, x.note.vi))}">${esc(x.claim)}</button>`).join("");
+  } catch (e) { demoSamples = null; }
+}
+$("demoSamples").onclick = async (e) => {
+  const id = e.target.closest("button")?.dataset.id; if (!id) return;
+  const box = $("demoResult");
+  box.innerHTML = esc(L("Scoring…", "Đang chấm…"));
+  try {
+    const r = await fetch("/api/demo/score", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sample: id }) });
+    const j = await r.json();
+    if (!r.ok) { box.innerHTML = esc(j.error || r.status); return; }
+    const label = (VLABEL[currentLang()] || VLABEL.en)[j.verdict] || j.verdict;
+    const ev = (j.evidence || []).slice(0, 5).map((x) => `<li>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noreferrer">${esc(x.handle || x.platform)}</a>` : esc(x.handle || x.platform)} · ${esc(x.stance)}${x.synthetic ? " · " + esc(L("sample data", "dữ liệu mẫu")) : ""}<br><span class="muted">${esc(String(x.text).slice(0, 140))}</span></li>`).join("");
+    box.innerHTML = (j.sourceError ? `<p style="margin:8px 0"><b>${esc(L("Live source unreachable right now: no score shown", "Nguồn trực tiếp tạm thời không truy cập được: chưa chấm"))}</b></p>` : `<p style="margin:8px 0"><b>${esc(label)}</b> · ${esc(L("score", "điểm"))} ${esc(j.score)}/100 · ${esc(L("independent sources", "nguồn độc lập"))} ${esc(j.independentSupport)} · ${esc(L("echo index", "chỉ số buồng vang"))} ${esc(j.echoIndex)}</p>`)
+      + `<p class="muted" style="margin:4px 0">${esc(L(j.note.en, j.note.vi))}${j.deskLive ? "" : " · " + esc(L("desk runs on sample data", "bàn này dùng dữ liệu mẫu"))}</p>`
+      + (j.reasonCodes && j.reasonCodes.length ? `<p class="muted" style="margin:4px 0">${esc(j.reasonCodes.join(", "))}</p>` : "")
+      + (ev ? `<ul style="margin:6px 0 0;padding-left:18px;font-size:13px">${ev}</ul>` : "")
+      + (j.sourceError ? `<p class="muted">${esc(j.sourceError)}</p>` : "")
+      + (j.lastPaidReceipt ? `<p style="margin:6px 0">${esc(L("Last real paid check of this claim", "Lần chấm có trả phí thật gần nhất"))}: ${esc(L("receipt", "biên nhận"))} #${esc(j.lastPaidReceipt.index)} · <b>${esc((VLABEL[currentLang()] || VLABEL.en)[j.lastPaidReceipt.verdict] || j.lastPaidReceipt.verdict)}</b> ${esc(j.lastPaidReceipt.score)}/100${j.lastPaidReceipt.paymentTx ? ` · <a href="${esc((lastState && lastState.explorer) || "https://testnet.snowtrace.io")}/tx/${esc(j.lastPaidReceipt.paymentTx)}" target="_blank" rel="noreferrer">${esc(L("payment on Snowtrace", "giao dịch trên Snowtrace"))}</a>` : ""}</p>` : "")
+      + `<p class="muted" style="margin:8px 0 0;font-size:12px">${esc(L("Free demo: 0 USDC charged, no receipt, nothing on-chain.", "Demo miễn phí: 0 USDC, không biên nhận, không gửi gì lên chuỗi."))}</p>`;
+  } catch (err) { box.innerHTML = esc(String(err)); }
+};
 $("examples").innerHTML = EXAMPLES.map(([c], i) => `<button class="chipbtn" data-i="${i}">${esc(c)}</button>`).join("");
 $("examples").onclick = (e) => { const i = e.target.dataset.i; if (i === undefined) return; $("claim").value = EXAMPLES[i][0]; $("desk").value = EXAMPLES[i][1]; };
 $("curl").textContent = CURL();
 const oneLine = () => CURL().replace(/\\\n\s*/g, "");
 $("copyCurl").onclick = () => copyText(oneLine(), L("curl command copied", "Đã sao chép lệnh curl"));
 $("tryApi").onclick = () => { const n = $("roNote"); if (n.style.display !== "none") n.scrollIntoView({ behavior: "smooth", block: "center" }); copyText(oneLine(), L("curl command copied", "Đã sao chép lệnh curl")); };
-$("themeDefault").onclick = () => setTheme("default");
-$("themeVn").onclick = () => setTheme("vn");
 $("langEn").onclick = () => setLang("en");
 $("langVi").onclick = () => setLang("vi");
 

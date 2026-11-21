@@ -77,13 +77,16 @@ export class QuoteBook {
         maxSources: this.cfg.pricing.maxSources,
       },
     };
+    // The scheme that has real Fuji transactions (lotus-jar) goes first, so a standard x402 client
+    // that picks accepts[0] does not land on `exact`, which has not been run on Fuji yet.
+    const exact: PaymentRequirement = { scheme: "exact", ...common, extra };
     const accepts: PaymentRequirement[] = [
-      { scheme: "exact", ...common, extra },
       ...(this.cfg.jarFactory
         ? [{ scheme: "lotus-jar" as const, ...common, extra: { ...extra, jarFactory: this.cfg.jarFactory } }]
         : []),
+      exact,
     ];
-    q.exact = accepts[0];
+    q.exact = exact;
     this.quotes.set(q.id, q);
     return { quote: q, body: { x402Version: 1, error: "X-PAYMENT header is required", accepts } };
   }

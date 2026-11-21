@@ -17,6 +17,7 @@ import { readWallets } from "./agent/wallets";
 import { readJar } from "./agent/jar";
 import { EthersChain } from "./x402/chain";
 import { dashboardRouter } from "./web/dashboard";
+import { demoRouter } from "./web/demo";
 
 /** Serverless disks are read-only: copy the committed ledger snapshot to a writable temp file. */
 export function writableLedger(snapshot: string): Ledger {
@@ -48,12 +49,11 @@ export function buildPublicApp(env: NodeJS.ProcessEnv = process.env) {
   const chain = new EthersChain(cfg, undefined, { provider });
   const root = path.join(__dirname, "..");
   const ledger = writableLedger(path.join(root, env.LEDGER_SNAPSHOT ?? "data/demo/ledger.jsonl"));
-  const app = createApp({
-    cfg,
-    chain,
-    ledger,
-    evidence: new DeskRouter({ vn_stocks: new VnExchangeProvider() }, new FixtureProvider()),
-  });
+  const evidence = new DeskRouter({ vn_stocks: new VnExchangeProvider() }, new FixtureProvider());
+  const app = createApp({ cfg, chain, ledger, evidence });
+  // Judge demo: free scoring of fixed sample claims, no payment and nothing on-chain (off unless DEMO_MODE=1).
+  const demoMode = env.DEMO_MODE === "1";
+  if (demoMode) app.use(demoRouter({ evidence, ledger, limit: Number(env.DEMO_RATE_LIMIT ?? "10") }));
   const jarAddr = env.JAR_ADDRESS ?? "0x805113113EC069205f59d72137c01244BfAA9619";
   app.use(
     dashboardRouter({
@@ -65,6 +65,7 @@ export function buildPublicApp(env: NodeJS.ProcessEnv = process.env) {
       botEnabled: false,
       allowLocalApprove: false,
       publicDemo: true,
+      demoMode,
       treasury: cfg.treasury,
       refunds: readRefunds(path.join(root, "data/demo/refunds.json")),
       wallets: (j) => readWallets(cfg, provider, j, env.INBOX_ADDRESS || "0xd878Ba74d2bbc1AA4eA669578D13E94db202fA20"),

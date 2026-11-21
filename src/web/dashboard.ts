@@ -20,6 +20,8 @@ export type DashboardDeps = {
   allowLocalApprove: boolean;
   /** Public read-only demo (e.g. deployed or tunnelled): nobody gets full access without the token. */
   publicDemo?: boolean;
+  /** Free judge demo (fixed sample claims, nothing on-chain) is mounted: the page shows its card. */
+  demoMode?: boolean;
   /** Optional secret: `x-lotus-token` header or `?token=` gives full access (pending cards, ask, approve). */
   token?: string;
   /** Public contract addresses shown on the page. */
@@ -96,6 +98,7 @@ export function dashboardRouter(d: DashboardDeps): Router {
       wallets: walletsCache,
       desks: Object.values(DESKS).map((x) => ({ id: x.id, name: x.name, live: x.live })),
       readOnly: !full,
+      demoMode: Boolean(d.demoMode),
       canApproveHere: full && d.allowLocalApprove,
       // Public viewers see that something is waiting, never what or how much.
       pending: full ? d.hub.listPending() : [],

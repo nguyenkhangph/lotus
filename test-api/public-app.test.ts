@@ -21,7 +21,8 @@ describe("public (Vercel) app — read-only, no keys", () => {
   it("POST /v1/score answers 402 with x402 terms", async () => {
     const r = await request(app).post("/v1/score").send({ claim: "NATO has invoked Article 5", desk: "gold_war" });
     expect(r.status).to.equal(402);
-    expect(r.body.accepts.map((a: any) => a.scheme)).to.include("lotus-jar");
+    // lotus-jar (the scheme with real Fuji transactions) is offered first; exact stays as a fallback.
+    expect(r.body.accepts.map((a: any) => a.scheme)).to.deep.equal(["lotus-jar", "exact"]);
   });
 
   it("is read-only even for requests that look local", async () => {

@@ -7,9 +7,9 @@ Không đủ bằng chứng thì Lotus trả `MISSING EVIDENCE` thay vì đoán;
 
 Bài dự thi **Team1 Vietnam UniHack 2026** (Avalanche). Hạn nộp: 21/11/2026, 23:59 giờ Việt Nam. Giấy phép: [MIT](LICENSE).
 
-**Demo công khai (chỉ đọc):** https://lotus-azure-ten.vercel.app
+**Demo công khai (chỉ đọc):** https://lotus-azure-ten.vercel.app (tên miền riêng: https://lotusproof.xyz) · giám khảo bấm thử miễn phí ở mục **Giám khảo chấm thử** (không trả tiền, không gửi gì lên chuỗi)
 
-**Video demo (2:56, tiếng Việt):** https://drive.google.com/file/d/1eJMHXSc6XAv1XTA0VYitlEfWQ4PpnYid/view?usp=sharing · **Slide pitch:** https://docs.google.com/presentation/d/1FqwX6q6E2lgV85YN72tTxSpjguBbg3sxzPc_0wwBlOY/view?usp=sharing
+**Video demo (2:58, tiếng Việt):** https://drive.google.com/file/d/1L_TE8V9jqwdieqs1pum6dlb5uQ_x3y8o/view?usp=sharing · **Slide pitch:** https://docs.google.com/presentation/d/1FqwX6q6E2lgV85YN72tTxSpjguBbg3sxzPc_0wwBlOY/view?usp=sharing
 
 Thử API (trả về HTTP 402 kèm điều khoản x402):
 
@@ -19,7 +19,19 @@ curl -i -X POST https://lotus-azure-ten.vercel.app/v1/score \
   -d '{"claim":"FOX chia co tuc","desk":"vn_stocks"}'
 ```
 
-> ⚠️ **Đừng trả tiền vào bản demo này.** Đây là testnet và bản công khai chỉ để xem. Báo giá 402 có kèm scheme `exact`, nhưng scheme này chưa từng được chạy thật trên Fuji. Mọi giao dịch thật trong README đều đi qua scheme `lotus-jar`.
+> ⚠️ **Đừng trả tiền vào bản demo này.** Đây là testnet và bản công khai chỉ để xem. Báo giá 402 đưa scheme `lotus-jar` lên đầu; scheme `exact` vẫn được liệt kê làm phương án dự phòng nhưng chưa từng được chạy thật trên Fuji. Mọi giao dịch thật trong README đều đi qua scheme `lotus-jar`.
+
+## Tóm tắt cho giám khảo (1 phút)
+
+| Câu hỏi | Trả lời ngắn | Chi tiết |
+|---|---|---|
+| **Lotus là gì?** | API chấm bằng chứng cho nhận định thị trường. AI agent trả phí theo lượt qua HTTP 402 (x402) bằng test USDC trên Avalanche Fuji. Chỉ đếm nguồn độc lập; thiếu bằng chứng thì nói `MISSING_EVIDENCE`, không đoán. | [Lotus làm gì](#lotus-làm-gì) |
+| **Vì sao on-chain?** | Hạn mức chi của agent nằm trong hợp đồng `LotusJar` (giao dịch sai bị revert), biên nhận được băm nối chuỗi và neo trên `LotusReceipts`, agent trả cho agent từng khoản nhỏ bằng stablecoin. | [Vì sao cần on-chain](#vì-sao-cần-on-chain) |
+| **Vì sao Avalanche?** | Phí thấp và xác nhận nhanh trên C-Chain nên trả vài cent mỗi câu và hoàn phần thừa ngay là khả thi; EVM nên dùng được EIP-712/EIP-3009 và verify trên Snowtrace; USDC của Circle có sẵn trên Fuji. Hướng mở rộng: một Avalanche L1 riêng cho biên nhận khi khối lượng lớn (chưa làm). | [Vì sao chọn Avalanche](#vì-sao-chọn-avalanche) |
+| **Tiền từ đâu?** | Phí theo lượt: 0,05 USDC cơ bản + 0,05 USDC mỗi nguồn độc lập, trần 0,45 USDC, phần thừa hoàn on-chain. Người trả: trợ lý đầu tư AI, bộ phận phân tích dữ liệu, sàn và công ty dữ liệu. Không token, không lợi suất. | [Tiền đến từ đâu](#tiền-đến-từ-đâu) |
+| **Luật Việt Nam?** | Không tư vấn đầu tư (hỏi mua/bán bị từ chối miễn phí; tư vấn có thu phí cần giấy phép theo Điều 72 Luật Chứng khoán 2019). Crypto không phải phương tiện thanh toán hợp pháp: demo chỉ dùng test USDC, khách tại Việt Nam sẽ trả VND qua kênh hợp pháp. Lương đội trả bằng VND. Trên chuỗi chỉ lưu hash (Nghị định 13/2023). Không phát hành token, không làm sàn, không giữ tiền hộ. | [Pháp lý tại Việt Nam](#pháp-lý-tại-việt-nam) |
+| **Kiểm chứng ở đâu?** | 4 hợp đồng verify trên Snowtrace, 9 biên nhận thật (#5–#8 từ công bố thật của HNX), 3,40 USDC đã hoàn on-chain, 33 test hợp đồng + 56 test API, red team 28/28. | [Đang chạy trên Avalanche Fuji](#đang-chạy-trên-avalanche-fuji) |
+| **Khai báo trước (dev toggle / dữ liệu mẫu)** | 4 bàn ngoài chứng khoán VN dùng dữ liệu mẫu, có nhãn `SYNTHETIC`. Bản demo chạy khoá chủ hũ chung máy chủ với bot. Scheme `exact` chưa chạy thật trên Fuji. Mục "Giám khảo chấm thử" là demo miễn phí, không đi qua thanh toán. | [Giới hạn](#giới-hạn) |
 
 ### In English
 
@@ -30,21 +42,7 @@ Money moves only from a **policy-guarded jar contract** (`LotusJar`): per-tx/day
 
 ## Giao diện
 
-Demo mặc định bằng **tiếng Việt**. Nút **EN | VI** trên thanh điều hướng đổi sang tiếng Anh, có thể mở sẵn bằng `?lang=en`. Có hai giao diện (**Theme: Default | Vietnam**). Giao diện Việt Nam luôn dùng tiếng Việt, mở sẵn bằng `?theme=vn`; bấm EN trong giao diện này sẽ trở về giao diện mặc định. Trình duyệt nhớ lựa chọn (`localStorage`). Mục Quy tắc hiểu quy tắc viết bằng cả tiếng Anh lẫn tiếng Việt, và trả lời bằng ngôn ngữ đang chọn.
-
-Bản **Việt Nam** dùng phong cách đêm sơn mài và các tên ẩn dụ lịch sử (chỉ chữ trên trang, không đổi tên hợp đồng, scheme, route hay id bàn):
-
-| Mặc định | Bản Việt Nam | Chú thích ngắn (đúng sự thật; truyền thuyết được ghi rõ) |
-|---|---|---|
-| Hũ bằng chứng (`LotusJar`) | Hũ Âu Cơ | Truyền thuyết Lạc Long Quân–Âu Cơ: mẹ giữ của cho con |
-| Hạn mức / bộ quy tắc | Nam quốc sơn hà — hạn mức là ranh giới | Bài thơ được truyền là của Lý Thường Kiệt, trận Như Nguyệt 1077; tác quyền mang tính truyền thống |
-| Kill switch / khoá hũ | Cọc Bạch Đằng | Trận 938 (Ngô Quyền) và 1288 (Trần Hưng Đạo) |
-| Người duyệt | Hội nghị Diên Hồng | Năm 1284, Thượng hoàng Trần Thánh Tông triệu bô lão (đời vua Trần Nhân Tông) |
-| Sổ biên nhận (`LotusReceipts`) | Sổ Trống đồng | Văn hoá Đông Sơn, khoảng thế kỷ 7 TCN–thế kỷ 1/2 SCN; ẩn dụ dấu ấn, không phải sổ kế toán cổ |
-| Bảo vệ (guardian) | Thánh Gióng | Nhân vật truyền thuyết thời Hùng; chỉ khoá, không được chi |
-| Agent | Sứ giả Văn Lang | Văn Lang trong sử liệu truyền thống; sứ giả không cầm khoá quỹ |
-
-**Quỹ Lạc Hồng** chỉ hiện trên bản Việt Nam, ghi rõ là tầm nhìn: một ngăn tiết kiệm tách khỏi hũ chi tiêu, *chưa chạy*. Lotus không trả lãi, không hứa lợi suất và không đầu tư hộ. Dải “Từ Văn Lang đến Lotus” là phép liên tưởng văn hoá, không phải phả hệ của sản phẩm.
+Demo mặc định bằng **tiếng Việt**. Nút **EN | VI** trên thanh điều hướng đổi sang tiếng Anh, có thể mở sẵn bằng `?lang=en`. Trình duyệt nhớ lựa chọn (`localStorage`). Mục Quy tắc hiểu quy tắc viết bằng cả tiếng Anh lẫn tiếng Việt, và trả lời bằng ngôn ngữ đang chọn.
 
 ## Ba ví tách biệt
 
@@ -203,6 +201,10 @@ npm run verify:fuji   # verify mã nguồn hợp đồng trên Snowtrace
 Cần Node ≥ 22.15. Các script chạy với `--use-system-ca` vì `hnx.vn` không gửi kèm chứng chỉ trung gian: Windows và `curl` tự bù được, còn Node mặc định thì không.
 
 Hardhat biên dịch bằng `solc` lấy từ npm (`node_modules/solc`), nên chạy được cả khi mạng chặn binaries.soliditylang.org.
+
+### Demo cho giám khảo (`DEMO_MODE=1`)
+
+Bật biến môi trường `DEMO_MODE=1` (Vercel: Project → Settings → Environment Variables) để trang công khai hiện thẻ **Giám khảo chấm thử**: 5 nhận định mẫu cố định, chấm miễn phí qua `POST /api/demo/score` (`{"sample":"nato"}`), không nhận chữ tự do, không trả tiền, không ghi biên nhận, không gửi gì lên chuỗi, giới hạn `DEMO_RATE_LIMIT` (mặc định 10) lượt mỗi phút mỗi IP. Nếu nguồn công bố trực tiếp (HNX/HOSE) không truy cập được từ máy chủ, thẻ hiện biên nhận trả phí thật gần nhất của chính nhận định đó (vd. biên nhận #6, FOX). Tắt biến này thì các route demo biến mất. Test: `test-api/demo-mode.test.ts`.
 
 ### Deploy lên Fuji
 
