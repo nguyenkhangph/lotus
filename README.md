@@ -269,10 +269,14 @@ Nguồn: [Luật Chứng khoán 2019, Điều 72](https://lsvn.vn/dieu-kien-duoc
 
 Tên dự án thống nhất là **Lotus** (repo, web, form và slide).
 
+Đội đến từ **Trường Đại học Sài Gòn**.
+
 | Thành viên | Vai trò |
 |---|---|
-| Phạm Nguyễn Khang | ĐIỀN_VAI_TRÒ |
-| ĐIỀN_TÊN | ĐIỀN_VAI_TRÒ |
+| Đinh Thị Lan Anh | Thí sinh |
+| Nguyễn Minh Huy | Thí sinh |
+| Phạm Nguyên Khang | Mentor |
+| Bùi Hoàng Long | Mentor |
 
 ## Cấu trúc
 
